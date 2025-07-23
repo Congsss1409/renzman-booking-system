@@ -9,6 +9,7 @@ use App\Models\Service;
 use App\Models\Therapist;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB; // Import the DB facade
 
 class AdminController extends Controller
 {
@@ -73,7 +74,6 @@ class AdminController extends Controller
             'end_time' => $endTime,
             'price' => $service->price,
             'status' => 'Confirmed',
-            // Note: We are not creating a feedback token for admin-created bookings
         ]);
 
         return redirect()->route('admin.dashboard')->with('success', 'New booking created successfully.');
@@ -92,12 +92,47 @@ class AdminController extends Controller
      */
     public function feedback()
     {
-        // Get only the bookings that have a rating
         $feedbacks = Booking::with('therapist', 'service', 'branch')
                             ->whereNotNull('rating')
                             ->orderBy('start_time', 'desc')
                             ->get();
         
         return view('admin.feedback', compact('feedbacks'));
+    }
+
+    /**
+     * Show the analytics and reports page.
+     */
+    public function analytics()
+    {
+        // 1. Key Performance Indicators (KPIs)
+        $totalBookings = Booking::count();
+        $totalRevenue = Booking::where('status', '!=', 'Cancelled')->sum('price');
+        $averageRating = Booking::whereNotNull('rating')->avg('rating');
+
+        // 2. Most Popular Services
+        $popularServices = Booking::select('service_id', DB::raw('count(*) as total'))
+                                    ->groupBy('service_id')
+                                    ->with('service')
+                                    ->orderBy('total', 'desc')
+                                    ->take(5)
+                                    ->get();
+
+        // 3. Busiest Therapists
+        $busiestTherapists = Booking::select('therapist_id', DB::raw('count(*) as total'))
+                                      ->where('status', '!=', 'Cancelled')
+                                      ->groupBy('therapist_id')
+                                      ->with('therapist')
+                                      ->orderBy('total', 'desc')
+                                      ->take(5)
+                                      ->get();
+
+        return view('admin.analytics', compact(
+            'totalBookings',
+            'totalRevenue',
+            'averageRating',
+            'popularServices',
+            'busiestTherapists'
+        ));
     }
 }

@@ -4,19 +4,7 @@
 @section('content')
 <div class="container mx-auto p-4 sm:p-6 lg:p-8 max-w-2xl">
     <div class="bg-white p-6 sm:p-8 rounded-2xl shadow-lg">
-
         <h1 class="text-2xl sm:text-3xl font-bold text-center text-emerald-700 mb-8">Step 4: Confirm Your Details</h1>
-
-        @if($errors->any())
-            <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6" role="alert">
-                <p class="font-bold">Please correct the following errors:</p>
-                <ul>
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
 
         <!-- Booking Summary -->
         <div class="bg-gray-50 p-6 rounded-lg border mb-8">
@@ -51,7 +39,7 @@
             <div class="mt-8 flex justify-between items-center">
                 <a href="{{ route('booking.create.step-three') }}" class="text-gray-600 hover:text-emerald-700">&larr; Back to Date & Time</a>
                 <button type="submit" class="bg-emerald-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-emerald-700 transition-colors shadow-md">
-                    Confirm & Book Appointment
+                    Proceed to Payment &rarr;
                 </button>
             </div>
         </form>

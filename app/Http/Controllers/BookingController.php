@@ -11,7 +11,7 @@ use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\BookingConfirmed;
-use Illuminate\Support\Str; // Import the Str facade to generate UUIDs
+use Illuminate\Support\Str;
 
 class BookingController extends Controller
 {
@@ -92,31 +92,78 @@ class BookingController extends Controller
         return view('booking.step-four', compact('booking', 'branch', 'service', 'therapist'));
     }
 
-    // Step 4: Store Final Booking
+    // Step 4: Store Client Details and Proceed to Payment
     public function storeStepFour(Request $request)
     {
-        $validated = $request->validate(['client_name' => 'required|string|max:255', 'client_email' => 'required|email|max:255', 'client_phone' => 'required|string|max:20']);
+        $validated = $request->validate([
+            'client_name' => 'required|string|max:255',
+            'client_email' => 'required|email|max:255',
+            'client_phone' => 'required|string|max:20',
+        ]);
+
+        $booking = $request->session()->get('booking');
+        $booking->client_name = $validated['client_name'];
+        $booking->client_email = $validated['client_email'];
+        $booking->client_phone = $validated['client_phone'];
+        $request->session()->put('booking', $booking);
+
+        return redirect()->route('booking.create.step-five');
+    }
+
+    // Step 5: Show Payment Page
+    public function createStepFive(Request $request)
+    {
+        $booking = $request->session()->get('booking');
+        if (empty($booking->client_name)) {
+            return redirect()->route('booking.create.step-four');
+        }
+        $service = Service::find($booking->service_id);
+        return view('booking.step-five', compact('booking', 'service'));
+    }
+
+    // Step 5: Store Payment Method and Finalize Booking
+    public function storeStepFive(Request $request)
+    {
+        $validated = $request->validate([
+            'payment_method' => 'required|string|in:GCash,Maya,On-Site',
+        ]);
+
         $bookingData = $request->session()->get('booking');
         $service = Service::find($bookingData->service_id);
         $startTime = Carbon::parse($bookingData->date . ' ' . $bookingData->time);
         $endTime = $startTime->copy()->addMinutes($service->duration);
 
+        // Calculate Downpayment and Balance
+        $downpaymentAmount = 0;
+        $remainingBalance = $service->price;
+        $paymentStatus = 'Pending';
+
+        if ($validated['payment_method'] !== 'On-Site') {
+            // Require 50% downpayment for online payments
+            $downpaymentAmount = $service->price * 0.50;
+            $remainingBalance = $service->price - $downpaymentAmount;
+            $paymentStatus = 'Paid Downpayment';
+        }
+
         $booking = Booking::create([
-            'client_name' => $validated['client_name'],
-            'client_email' => $validated['client_email'],
-            'client_phone' => $validated['client_phone'],
+            'client_name' => $bookingData->client_name,
+            'client_email' => $bookingData->client_email,
+            'client_phone' => $bookingData->client_phone,
             'branch_id' => $bookingData->branch_id,
             'service_id' => $bookingData->service_id,
             'therapist_id' => $bookingData->therapist_id,
             'start_time' => $startTime,
             'end_time' => $endTime,
             'price' => $service->price,
+            'downpayment_amount' => $downpaymentAmount,
+            'remaining_balance' => $remainingBalance,
+            'payment_method' => $validated['payment_method'],
+            'payment_status' => $paymentStatus,
             'status' => 'Confirmed',
-            'feedback_token' => Str::uuid(), // Generate a unique token for the feedback link
+            'feedback_token' => Str::uuid(),
         ]);
 
-        // Send the confirmation email
-        Mail::to($validated['client_email'])->send(new BookingConfirmed($booking));
+        Mail::to($booking->client_email)->send(new BookingConfirmed($booking));
 
         $request->session()->forget('booking');
         return redirect()->route('booking.success');
@@ -130,24 +177,20 @@ class BookingController extends Controller
 
     /**
      * Get the availability for a given therapist on a specific date.
-     * This method is called by the JavaScript on the booking page.
      */
     public function getAvailability(Request $request, Therapist $therapist, $date)
     {
         try {
             $selectedDate = Carbon::parse($date);
         } catch (\Exception $e) {
-            // Handle cases where the date format is invalid
             return response()->json(['error' => 'Invalid date format'], 400);
         }
 
-        // Get all bookings for the specified therapist on the selected date
         $bookings = Booking::where('therapist_id', $therapist->id)
                             ->whereDate('start_time', $selectedDate->toDateString())
-                            ->where('status', '!=', 'Cancelled') // Ignore cancelled bookings
+                            ->where('status', '!=', 'Cancelled')
                             ->get();
 
-        // Extract the start times and format them as 'h:i A' (e.g., 09:00 AM)
         $bookedTimes = $bookings->map(function ($booking) {
             return Carbon::parse($booking->start_time)->format('h:i A');
         });

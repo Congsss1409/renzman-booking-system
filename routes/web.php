@@ -18,7 +18,6 @@ Route::post('logout', [LoginController::class, 'destroy'])->name('logout');
 
 // --- Booking Routes ---
 Route::prefix('booking')->name('booking.')->group(function () {
-    // ... booking steps
     Route::get('/step-one', [BookingController::class, 'createStepOne'])->name('create.step-one');
     Route::post('/step-one', [BookingController::class, 'storeStepOne'])->name('store.step-one');
     Route::get('/step-two', [BookingController::class, 'createStepTwo'])->name('create.step-two');
@@ -27,6 +26,11 @@ Route::prefix('booking')->name('booking.')->group(function () {
     Route::post('/step-three', [BookingController::class, 'storeStepThree'])->name('store.step-three');
     Route::get('/step-four', [BookingController::class, 'createStepFour'])->name('create.step-four');
     Route::post('/step-four', [BookingController::class, 'storeStepFour'])->name('store.step-four');
+    
+    // New routes for the payment step
+    Route::get('/step-five', [BookingController::class, 'createStepFive'])->name('create.step-five');
+    Route::post('/step-five', [BookingController::class, 'storeStepFive'])->name('store.step-five');
+
     Route::get('/success', [BookingController::class, 'success'])->name('success');
 });
 
@@ -45,7 +49,6 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
     Route::get('/bookings/create', [AdminController::class, 'createBooking'])->name('bookings.create');
     Route::post('/bookings', [AdminController::class, 'storeBooking'])->name('bookings.store');
     Route::get('/branches/{branch}/therapists', [AdminController::class, 'getTherapistsByBranch'])->name('branches.therapists');
-    
-    // New route for the feedback page
     Route::get('/feedback', [AdminController::class, 'feedback'])->name('feedback');
+    Route::get('/analytics', [AdminController::class, 'analytics'])->name('analytics');
 });
