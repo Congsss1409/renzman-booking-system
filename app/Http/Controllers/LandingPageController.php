@@ -1,9 +1,10 @@
 <?php
+// app/Http/Controllers/LandingPageController.php
 
 namespace App\Http\Controllers;
 
+use App\Models\Service;
 use Illuminate\Http\Request;
-use Illuminate\View\View;
 
 class LandingPageController extends Controller
 {
@@ -12,10 +13,11 @@ class LandingPageController extends Controller
      *
      * @return \Illuminate\View\View
      */
-    public function index(): View
+    public function index()
     {
-        // In the future, you could pass data like testimonials
-        // or featured services from the database to this view.
-        return view('landing');
+        // Fetch a few services to feature on the homepage
+        $featuredServices = Service::inRandomOrder()->take(3)->get();
+        
+        return view('landing', compact('featuredServices'));
     }
 }

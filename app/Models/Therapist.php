@@ -17,7 +17,16 @@ class Therapist extends Model
      */
     protected $fillable = [
         'name',
+        'branch_id', // Add branch_id here
     ];
+
+    /**
+     * Get the branch that the therapist belongs to.
+     */
+    public function branch()
+    {
+        return $this->belongsTo(Branch::class);
+    }
 
     /**
      * Get the bookings for the therapist.

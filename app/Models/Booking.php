@@ -19,12 +19,16 @@ class Booking extends Model
         'client_name',
         'client_email',
         'client_phone',
+        'branch_id',
         'service_id',
         'therapist_id',
         'start_time',
         'end_time',
         'price',
         'status',
+        'feedback_token', // Add this
+        'rating',         // Add this
+        'feedback',       // Add this
     ];
 
     /**
@@ -36,6 +40,14 @@ class Booking extends Model
         'start_time' => 'datetime',
         'end_time' => 'datetime',
     ];
+
+    /**
+     * Get the branch for the booking.
+     */
+    public function branch()
+    {
+        return $this->belongsTo(Branch::class);
+    }
 
     /**
      * Get the service for the booking.

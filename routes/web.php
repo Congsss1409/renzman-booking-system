@@ -1,46 +1,51 @@
 <?php
+// routes/web.php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\LandingPageController;
 use App\Http\Controllers\BookingController;
-use App\Http\Controllers\LandingPageController; // <-- ADD THIS LINE
+use App\Http\Controllers\AdminController;
+use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\FeedbackController;
 
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| contains the "web" middleware group. Now create something great!
-|
-*/
-
-// --- NEW LANDING PAGE ROUTE ---
-// This now points the homepage to our new controller
+// --- Public Routes ---
 Route::get('/', [LandingPageController::class, 'index'])->name('landing');
 
+// --- Auth Routes ---
+Route::get('login', [LoginController::class, 'create'])->name('login');
+Route::post('login', [LoginController::class, 'store'])->name('login.store');
+Route::post('logout', [LoginController::class, 'destroy'])->name('logout');
 
-// --- BOOKING PROCESS ROUTES ---
-// This group remains the same, but is no longer the homepage.
-Route::prefix('book')->name('booking.')->group(function () {
+// --- Booking Routes ---
+Route::prefix('booking')->name('booking.')->group(function () {
+    // ... booking steps
+    Route::get('/step-one', [BookingController::class, 'createStepOne'])->name('create.step-one');
+    Route::post('/step-one', [BookingController::class, 'storeStepOne'])->name('store.step-one');
+    Route::get('/step-two', [BookingController::class, 'createStepTwo'])->name('create.step-two');
+    Route::post('/step-two', [BookingController::class, 'storeStepTwo'])->name('store.step-two');
+    Route::get('/step-three', [BookingController::class, 'createStepThree'])->name('create.step-three');
+    Route::post('/step-three', [BookingController::class, 'storeStepThree'])->name('store.step-three');
+    Route::get('/step-four', [BookingController::class, 'createStepFour'])->name('create.step-four');
+    Route::post('/step-four', [BookingController::class, 'storeStepFour'])->name('store.step-four');
+    Route::get('/success', [BookingController::class, 'success'])->name('success');
+});
 
-    // Step 1: Show Location Selection Form
-    Route::get('/step-1', [BookingController::class, 'showStepOne'])->name('stepOne');
-    Route::post('/step-1', [BookingController::class, 'processStepOne'])->name('processStepOne');
+// --- Feedback Routes ---
+Route::get('/feedback/{token}', [FeedbackController::class, 'create'])->name('feedback.create');
+Route::post('/feedback/{token}', [FeedbackController::class, 'store'])->name('feedback.store');
+Route::get('/feedback/thanks', [FeedbackController::class, 'thanks'])->name('feedback.thanks');
 
-    // Step 2: Show Service Selection Form
-    Route::get('/step-2', [BookingController::class, 'showStepTwo'])->name('stepTwo');
-    Route::post('/step-2', [BookingController::class, 'processStepTwo'])->name('processStepTwo');
+// --- API Route for Availability ---
+Route::get('/api/therapists/{therapist}/availability/{date}', [BookingController::class, 'getAvailability'])->name('api.therapists.availability');
 
-    // Step 3: Show Date & Time Selection Form
-    Route::get('/step-3', [BookingController::class, 'showStepThree'])->name('stepThree');
-    Route::post('/step-3', [BookingController::class, 'processStepThree'])->name('processStepThree');
-
-    // Step 4: Show Confirmation Page
-    Route::get('/step-4', [BookingController::class, 'showStepFour'])->name('stepFour');
-    Route::post('/step-4', [BookingController::class, 'storeBooking'])->name('store');
-
-    // Step 5: Show Success Page
-    Route::get('/success', [BookingController::class, 'showSuccess'])->name('success');
-
+// --- Protected Admin Routes ---
+Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
+    Route::post('/bookings/{booking}/cancel', [AdminController::class, 'cancelBooking'])->name('bookings.cancel');
+    Route::get('/bookings/create', [AdminController::class, 'createBooking'])->name('bookings.create');
+    Route::post('/bookings', [AdminController::class, 'storeBooking'])->name('bookings.store');
+    Route::get('/branches/{branch}/therapists', [AdminController::class, 'getTherapistsByBranch'])->name('branches.therapists');
+    
+    // New route for the feedback page
+    Route::get('/feedback', [AdminController::class, 'feedback'])->name('feedback');
 });

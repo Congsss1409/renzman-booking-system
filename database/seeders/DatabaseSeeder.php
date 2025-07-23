@@ -3,9 +3,9 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use App\Models\User; // Import the User model
+use Illuminate\Support\Facades\Hash; // Import the Hash facade
 
 class DatabaseSeeder extends Seeder
 {
@@ -14,9 +14,16 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
+        // Create a default admin user
+        User::create([
+            'name' => 'Admin',
+            'email' => 'admin@renzman.com',
+            'password' => Hash::make('password'), // The password is 'password'
+        ]);
 
+        // This method calls all your other seeders
         $this->call([
+            BranchSeeder::class,
             ServiceSeeder::class,
             TherapistSeeder::class,
         ]);
