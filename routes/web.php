@@ -7,6 +7,7 @@ use App\Http\Controllers\BookingController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\FeedbackController;
+use App\Http\Controllers\TherapistController;
 
 // --- Public Routes ---
 Route::get('/', [LandingPageController::class, 'index'])->name('landing');
@@ -26,18 +27,15 @@ Route::prefix('booking')->name('booking.')->group(function () {
     Route::post('/step-three', [BookingController::class, 'storeStepThree'])->name('store.step-three');
     Route::get('/step-four', [BookingController::class, 'createStepFour'])->name('create.step-four');
     Route::post('/step-four', [BookingController::class, 'storeStepFour'])->name('store.step-four');
-    
-    // New routes for the payment step
     Route::get('/step-five', [BookingController::class, 'createStepFive'])->name('create.step-five');
     Route::post('/step-five', [BookingController::class, 'storeStepFive'])->name('store.step-five');
-
     Route::get('/success', [BookingController::class, 'success'])->name('success');
 });
 
 // --- Feedback Routes ---
 Route::get('/feedback/{token}', [FeedbackController::class, 'create'])->name('feedback.create');
 Route::post('/feedback/{token}', [FeedbackController::class, 'store'])->name('feedback.store');
-Route::get('/feedback/thanks', [FeedbackController::class, 'thanks'])->name('feedback.thanks');
+// The 'feedback.thanks' route has been removed.
 
 // --- API Route for Availability ---
 Route::get('/api/therapists/{therapist}/availability/{date}', [BookingController::class, 'getAvailability'])->name('api.therapists.availability');
@@ -51,4 +49,11 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
     Route::get('/branches/{branch}/therapists', [AdminController::class, 'getTherapistsByBranch'])->name('branches.therapists');
     Route::get('/feedback', [AdminController::class, 'feedback'])->name('feedback');
     Route::get('/analytics', [AdminController::class, 'analytics'])->name('analytics');
+    Route::get('/bookings/{booking}/edit', [AdminController::class, 'editBooking'])->name('bookings.edit');
+    Route::put('/bookings/{booking}', [AdminController::class, 'updateBooking'])->name('bookings.update');
+});
+
+// --- Protected Therapist Routes ---
+Route::middleware('auth')->prefix('therapist')->name('therapist.')->group(function () {
+    Route::get('/dashboard', [TherapistController::class, 'dashboard'])->name('dashboard');
 });

@@ -13,10 +13,8 @@ class FeedbackController extends Controller
      */
     public function create($token)
     {
-        // Find the booking using the secure token
         $booking = Booking::where('feedback_token', $token)->firstOrFail();
 
-        // Check if feedback has already been submitted
         if ($booking->rating) {
             return view('feedback.already-submitted');
         }
@@ -31,25 +29,19 @@ class FeedbackController extends Controller
     {
         $booking = Booking::where('feedback_token', $token)->firstOrFail();
 
-        // Validate the submitted data
         $validated = $request->validate([
             'rating' => 'required|integer|min:1|max:5',
             'feedback' => 'nullable|string',
         ]);
 
-        // Update the booking with the feedback
         $booking->rating = $validated['rating'];
         $booking->feedback = $validated['feedback'];
         $booking->save();
 
-        return redirect()->route('feedback.thanks');
+        // --- RECODED LOGIC ---
+        // Redirect to the homepage with a success message for SweetAlert2.
+        return redirect('/')->with('feedback_success', 'Your feedback has been submitted. We appreciate you taking the time to help us improve!');
     }
 
-    /**
-     * Show a "thank you" page after submission.
-     */
-    public function thanks()
-    {
-        return view('feedback.thanks');
-    }
+    // The thanks() method is no longer needed and has been removed.
 }

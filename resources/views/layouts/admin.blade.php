@@ -4,11 +4,25 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    {{-- Add CSRF Token for secure JS requests --}}
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+
     <title>Admin Dashboard - Renzman Booking</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style> body { font-family: 'Inter', sans-serif; } </style>
+    <style> 
+        body { font-family: 'Inter', sans-serif; } 
+        /* Style for the new row highlight */
+        .new-booking-row {
+            animation: fadeInAndHighlight 2s ease-out;
+        }
+        @keyframes fadeInAndHighlight {
+            0% { background-color: #a7f3d0; opacity: 0; }
+            50% { background-color: #a7f3d0; opacity: 1; }
+            100% { background-color: transparent; opacity: 1; }
+        }
+    </style>
 </head>
 <body class="bg-gray-100">
     <div class="flex h-screen bg-gray-100">
@@ -61,5 +75,25 @@
             </main>
         </div>
     </div>
+
+    {{-- Load Laravel Echo and Pusher JS --}}
+    @vite('resources/js/app.js')
+    
+    {{-- This script will only run if the user is logged in --}}
+    @auth
+    <script>
+        // Listen for new bookings on the private 'admin' channel
+        window.Echo.private('admin')
+            .listen('BookingCreated', (e) => {
+                console.log('New booking received:', e.booking);
+                
+                // Call a function to add the new booking to the table
+                // This function must be defined in the specific view (dashboard.blade.php)
+                if (typeof addNewBookingRow === 'function') {
+                    addNewBookingRow(e.booking);
+                }
+            });
+    </script>
+    @endauth
 </body>
 </html>

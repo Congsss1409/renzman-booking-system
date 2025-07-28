@@ -17,7 +17,8 @@ class Therapist extends Model
      */
     protected $fillable = [
         'name',
-        'branch_id', // Add branch_id here
+        'branch_id',
+        'user_id', // Add user_id here
     ];
 
     /**
@@ -26,6 +27,14 @@ class Therapist extends Model
     public function branch()
     {
         return $this->belongsTo(Branch::class);
+    }
+
+    /**
+     * Get the user account associated with the therapist.
+     */
+    public function user()
+    {
+        return $this->belongsTo(User::class);
     }
 
     /**

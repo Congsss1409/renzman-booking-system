@@ -12,6 +12,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\BookingConfirmed;
 use Illuminate\Support\Str;
+use App\Events\BookingCreated;
 
 class BookingController extends Controller
 {
@@ -91,7 +92,7 @@ class BookingController extends Controller
         $therapist = Therapist::find($booking->therapist_id);
         return view('booking.step-four', compact('booking', 'branch', 'service', 'therapist'));
     }
-
+    
     // Step 4: Store Client Details and Proceed to Payment
     public function storeStepFour(Request $request)
     {
@@ -133,13 +134,11 @@ class BookingController extends Controller
         $startTime = Carbon::parse($bookingData->date . ' ' . $bookingData->time);
         $endTime = $startTime->copy()->addMinutes($service->duration);
 
-        // Calculate Downpayment and Balance
         $downpaymentAmount = 0;
         $remainingBalance = $service->price;
         $paymentStatus = 'Pending';
 
         if ($validated['payment_method'] !== 'On-Site') {
-            // Require 50% downpayment for online payments
             $downpaymentAmount = $service->price * 0.50;
             $remainingBalance = $service->price - $downpaymentAmount;
             $paymentStatus = 'Paid Downpayment';
@@ -164,6 +163,8 @@ class BookingController extends Controller
         ]);
 
         Mail::to($booking->client_email)->send(new BookingConfirmed($booking));
+        
+        broadcast(new BookingCreated($booking))->toOthers();
 
         $request->session()->forget('booking');
         return redirect()->route('booking.success');
@@ -175,9 +176,6 @@ class BookingController extends Controller
         return view('booking.success');
     }
 
-    /**
-     * Get the availability for a given therapist on a specific date.
-     */
     public function getAvailability(Request $request, Therapist $therapist, $date)
     {
         try {

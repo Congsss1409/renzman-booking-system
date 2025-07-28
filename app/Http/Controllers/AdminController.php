@@ -9,7 +9,8 @@ use App\Models\Service;
 use App\Models\Therapist;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\DB; // Import the DB facade
+use Illuminate\Support\Facades\DB;
+use App\Events\BookingCreated;
 
 class AdminController extends Controller
 {
@@ -63,7 +64,7 @@ class AdminController extends Controller
         $startTime = Carbon::parse($validated['booking_date'] . ' ' . $validated['booking_time']);
         $endTime = $startTime->copy()->addMinutes($service->duration);
 
-        Booking::create([
+        $booking = Booking::create([
             'client_name' => $validated['client_name'],
             'client_email' => 'walkin@renzman.com',
             'client_phone' => $validated['client_phone'],
@@ -75,6 +76,8 @@ class AdminController extends Controller
             'price' => $service->price,
             'status' => 'Confirmed',
         ]);
+
+        broadcast(new BookingCreated($booking))->toOthers();
 
         return redirect()->route('admin.dashboard')->with('success', 'New booking created successfully.');
     }
@@ -105,12 +108,10 @@ class AdminController extends Controller
      */
     public function analytics()
     {
-        // 1. Key Performance Indicators (KPIs)
         $totalBookings = Booking::count();
         $totalRevenue = Booking::where('status', '!=', 'Cancelled')->sum('price');
         $averageRating = Booking::whereNotNull('rating')->avg('rating');
 
-        // 2. Most Popular Services
         $popularServices = Booking::select('service_id', DB::raw('count(*) as total'))
                                     ->groupBy('service_id')
                                     ->with('service')
@@ -118,7 +119,6 @@ class AdminController extends Controller
                                     ->take(5)
                                     ->get();
 
-        // 3. Busiest Therapists
         $busiestTherapists = Booking::select('therapist_id', DB::raw('count(*) as total'))
                                       ->where('status', '!=', 'Cancelled')
                                       ->groupBy('therapist_id')
@@ -134,5 +134,52 @@ class AdminController extends Controller
             'popularServices',
             'busiestTherapists'
         ));
+    }
+
+    /**
+     * Show the form for editing an existing booking.
+     */
+    public function editBooking(Booking $booking)
+    {
+        $branches = Branch::all();
+        $services = Service::all();
+        $therapists = Therapist::where('branch_id', $booking->branch_id)->get();
+
+        return view('admin.edit-booking', compact('booking', 'branches', 'services', 'therapists'));
+    }
+
+    /**
+     * Update an existing booking in storage.
+     */
+    public function updateBooking(Request $request, Booking $booking)
+    {
+        $validated = $request->validate([
+            'client_name' => 'required|string|max:255',
+            'client_phone' => 'required|string|max:20',
+            'branch_id' => 'required|exists:branches,id',
+            'therapist_id' => 'required|exists:therapists,id',
+            'service_id' => 'required|exists:services,id',
+            'booking_date' => 'required|date',
+            'booking_time' => 'required',
+            'status' => 'required|string',
+        ]);
+
+        $service = Service::find($validated['service_id']);
+        $startTime = Carbon::parse($validated['booking_date'] . ' ' . $validated['booking_time']);
+        $endTime = $startTime->copy()->addMinutes($service->duration);
+
+        $booking->update([
+            'client_name' => $validated['client_name'],
+            'client_phone' => $validated['client_phone'],
+            'branch_id' => $validated['branch_id'],
+            'service_id' => $validated['service_id'],
+            'therapist_id' => $validated['therapist_id'],
+            'start_time' => $startTime,
+            'end_time' => $endTime,
+            'price' => $service->price,
+            'status' => $validated['status'],
+        ]);
+
+        return redirect()->route('admin.dashboard')->with('success', 'Booking has been updated successfully.');
     }
 }
