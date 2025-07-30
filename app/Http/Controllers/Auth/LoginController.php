@@ -30,17 +30,8 @@ class LoginController extends Controller
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
 
-            // --- NEW: Role-based redirect ---
-            $user = Auth::user();
-            if ($user->role === 'admin') {
-                return redirect()->intended(route('admin.dashboard'));
-            } elseif ($user->role === 'therapist') {
-                return redirect()->intended(route('therapist.dashboard'));
-            }
-            // --- END NEW ---
-
-            // Default fallback (should not be reached if roles are set)
-            return redirect('/');
+            // The login now only redirects to the admin dashboard.
+            return redirect()->intended(route('admin.dashboard'));
         }
 
         return back()->withErrors([

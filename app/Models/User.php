@@ -21,7 +21,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'role', // Add role here
+        // 'role' has been removed
     ];
 
     /**
@@ -47,11 +47,5 @@ class User extends Authenticatable
         ];
     }
 
-    /**
-     * Get the therapist record associated with the user.
-     */
-    public function therapist()
-    {
-        return $this->hasOne(Therapist::class);
-    }
+    // The therapist() relationship has been removed.
 }

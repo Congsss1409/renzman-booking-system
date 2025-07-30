@@ -18,7 +18,7 @@ class Therapist extends Model
     protected $fillable = [
         'name',
         'branch_id',
-        'user_id', // Add user_id here
+        // 'user_id' has been removed
     ];
 
     /**
@@ -30,18 +30,12 @@ class Therapist extends Model
     }
 
     /**
-     * Get the user account associated with the therapist.
-     */
-    public function user()
-    {
-        return $this->belongsTo(User::class);
-    }
-
-    /**
      * Get the bookings for the therapist.
      */
     public function bookings()
     {
         return $this->hasMany(Booking::class);
     }
+
+    // The user() relationship has been removed.
 }

@@ -7,7 +7,7 @@ use App\Http\Controllers\BookingController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\FeedbackController;
-use App\Http\Controllers\TherapistController;
+// The TherapistController is no longer needed
 
 // --- Public Routes ---
 Route::get('/', [LandingPageController::class, 'index'])->name('landing');
@@ -35,7 +35,6 @@ Route::prefix('booking')->name('booking.')->group(function () {
 // --- Feedback Routes ---
 Route::get('/feedback/{token}', [FeedbackController::class, 'create'])->name('feedback.create');
 Route::post('/feedback/{token}', [FeedbackController::class, 'store'])->name('feedback.store');
-// The 'feedback.thanks' route has been removed.
 
 // --- API Route for Availability ---
 Route::get('/api/therapists/{therapist}/availability/{date}', [BookingController::class, 'getAvailability'])->name('api.therapists.availability');
@@ -53,7 +52,4 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
     Route::put('/bookings/{booking}', [AdminController::class, 'updateBooking'])->name('bookings.update');
 });
 
-// --- Protected Therapist Routes ---
-Route::middleware('auth')->prefix('therapist')->name('therapist.')->group(function () {
-    Route::get('/dashboard', [TherapistController::class, 'dashboard'])->name('dashboard');
-});
+// The therapist routes section has been removed.
