@@ -1,5 +1,4 @@
 <?php
-// app/Http/Controllers/AdminController.php
 
 namespace App\Http\Controllers;
 
@@ -8,178 +7,190 @@ use App\Models\Branch;
 use App\Models\Service;
 use App\Models\Therapist;
 use Illuminate\Http\Request;
-use Carbon\Carbon;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\BookingCancelled;
 use Illuminate\Support\Facades\DB;
-use App\Events\BookingCreated;
+use Carbon\Carbon;
 
 class AdminController extends Controller
 {
     /**
-     * Show the admin dashboard with all bookings.
+     * Display the admin dashboard with all bookings.
+     *
+     * @return \Illuminate\View\View
      */
     public function dashboard()
     {
-        $bookings = Booking::with('service', 'therapist', 'branch')
-                             ->orderBy('start_time', 'desc')
-                             ->get();
+        // Eager load relationships for efficiency
+        $bookings = Booking::with(['service', 'therapist', 'branch'])->latest()->get();
         return view('admin.dashboard', compact('bookings'));
     }
 
     /**
-     * Cancel a specific booking.
-     */
-    public function cancelBooking(Booking $booking)
-    {
-        $booking->status = 'Cancelled';
-        $booking->save();
-        return redirect()->route('admin.dashboard')->with('success', 'Booking has been successfully cancelled.');
-    }
-
-    /**
      * Show the form for creating a new booking.
+     *
+     * @return \Illuminate\View\View
      */
     public function createBooking()
     {
-        $branches = Branch::all();
         $services = Service::all();
-        return view('admin.create-booking', compact('branches', 'services'));
+        $therapists = Therapist::all();
+        $branches = Branch::all();
+        return view('admin.create-booking', compact('services', 'therapists', 'branches'));
     }
 
     /**
-     * Store a new booking made by an admin.
+     * Store a newly created booking in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function storeBooking(Request $request)
     {
-        $validated = $request->validate([
+        // Validating request against the database schema from the SQL file
+        $request->validate([
+            'client_name' => 'required|string|max:255',
+            'client_email' => 'required|email|max:255',
+            'client_phone' => 'required|string|max:20',
+            'service_id' => 'required|exists:services,id',
+            'therapist_id' => 'required|exists:therapists,id',
+            'branch_id' => 'required|exists:branches,id',
+            'start_time' => 'required|date',
+            'downpayment_amount' => 'nullable|numeric',
+            // Other fields from your form can be added here
+        ]);
+
+        // Manually creating the booking to match the database columns
+        $service = Service::find($request->service_id);
+        Booking::create([
+            'client_name' => $request->client_name,
+            'client_email' => $request->client_email,
+            'client_phone' => $request->client_phone,
+            'service_id' => $request->service_id,
+            'therapist_id' => $request->therapist_id,
+            'branch_id' => $request->branch_id,
+            'start_time' => Carbon::parse($request->start_time),
+            'end_time' => Carbon::parse($request->start_time)->addMinutes($service->duration),
+            'price' => $service->price,
+            'downpayment_amount' => $request->downpayment_amount,
+            'payment_method' => $request->payment_method,
+        ]);
+
+        return redirect()->route('admin.dashboard')->with('success', 'Booking created successfully.');
+    }
+
+    /**
+     * Show the form for editing the specified booking.
+     *
+     * @param  \App\Models\Booking  $booking
+     * @return \Illuminate\View\View
+     */
+    public function editBooking(Booking $booking)
+    {
+        $services = Service::all();
+        $therapists = Therapist::all();
+        $branches = Branch::all();
+        return view('admin.edit-booking', compact('booking', 'services', 'therapists', 'branches'));
+    }
+
+    /**
+     * Update the specified booking in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \App\Models\Booking  $booking
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function updateBooking(Request $request, Booking $booking)
+    {
+        // Manually merge date and time into a single start_time field before validation.
+        $request->merge([
+            'start_time' => Carbon::parse($request->input('date') . ' ' . $request->input('time'))->toDateTimeString(),
+            'status' => strtolower($request->input('status'))
+        ]);
+
+        // We don't want to validate or update the email, so it's removed from the rules.
+        $validatedData = $request->validate([
             'client_name' => 'required|string|max:255',
             'client_phone' => 'required|string|max:20',
-            'branch_id' => 'required|exists:branches,id',
-            'therapist_id' => 'required|exists:therapists,id',
             'service_id' => 'required|exists:services,id',
-            'booking_date' => 'required|date',
-            'booking_time' => 'required',
+            'therapist_id' => 'required|exists:therapists,id',
+            'branch_id' => 'required|exists:branches,id',
+            'start_time' => 'required|date',
+            'status' => 'required|string|in:pending,confirmed,cancelled,completed',
+            'downpayment_amount' => 'nullable|numeric',
         ]);
 
-        $service = Service::find($validated['service_id']);
-        $startTime = Carbon::parse($validated['booking_date'] . ' ' . $validated['booking_time']);
-        $endTime = $startTime->copy()->addMinutes($service->duration);
-
-        $booking = Booking::create([
-            'client_name' => $validated['client_name'],
-            'client_email' => 'walkin@renzman.com',
-            'client_phone' => $validated['client_phone'],
-            'branch_id' => $validated['branch_id'],
-            'service_id' => $validated['service_id'],
-            'therapist_id' => $validated['therapist_id'],
-            'start_time' => $startTime,
-            'end_time' => $endTime,
-            'price' => $service->price,
-            'status' => 'Confirmed',
-        ]);
-
-        broadcast(new BookingCreated($booking))->toOthers();
-
-        return redirect()->route('admin.dashboard')->with('success', 'New booking created successfully.');
-    }
-
-    /**
-     * API endpoint to get therapists for a selected branch.
-     */
-    public function getTherapistsByBranch(Branch $branch)
-    {
-        return response()->json($branch->therapists);
-    }
-
-    /**
-     * Show the feedback page with all submitted feedback.
-     */
-    public function feedback()
-    {
-        $feedbacks = Booking::with('therapist', 'service', 'branch')
-                            ->whereNotNull('rating')
-                            ->orderBy('start_time', 'desc')
-                            ->get();
+        // Prepare the data for updating the model.
+        $updateData = $validatedData;
         
-        return view('admin.feedback', compact('feedbacks'));
+        // If service or start time changes, update price and end time accordingly.
+        $service = Service::find($validatedData['service_id']);
+        if ($service) {
+            $updateData['price'] = $service->price;
+            $updateData['end_time'] = Carbon::parse($updateData['start_time'])->addMinutes($service->duration);
+        }
+
+        $booking->update($updateData);
+
+        return redirect()->route('admin.dashboard')->with('success', 'Booking updated successfully.');
     }
 
     /**
-     * Show the analytics and reports page.
+     * Cancel the specified booking and send a notification email.
+     *
+     * @param  \App\Models\Booking  $booking
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function cancelBooking(Booking $booking)
+    {
+        // Update the status to 'cancelled' instead of deleting
+        $booking->update(['status' => 'cancelled']);
+
+        // Send cancellation email to the user.
+        // The try-catch block has been removed for debugging.
+        // If there's an issue with sending the email, an error will now be displayed.
+        Mail::to($booking->client_email)->send(new BookingCancelled($booking));
+
+        return redirect()->route('admin.dashboard')->with('success', 'Booking has been cancelled successfully.');
+    }
+
+    /**
+     * Display analytics.
+     *
+     * @return \Illuminate\View\View
      */
     public function analytics()
     {
         $totalBookings = Booking::count();
-        $totalRevenue = Booking::where('status', '!=', 'Cancelled')->sum('price');
+        // Correctly calculating revenue by summing the 'price' column from the 'bookings' table itself
+        $totalRevenue = Booking::where('status', 'completed')->sum('price');
         $averageRating = Booking::whereNotNull('rating')->avg('rating');
 
         $popularServices = Booking::select('service_id', DB::raw('count(*) as total'))
-                                    ->groupBy('service_id')
-                                    ->with('service')
-                                    ->orderBy('total', 'desc')
-                                    ->take(5)
-                                    ->get();
+            ->groupBy('service_id')
+            ->orderBy('total', 'desc')
+            ->with('service')
+            ->take(5)
+            ->get();
 
         $busiestTherapists = Booking::select('therapist_id', DB::raw('count(*) as total'))
-                                      ->where('status', '!=', 'Cancelled')
-                                      ->groupBy('therapist_id')
-                                      ->with('therapist')
-                                      ->orderBy('total', 'desc')
-                                      ->take(5)
-                                      ->get();
+            ->groupBy('therapist_id')
+            ->orderBy('total', 'desc')
+            ->with('therapist')
+            ->take(5)
+            ->get();
 
-        return view('admin.analytics', compact(
-            'totalBookings',
-            'totalRevenue',
-            'averageRating',
-            'popularServices',
-            'busiestTherapists'
-        ));
+        return view('admin.analytics', compact('totalBookings', 'totalRevenue', 'averageRating', 'popularServices', 'busiestTherapists'));
     }
 
     /**
-     * Show the form for editing an existing booking.
+     * Display customer feedback.
+     *
+     * @return \Illuminate\View\View
      */
-    public function editBooking(Booking $booking)
+    public function feedback()
     {
-        $branches = Branch::all();
-        $services = Service::all();
-        $therapists = Therapist::where('branch_id', $booking->branch_id)->get();
-
-        return view('admin.edit-booking', compact('booking', 'branches', 'services', 'therapists'));
-    }
-
-    /**
-     * Update an existing booking in storage.
-     */
-    public function updateBooking(Request $request, Booking $booking)
-    {
-        $validated = $request->validate([
-            'client_name' => 'required|string|max:255',
-            'client_phone' => 'required|string|max:20',
-            'branch_id' => 'required|exists:branches,id',
-            'therapist_id' => 'required|exists:therapists,id',
-            'service_id' => 'required|exists:services,id',
-            'booking_date' => 'required|date',
-            'booking_time' => 'required',
-            'status' => 'required|string',
-        ]);
-
-        $service = Service::find($validated['service_id']);
-        $startTime = Carbon::parse($validated['booking_date'] . ' ' . $validated['booking_time']);
-        $endTime = $startTime->copy()->addMinutes($service->duration);
-
-        $booking->update([
-            'client_name' => $validated['client_name'],
-            'client_phone' => $validated['client_phone'],
-            'branch_id' => $validated['branch_id'],
-            'service_id' => $validated['service_id'],
-            'therapist_id' => $validated['therapist_id'],
-            'start_time' => $startTime,
-            'end_time' => $endTime,
-            'price' => $service->price,
-            'status' => $validated['status'],
-        ]);
-
-        return redirect()->route('admin.dashboard')->with('success', 'Booking has been updated successfully.');
+        $feedbacks = Booking::whereNotNull('rating')->with('service', 'therapist', 'branch')->get();
+        return view('admin.feedback', compact('feedbacks'));
     }
 }

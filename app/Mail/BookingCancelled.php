@@ -2,6 +2,7 @@
 
 namespace App\Mail;
 
+use App\Models\Booking;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
@@ -14,11 +15,21 @@ class BookingCancelled extends Mailable
     use Queueable, SerializesModels;
 
     /**
-     * Create a new message instance.
+     * The booking instance.
+     *
+     * @var \App\Models\Booking
      */
-    public function __construct()
+    public $booking;
+
+    /**
+     * Create a new message instance.
+     *
+     * @param  \App\Models\Booking  $booking
+     * @return void
+     */
+    public function __construct(Booking $booking)
     {
-        //
+        $this->booking = $booking;
     }
 
     /**
@@ -27,7 +38,7 @@ class BookingCancelled extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Booking Cancelled',
+            subject: 'Booking Cancellation Confirmation',
         );
     }
 
@@ -37,7 +48,7 @@ class BookingCancelled extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'view.name',
+            view: 'emails.booking-cancelled',
         );
     }
 
