@@ -1,8 +1,9 @@
 <?php
 // database/seeders/DatabaseSeeder.php
 
-namespace Illuminate\Database\Seeder;
+namespace Database\Seeders;
 
+use Illuminate\Database\Seeder;
 use App\Models\User;
 use App\Models\Therapist;
 use App\Models\Branch;
@@ -16,13 +17,7 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // Temporarily disable foreign key checks for clean truncation
-        Schema::disableForeignKeyConstraints();
-        User::truncate();
-        Therapist::truncate();
-        Schema::enableForeignKeyConstraints();
-
-        // 1. Create the Admin User (now the only user)
+        // 1. Create the Admin User (now the only user type)
         User::create([
             'name' => 'Admin',
             'email' => 'admin@renzman.com',
@@ -33,29 +28,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             BranchSeeder::class,
             ServiceSeeder::class,
+            TherapistSeeder::class, // This will now create therapists without logins
         ]);
-
-        // 3. Create all therapists without user accounts
-        $malaria = Branch::where('name', 'Metro Plaza Malaria')->first();
-        $bagongSilang = Branch::where('name', 'Metro Plaza Bagong Silang')->first();
-        $zabarte = Branch::where('name', 'Zabarte Town Center')->first();
-        $genLuis = Branch::where('name', 'Metro Plaza Gen Luis')->first();
-
-        if ($malaria) {
-            Therapist::create(['name' => 'Anna', 'branch_id' => $malaria->id]);
-            Therapist::create(['name' => 'Ben', 'branch_id' => $malaria->id]);
-        }
-        if ($bagongSilang) {
-            Therapist::create(['name' => 'Carla', 'branch_id' => $bagongSilang->id]);
-            Therapist::create(['name' => 'David', 'branch_id' => $bagongSilang->id]);
-        }
-        if ($zabarte) {
-            Therapist::create(['name' => 'Elena', 'branch_id' => $zabarte->id]);
-            Therapist::create(['name' => 'Frank', 'branch_id' => $zabarte->id]);
-        }
-        if ($genLuis) {
-            Therapist::create(['name' => 'Grace', 'branch_id' => $genLuis->id]);
-            Therapist::create(['name' => 'Henry', 'branch_id' => $genLuis->id]);
-        }
     }
 }

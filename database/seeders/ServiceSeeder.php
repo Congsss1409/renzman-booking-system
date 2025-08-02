@@ -6,7 +6,7 @@ namespace Database\Seeders;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use App\Models\Service;
-use Illuminate\Support\Facades\Schema; // Import the Schema facade
+use Illuminate\Support\Facades\Schema;
 
 class ServiceSeeder extends Seeder
 {
@@ -15,21 +15,12 @@ class ServiceSeeder extends Seeder
      */
     public function run(): void
     {
-        // --- This is the fix for the foreign key constraint error ---
         // Temporarily disable foreign key checks to allow truncation
         Schema::disableForeignKeyConstraints();
-
-        // Clear the table first to prevent duplicate entries on re-seeding
         Service::truncate();
-
-        // Re-enable foreign key checks
         Schema::enableForeignKeyConstraints();
-        // --- End of fix ---
 
-
-        // --- Data extracted from the Renzman flyer ---
-
-        // CHAIR MASSAGE
+        // Data based on the Renzman flyer
         Service::create([
             'name' => 'Chair Massage (Half Body)',
             'description' => 'A quick, focused massage on the upper body, perfect for immediate relief.',
@@ -42,8 +33,6 @@ class ServiceSeeder extends Seeder
             'price' => 450.00,
             'duration' => 60
         ]);
-
-        // BED MASSAGE
         Service::create([
             'name' => 'Bed Massage (Whole Body)',
             'description' => 'A traditional full-body massage on a comfortable massage bed for deep relaxation.',
@@ -62,8 +51,6 @@ class ServiceSeeder extends Seeder
             'price' => 550.00,
             'duration' => 60
         ]);
-
-        // OFFERS
         Service::create([
             'name' => 'Ventosa (Cupping Therapy)',
             'description' => 'An ancient form of alternative medicine using special cups to create suction.',

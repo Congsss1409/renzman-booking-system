@@ -7,7 +7,6 @@ use App\Http\Controllers\BookingController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\FeedbackController;
-// The TherapistController is no longer needed
 
 // --- Public Routes ---
 Route::get('/', [LandingPageController::class, 'index'])->name('landing');
@@ -51,5 +50,3 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
     Route::get('/bookings/{booking}/edit', [AdminController::class, 'editBooking'])->name('bookings.edit');
     Route::put('/bookings/{booking}', [AdminController::class, 'updateBooking'])->name('bookings.update');
 });
-
-// The therapist routes section has been removed.
