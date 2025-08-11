@@ -17,8 +17,8 @@ class Therapist extends Model
      */
     protected $fillable = [
         'name',
+        'image_url', // Add this
         'branch_id',
-        // 'user_id' has been removed
     ];
 
     /**
@@ -36,6 +36,4 @@ class Therapist extends Model
     {
         return $this->hasMany(Booking::class);
     }
-
-    // The user() relationship has been removed.
 }

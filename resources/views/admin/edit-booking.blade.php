@@ -23,7 +23,6 @@
         @method('PUT') {{-- Use PUT method for updates --}}
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             
-            <!-- Client Details -->
             <div class="md:col-span-2">
                 <h3 class="text-lg font-semibold text-gray-700 border-b pb-2 mb-4">Client Information</h3>
             </div>
@@ -36,7 +35,6 @@
                 <input type="tel" name="client_phone" id="client_phone" value="{{ old('client_phone', $booking->client_phone) }}" required class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-emerald-500 focus:border-emerald-500">
             </div>
 
-            <!-- Appointment Details -->
             <div class="md:col-span-2">
                 <h3 class="text-lg font-semibold text-gray-700 border-b pb-2 mb-4 mt-6">Appointment Details</h3>
             </div>
@@ -77,7 +75,7 @@
                 <select name="status" id="status" required class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-emerald-500 focus:border-emerald-500 bg-white">
                     <option value="Confirmed" {{ old('status', $booking->status) == 'Confirmed' ? 'selected' : '' }}>Confirmed</option>
                     <option value="Completed" {{ old('status', $booking->status) == 'Completed' ? 'selected' : '' }}>Completed</option>
-                    <option value="Cancelled" {{ old('status', $booking->status) == 'Cancelled' ? 'selected' : '' }}>Cancelled</option>
+                    {{-- The "Cancelled" option has been removed --}}
                 </select>
             </div>
         </div>

@@ -55,17 +55,14 @@
                     <label class="flex items-center p-4 border rounded-lg cursor-pointer hover:border-emerald-500 transition has-[:checked]:bg-emerald-50 has-[:checked]:border-emerald-600">
                         <input type="radio" name="payment_method" value="GCash" class="h-5 w-5 text-emerald-600 focus:ring-emerald-500">
                         <span class="ml-4 font-semibold text-lg text-gray-800">Pay Downpayment with GCash</span>
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/GCash_logo.svg/1200px-GCash_logo.svg.png" class="h-6 ml-auto" alt="GCash Logo">
+                        <img src="https://cdn.prod.website-files.com/6385b55675a0bd614777a5c1/6474928322d48888f6c8cfe5_biz-gcash-logo.svg" class="h-6 ml-auto" alt="GCash Logo">
                     </label>
                     <label class="flex items-center p-4 border rounded-lg cursor-pointer hover:border-emerald-500 transition has-[:checked]:bg-emerald-50 has-[:checked]:border-emerald-600">
                         <input type="radio" name="payment_method" value="Maya" class="h-5 w-5 text-emerald-600 focus:ring-emerald-500">
                         <span class="ml-4 font-semibold text-lg text-gray-800">Pay Downpayment with Maya</span>
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/9a/Maya_logo.svg/1200px-Maya_logo.svg.png" class="h-8 ml-auto" alt="Maya Logo">
+                        <img src="https://www.maya.ph/hubfs/Maya/MAYA-Mint%20Green.svg" class="h-8 ml-auto" alt="Maya Logo">
                     </label>
-                    <label class="flex items-center p-4 border rounded-lg cursor-pointer hover:border-emerald-500 transition has-[:checked]:bg-emerald-50 has-[:checked]:border-emerald-600">
-                        <input type="radio" name="payment_method" value="On-Site" class="h-5 w-5 text-emerald-600 focus:ring-emerald-500">
-                        <span class="ml-4 font-semibold text-lg text-gray-800">Pay Full Amount On-Site</span>
-                    </label>
+                    
                 </div>
                 
                 <div class="mt-10 flex justify-between items-center border-t pt-6">

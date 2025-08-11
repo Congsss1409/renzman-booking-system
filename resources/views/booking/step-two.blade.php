@@ -8,7 +8,7 @@
         <div>
             <h1 class="text-3xl font-bold mb-4">Select a Therapist</h1>
             <p class="text-emerald-100 mb-6">
-                Choose one of our certified therapists available at your selected branch.
+                Choose one of our certified therapists available at your selected branch. You can see their current status to help you decide.
             </p>
             <div class="border-t border-emerald-500 pt-6 space-y-4 text-emerald-200">
                 <div class="flex items-center opacity-50">
@@ -36,7 +36,7 @@
     </div>
 
     <div class="w-full md:w-2/3 bg-white p-8 lg:p-12 overflow-y-auto">
-        <div class="max-w-2xl mx-auto">
+        <div class="max-w-3xl mx-auto">
             <h2 class="text-2xl font-bold text-gray-800 mb-2">Step 2: Choose Your Therapist</h2>
             <p class="text-gray-600 mb-8">
                 Therapists available at <span class="font-semibold">{{ $branch->name }}</span>
@@ -50,16 +50,29 @@
 
             <form action="{{ route('booking.store.step-two') }}" method="POST">
                 @csrf
-                <div class="space-y-4 border-t pt-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 border-t pt-4">
                     @forelse ($therapists as $therapist)
-                    <label class="flex items-center p-4 border rounded-lg cursor-pointer hover:border-emerald-500 transition has-[:checked]:bg-emerald-50 has-[:checked]:border-emerald-600">
-                        <input type="radio" name="therapist_id" value="{{ $therapist->id }}" class="h-5 w-5 text-emerald-600 focus:ring-emerald-500"
+                    <label class="relative flex flex-col items-center p-4 border rounded-lg cursor-pointer hover:border-emerald-500 transition has-[:checked]:bg-emerald-50 has-[:checked]:border-emerald-600 has-[:checked]:ring-2 has-[:checked]:ring-emerald-500">
+                        <input type="radio" name="therapist_id" value="{{ $therapist->id }}" class="absolute top-4 right-4 h-5 w-5 text-emerald-600 focus:ring-emerald-500"
                             {{ (old('therapist_id', $booking->therapist_id ?? '') == $therapist->id) ? 'checked' : '' }}
                         >
-                        <span class="ml-4 font-semibold text-lg text-gray-800">{{ $therapist->name }}</span>
+                        <img class="w-24 h-24 rounded-full mb-4" src="{{ $therapist->image_url }}" alt="Photo of {{ $therapist->name }}">
+                        <span class="font-semibold text-lg text-gray-800 text-center">{{ $therapist->name }}</span>
+                        
+                        {{-- Status Indicator --}}
+                        @if ($therapist->status == 'Available')
+                            <div class="mt-2 text-xs font-semibold text-emerald-800 bg-emerald-100 px-2 py-1 rounded-full">
+                                Available Now
+                            </div>
+                        @else
+                            <div class="mt-2 text-xs font-semibold text-red-800 bg-red-100 px-2 py-1 rounded-full">
+                                In Session
+                            </div>
+                            <span class="text-xs text-gray-500 mt-1">Free at {{ $therapist->available_at }}</span>
+                        @endif
                     </label>
                     @empty
-                    <p class="text-center text-gray-500">No therapists are available for this branch.</p>
+                    <p class="col-span-full text-center text-gray-500">No therapists are available for this branch.</p>
                     @endforelse
                 </div>
 

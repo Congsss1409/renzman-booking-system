@@ -14,10 +14,8 @@ class TherapistSeeder extends Seeder
      */
     public function run(): void
     {
-        // Get all branches
         $branches = Branch::all()->keyBy('name');
 
-        // Create therapists and assign them to branches
         $therapists = [
             'Metro Plaza Malaria' => ['Anna', 'Ben', 'Carlos', 'Diana'],
             'Metro Plaza Bagong Silang' => ['Carla', 'David', 'Fiona', 'George'],
@@ -31,6 +29,8 @@ class TherapistSeeder extends Seeder
                     Therapist::create([
                         'name' => $name,
                         'branch_id' => $branches[$branchName]->id,
+                        // NEW: Add a placeholder image URL for each therapist
+                        'image_url' => 'https://ui-avatars.com/api/?name=' . urlencode($name) . '&color=FFFFFF&background=059669&size=128',
                     ]);
                 }
             }

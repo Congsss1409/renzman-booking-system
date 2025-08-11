@@ -10,14 +10,21 @@ class LandingPageController extends Controller
 {
     /**
      * Display the landing page.
-     *
-     * @return \Illuminate\View\View
      */
     public function index()
     {
-        // Fetch a few services to feature on the homepage
-        $featuredServices = Service::inRandomOrder()->take(3)->get();
+        // No changes here
+        return view('landing');
+    }
+
+    /**
+     * NEW: Display the services page.
+     */
+    public function services()
+    {
+        // Fetch all services from the database, ordered by price
+        $services = Service::orderBy('price')->get();
         
-        return view('landing', compact('featuredServices'));
+        return view('services', compact('services'));
     }
 }

@@ -4,37 +4,26 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    {{-- Add CSRF Token for secure JS requests --}}
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-
     <title>Admin Dashboard - Renzman Booking</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style> 
-        body { font-family: 'Inter', sans-serif; } 
-        /* Style for the new row highlight */
-        .new-booking-row {
-            animation: fadeInAndHighlight 2s ease-out;
-        }
-        @keyframes fadeInAndHighlight {
-            0% { background-color: #a7f3d0; opacity: 0; }
-            50% { background-color: #a7f3d0; opacity: 1; }
-            100% { background-color: transparent; opacity: 1; }
-        }
-    </style>
+    <style> body { font-family: 'Inter', sans-serif; } </style>
 </head>
 <body class="bg-gray-100">
     <div class="flex h-screen bg-gray-100">
-        <!-- Sidebar -->
         <div class="w-64 bg-gray-800 text-white flex flex-col">
             <div class="p-6 text-2xl font-bold border-b border-gray-700">
                 Renzman Admin
             </div>
             <nav class="flex-1 p-4 space-y-2">
-                <a href="{{ route('admin.dashboard') }}" class="flex items-center px-4 py-2 rounded-lg text-gray-300 hover:bg-gray-700 hover:text-white {{ request()->routeIs('admin.dashboard') ? 'bg-emerald-700 !text-white' : '' }}">
+                <a href="{{ route('admin.dashboard') }}" class="flex items-center px-4 py-2 rounded-lg text-gray-300 hover:bg-gray-700 hover:text-white {{ request()->routeIs('admin.dashboard*') ? 'bg-emerald-700 !text-white' : '' }}">
                     <svg class="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"/></svg>
                     Dashboard
+                </a>
+                <a href="{{ route('admin.therapists.index') }}" class="flex items-center px-4 py-2 rounded-lg text-gray-300 hover:bg-gray-700 hover:text-white {{ request()->routeIs('admin.therapists*') ? 'bg-emerald-700 !text-white' : '' }}">
+                    <svg class="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M15 21a6 6 0 00-9-5.197m0 0A6.995 6.995 0 0112 12.75a6.995 6.995 0 016-3.947m-4.5 6.085a4 4 0 11-5.292 0m5.292 0a4 4 0 10-5.292 0M3 21a6 6 0 016-6m3 6a6 6 0 006-6" /></svg>
+                    Therapists
                 </a>
                 <a href="{{ route('admin.feedback') }}" class="flex items-center px-4 py-2 rounded-lg text-gray-300 hover:bg-gray-700 hover:text-white {{ request()->routeIs('admin.feedback') ? 'bg-emerald-700 !text-white' : '' }}">
                     <svg class="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" /></svg>
@@ -45,7 +34,6 @@
                     Analytics
                 </a>
             </nav>
-            <!-- Logout Button -->
             <div class="p-4 border-t border-gray-700">
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
@@ -57,7 +45,6 @@
             </div>
         </div>
 
-        <!-- Main Content -->
         <div class="flex-1 flex flex-col overflow-hidden">
             <header class="bg-white shadow-md p-4 flex justify-between items-center">
                 <h1 class="text-xl font-semibold">@yield('header')</h1>
@@ -75,25 +62,5 @@
             </main>
         </div>
     </div>
-
-    {{-- Load Laravel Echo and Pusher JS --}}
-    @vite('resources/js/app.js')
-    
-    {{-- This script will only run if the user is logged in --}}
-    @auth
-    <script>
-        // Listen for new bookings on the private 'admin' channel
-        window.Echo.private('admin')
-            .listen('BookingCreated', (e) => {
-                console.log('New booking received:', e.booking);
-                
-                // Call a function to add the new booking to the table
-                // This function must be defined in the specific view (dashboard.blade.php)
-                if (typeof addNewBookingRow === 'function') {
-                    addNewBookingRow(e.booking);
-                }
-            });
-    </script>
-    @endauth
 </body>
 </html>
