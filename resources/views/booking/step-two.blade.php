@@ -2,41 +2,75 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container mx-auto p-4 sm:p-6 lg:p-8 max-w-2xl">
-    <div class="bg-white p-6 sm:p-8 rounded-2xl shadow-lg">
-        <h1 class="text-2xl sm:text-3xl font-bold text-center text-emerald-700 mb-2">Step 2: Choose Your Therapist</h1>
-        <p class="text-center text-gray-600 mb-8">
-            Therapists available at <span class="font-semibold">{{ $branch->name }}</span>
-        </p>
-
-        @if($errors->any())
-            <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6" role="alert">
-                <p class="font-bold">Please select a therapist to continue.</p>
+<div class="min-h-screen flex flex-col md:flex-row">
+    
+    <div class="w-full md:w-1/3 bg-emerald-700 text-white p-8 flex flex-col justify-center">
+        <div>
+            <h1 class="text-3xl font-bold mb-4">Select a Therapist</h1>
+            <p class="text-emerald-100 mb-6">
+                Choose one of our certified therapists available at your selected branch.
+            </p>
+            <div class="border-t border-emerald-500 pt-6 space-y-4 text-emerald-200">
+                <div class="flex items-center opacity-50">
+                    <span class="bg-emerald-500 text-white rounded-full h-6 w-6 text-sm flex items-center justify-center font-bold mr-3">1</span>
+                    <span>Branch & Service</span>
+                </div>
+                <div class="flex items-center">
+                    <span class="bg-emerald-500 text-white rounded-full h-6 w-6 text-sm flex items-center justify-center font-bold mr-3">2</span>
+                    <span>Choose Therapist</span>
+                </div>
+                <div class="flex items-center opacity-50">
+                    <span class="bg-emerald-500 text-white rounded-full h-6 w-6 text-sm flex items-center justify-center font-bold mr-3">3</span>
+                    <span>Select Date & Time</span>
+                </div>
+                <div class="flex items-center opacity-50">
+                    <span class="bg-emerald-500 text-white rounded-full h-6 w-6 text-sm flex items-center justify-center font-bold mr-3">4</span>
+                    <span>Your Details</span>
+                </div>
+                <div class="flex items-center opacity-50">
+                    <span class="bg-emerald-500 text-white rounded-full h-6 w-6 text-sm flex items-center justify-center font-bold mr-3">5</span>
+                    <span>Payment</span>
+                </div>
             </div>
-        @endif
+        </div>
+    </div>
 
-        <form action="{{ route('booking.store.step-two') }}" method="POST">
-            @csrf
-            <div class="space-y-4">
-                @forelse ($therapists as $therapist)
-                <label class="flex items-center p-4 border rounded-lg cursor-pointer hover:border-emerald-500 transition has-[:checked]:bg-emerald-50 has-[:checked]:border-emerald-600">
-                    <input type="radio" name="therapist_id" value="{{ $therapist->id }}" class="h-5 w-5 text-emerald-600 focus:ring-emerald-500"
-                        {{ (old('therapist_id', $booking->therapist_id ?? '') == $therapist->id) ? 'checked' : '' }}
-                    >
-                    <span class="ml-4 font-semibold text-lg text-gray-800">{{ $therapist->name }}</span>
-                </label>
-                @empty
-                <p class="text-center text-gray-500">No therapists are available for this branch.</p>
-                @endforelse
-            </div>
+    <div class="w-full md:w-2/3 bg-white p-8 lg:p-12 overflow-y-auto">
+        <div class="max-w-2xl mx-auto">
+            <h2 class="text-2xl font-bold text-gray-800 mb-2">Step 2: Choose Your Therapist</h2>
+            <p class="text-gray-600 mb-8">
+                Therapists available at <span class="font-semibold">{{ $branch->name }}</span>
+            </p>
 
-            <div class="mt-8 flex justify-between items-center">
-                <a href="{{ route('booking.create.step-one') }}" class="text-gray-600 hover:text-emerald-700">&larr; Back to Services</a>
-                <button type="submit" class="bg-emerald-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-emerald-700 transition-colors shadow-md">
-                    Next: Select Date & Time &rarr;
-                </button>
-            </div>
-        </form>
+            @if($errors->any())
+                <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6 rounded-lg" role="alert">
+                    <p class="font-bold">Please select a therapist to continue.</p>
+                </div>
+            @endif
+
+            <form action="{{ route('booking.store.step-two') }}" method="POST">
+                @csrf
+                <div class="space-y-4 border-t pt-4">
+                    @forelse ($therapists as $therapist)
+                    <label class="flex items-center p-4 border rounded-lg cursor-pointer hover:border-emerald-500 transition has-[:checked]:bg-emerald-50 has-[:checked]:border-emerald-600">
+                        <input type="radio" name="therapist_id" value="{{ $therapist->id }}" class="h-5 w-5 text-emerald-600 focus:ring-emerald-500"
+                            {{ (old('therapist_id', $booking->therapist_id ?? '') == $therapist->id) ? 'checked' : '' }}
+                        >
+                        <span class="ml-4 font-semibold text-lg text-gray-800">{{ $therapist->name }}</span>
+                    </label>
+                    @empty
+                    <p class="text-center text-gray-500">No therapists are available for this branch.</p>
+                    @endforelse
+                </div>
+
+                <div class="mt-10 flex justify-between items-center border-t pt-6">
+                    <a href="{{ route('booking.create.step-one') }}" class="text-gray-600 hover:text-emerald-700 font-semibold">&larr; Go Back</a>
+                    <button type="submit" class="bg-emerald-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-emerald-700 transition-colors shadow-md">
+                        Next: Select Date & Time &rarr;
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 @endsection
