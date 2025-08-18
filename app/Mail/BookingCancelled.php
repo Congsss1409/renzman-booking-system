@@ -1,4 +1,5 @@
 <?php
+// app/Mail/BookingCancelled.php
 
 namespace App\Mail;
 
@@ -14,18 +15,10 @@ class BookingCancelled extends Mailable
 {
     use Queueable, SerializesModels;
 
-    /**
-     * The booking instance.
-     *
-     * @var \App\Models\Booking
-     */
     public $booking;
 
     /**
      * Create a new message instance.
-     *
-     * @param  \App\Models\Booking  $booking
-     * @return void
      */
     public function __construct(Booking $booking)
     {
@@ -38,7 +31,7 @@ class BookingCancelled extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Booking Cancellation Confirmation',
+            subject: 'Important: Your Renzman Massage Booking Has Been Cancelled',
         );
     }
 

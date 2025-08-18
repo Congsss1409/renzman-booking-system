@@ -4,6 +4,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Service;
+use App\Models\Branch; // Import the Branch model
 use Illuminate\Http\Request;
 
 class LandingPageController extends Controller
@@ -13,18 +14,26 @@ class LandingPageController extends Controller
      */
     public function index()
     {
-        // No changes here
         return view('landing');
     }
 
     /**
-     * NEW: Display the services page.
+     * Display the services page.
      */
     public function services()
     {
-        // Fetch all services from the database, ordered by price
         $services = Service::orderBy('price')->get();
-        
         return view('services', compact('services'));
+    }
+
+    /**
+     * NEW: Display the about page.
+     */
+    public function about()
+    {
+        // Fetch all branches to display their locations
+        $branches = Branch::all();
+        
+        return view('about', compact('branches'));
     }
 }

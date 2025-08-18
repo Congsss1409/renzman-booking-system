@@ -25,8 +25,6 @@
             <thead class="bg-gray-800 text-white">
                 <tr>
                     <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Photo</th>
-                    
-                    {{-- Sortable Name Header --}}
                     <th class="text-left py-3 px-4 uppercase font-semibold text-sm">
                         <a href="{{ route('admin.therapists.index', ['sort_by' => 'name', 'sort_order' => ($sortBy == 'name' && $sortOrder == 'asc' ? 'desc' : 'asc')]) }}">
                             Name
@@ -35,8 +33,6 @@
                             @endif
                         </a>
                     </th>
-                    
-                    {{-- Sortable Branch Header --}}
                     <th class="text-left py-3 px-4 uppercase font-semibold text-sm">
                         <a href="{{ route('admin.therapists.index', ['sort_by' => 'branch', 'sort_order' => ($sortBy == 'branch' && $sortOrder == 'asc' ? 'desc' : 'asc')]) }}">
                             Assigned Branch
@@ -45,7 +41,6 @@
                             @endif
                         </a>
                     </th>
-
                     <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Actions</th>
                 </tr>
             </thead>
@@ -59,7 +54,7 @@
                         <td class="py-3 px-4">{{ $therapist->branch->name ?? 'Not Assigned' }}</td>
                         <td class="py-3 px-4 flex items-center space-x-4">
                             <a href="{{ route('admin.therapists.edit', $therapist) }}" class="text-blue-500 hover:text-blue-700 font-semibold">Edit</a>
-                            <form action="{{ route('admin.therapists.destroy', $therapist) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this therapist? This action cannot be undone.');">
+                            <form action="{{ route('admin.therapists.destroy', $therapist) }}" method="POST" class="delete-form">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="text-red-500 hover:text-red-700 font-semibold">Delete</button>
@@ -75,4 +70,26 @@
         </table>
     </div>
 </div>
+
+<script>
+// SweetAlert2 confirmation for deletion
+document.querySelectorAll('.delete-form').forEach(form => {
+    form.addEventListener('submit', function (event) {
+        event.preventDefault();
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "This action cannot be undone!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#10B981',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                this.submit();
+            }
+        })
+    });
+});
+</script>
 @endsection

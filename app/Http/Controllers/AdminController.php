@@ -12,7 +12,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use App\Events\BookingCreated;
 use Illuminate\Support\Facades\Mail;
-use App\Mail\BookingCancelled;
+use App\Mail\BookingCancelled; // Import the new Mailable
 use Illuminate\Support\Facades\Storage;
 
 class AdminController extends Controller
@@ -22,11 +22,9 @@ class AdminController extends Controller
      */
     public function dashboard()
     {
-        // --- NEW: Auto-complete past bookings ---
         Booking::where('status', 'Confirmed')
                ->where('start_time', '<', now())
                ->update(['status' => 'Completed']);
-        // --- END NEW ---
 
         $bookings = Booking::with('service', 'therapist', 'branch')
                              ->orderBy('start_time', 'desc')
@@ -41,7 +39,15 @@ class AdminController extends Controller
     {
         $booking->status = 'Cancelled';
         $booking->save();
-        return redirect()->route('admin.dashboard')->with('success', 'Booking has been successfully cancelled.');
+
+        // --- NEW: Send cancellation email to the client ---
+        // We check if the client has a real email before sending
+        if (filter_var($booking->client_email, FILTER_VALIDATE_EMAIL)) {
+            Mail::to($booking->client_email)->send(new BookingCancelled($booking));
+        }
+        // --- END NEW ---
+
+        return redirect()->route('admin.dashboard')->with('success', 'Booking has been successfully cancelled and the client has been notified.');
     }
 
     /**
@@ -69,8 +75,13 @@ class AdminController extends Controller
             'booking_time' => 'required',
         ]);
 
+        $selectedDateTime = Carbon::parse($validated['booking_date'] . ' ' . $validated['booking_time']);
+        if ($selectedDateTime->isPast()) {
+            return back()->withErrors(['booking_time' => 'You cannot create an appointment in the past.'])->withInput();
+        }
+
         $service = Service::find($validated['service_id']);
-        $startTime = Carbon::parse($validated['booking_date'] . ' ' . $validated['booking_time']);
+        $startTime = $selectedDateTime;
         $endTime = $startTime->copy()->addMinutes($service->duration);
 
         $booking = Booking::create([
@@ -121,14 +132,17 @@ class AdminController extends Controller
         $totalRevenue = Booking::where('status', '!=', 'Cancelled')->sum('price');
         $averageRating = Booking::whereNotNull('rating')->avg('rating');
 
-        $popularServices = Booking::select('service_id', DB::raw('count(*) as total'))
+        $popularServicesQuery = Booking::select('service_id', DB::raw('count(*) as total'))
                                     ->groupBy('service_id')
                                     ->with('service')
                                     ->orderBy('total', 'desc')
                                     ->take(5)
                                     ->get();
+        
+        $popularServicesLabels = $popularServicesQuery->pluck('service.name');
+        $popularServicesData = $popularServicesQuery->pluck('total');
 
-        $busiestTherapists = Booking::select('therapist_id', DB::raw('count(*) as total'))
+        $busiestTherapistsQuery = Booking::select('therapist_id', DB::raw('count(*) as total'))
                                       ->where('status', '!=', 'Cancelled')
                                       ->groupBy('therapist_id')
                                       ->with('therapist')
@@ -136,12 +150,33 @@ class AdminController extends Controller
                                       ->take(5)
                                       ->get();
 
+        $busiestTherapistsLabels = $busiestTherapistsQuery->pluck('therapist.name');
+        $busiestTherapistsData = $busiestTherapistsQuery->pluck('total');
+
+        $aiInsight = "Based on the current data, the business is performing well. ";
+        if ($popularServicesQuery->isNotEmpty()) {
+            $aiInsight .= "The most popular service is currently **" . $popularServicesQuery->first()->service->name . "**. ";
+        }
+        if ($busiestTherapistsQuery->isNotEmpty()) {
+            $aiInsight .= "The busiest therapist is **" . $busiestTherapistsQuery->first()->therapist->name . "**. ";
+        }
+        if ($averageRating > 4.5) {
+            $aiInsight .= "Client satisfaction is exceptionally high with an average rating of **" . number_format($averageRating, 2) . " stars**. Focus on maintaining this excellent standard of service.";
+        } elseif ($averageRating > 4.0) {
+            $aiInsight .= "Client satisfaction is strong with an average rating of **" . number_format($averageRating, 2) . " stars**. Consider promoting services with lower ratings to gather more feedback.";
+        } else {
+            $aiInsight .= "There is an opportunity to improve client satisfaction, as the average rating is currently **" . number_format($averageRating, 2) . " stars**.";
+        }
+
         return view('admin.analytics', compact(
             'totalBookings',
             'totalRevenue',
             'averageRating',
-            'popularServices',
-            'busiestTherapists'
+            'popularServicesLabels',
+            'popularServicesData',
+            'busiestTherapistsLabels',
+            'busiestTherapistsData',
+            'aiInsight'
         ));
     }
 
@@ -170,7 +205,7 @@ class AdminController extends Controller
             'service_id' => 'required|exists:services,id',
             'booking_date' => 'required|date',
             'booking_time' => 'required',
-            'status' => 'required|string',
+            'status' => 'required|string|in:Confirmed,Completed',
         ]);
 
         $service = Service::find($validated['service_id']);
@@ -198,14 +233,11 @@ class AdminController extends Controller
     public function listTherapists(Request $request)
     {
         $query = Therapist::with('branch');
-
         if ($request->has('search') && $request->search != '') {
             $query->where('name', 'LIKE', '%' . $request->search . '%');
         }
-
         $sortBy = $request->get('sort_by', 'name');
         $sortOrder = $request->get('sort_order', 'asc');
-
         if ($sortBy == 'branch') {
             $query->join('branches', 'therapists.branch_id', '=', 'branches.id')
                   ->orderBy('branches.name', $sortOrder)
@@ -213,9 +245,7 @@ class AdminController extends Controller
         } else {
             $query->orderBy($sortBy, $sortOrder);
         }
-        
         $therapists = $query->get();
-
         return view('admin.therapists', compact('therapists', 'sortBy', 'sortOrder'));
     }
 
@@ -238,7 +268,6 @@ class AdminController extends Controller
             'branch_id' => 'required|exists:branches,id',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
-
         if ($request->hasFile('image')) {
             if ($therapist->image_url) {
                 Storage::disk('public')->delete(str_replace('/storage/', '', $therapist->image_url));
@@ -246,9 +275,7 @@ class AdminController extends Controller
             $path = $request->file('image')->store('therapists', 'public');
             $validated['image_url'] = Storage::url($path);
         }
-
         $therapist->update($validated);
-
         return redirect()->route('admin.therapists.index')->with('success', 'Therapist details updated successfully.');
     }
 
@@ -271,16 +298,13 @@ class AdminController extends Controller
             'branch_id' => 'required|exists:branches,id',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
-
         if ($request->hasFile('image')) {
             $path = $request->file('image')->store('therapists', 'public');
             $validated['image_url'] = Storage::url($path);
         } else {
             $validated['image_url'] = 'https://ui-avatars.com/api/?name=' . urlencode($validated['name']) . '&color=FFFFFF&background=059669&size=128';
         }
-
         Therapist::create($validated);
-
         return redirect()->route('admin.therapists.index')->with('success', 'New therapist added successfully.');
     }
 
@@ -289,12 +313,14 @@ class AdminController extends Controller
      */
     public function destroyTherapist(Therapist $therapist)
     {
+        if ($therapist->bookings()->exists()) {
+            return redirect()->route('admin.therapists.index')
+                             ->with('error', 'Cannot delete this therapist because they have existing bookings. Please reassign or cancel their appointments first.');
+        }
         if ($therapist->image_url) {
             Storage::disk('public')->delete(str_replace('/storage/', '', $therapist->image_url));
         }
-        
         $therapist->delete();
-
         return redirect()->route('admin.therapists.index')->with('success', 'Therapist has been deleted.');
     }
 }

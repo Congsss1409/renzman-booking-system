@@ -22,7 +22,6 @@
         @csrf
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             
-            <!-- Client Details -->
             <div class="md:col-span-2">
                 <h3 class="text-lg font-semibold text-gray-700 border-b pb-2 mb-4">Client Information</h3>
             </div>
@@ -35,7 +34,6 @@
                 <input type="tel" name="client_phone" id="client_phone" value="{{ old('client_phone') }}" required class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-emerald-500 focus:border-emerald-500">
             </div>
 
-            <!-- Appointment Details -->
             <div class="md:col-span-2">
                 <h3 class="text-lg font-semibold text-gray-700 border-b pb-2 mb-4 mt-6">Appointment Details</h3>
             </div>
@@ -65,7 +63,7 @@
             </div>
             <div>
                 <label for="booking_date" class="block text-sm font-medium text-gray-700">Date</label>
-                <input type="date" name="booking_date" id="booking_date" value="{{ old('booking_date') }}" required class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-emerald-500 focus:border-emerald-500">
+                <input type="date" name="booking_date" id="booking_date" value="{{ old('booking_date', now()->format('Y-m-d')) }}" required class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-emerald-500 focus:border-emerald-500">
             </div>
             <div>
                 <label for="booking_time" class="block text-sm font-medium text-gray-700">Time</label>
@@ -88,14 +86,16 @@
 document.addEventListener('DOMContentLoaded', function () {
     const branchSelect = document.getElementById('branch_id');
     const therapistSelect = document.getElementById('therapist_id');
+    const dateInput = document.getElementById('booking_date');
+    const timeInput = document.getElementById('booking_time');
 
+    // --- Logic for therapist dropdown ---
     branchSelect.addEventListener('change', function () {
         const branchId = this.value;
         therapistSelect.innerHTML = '<option value="">Loading...</option>';
         therapistSelect.disabled = true;
 
         if (branchId) {
-            // Fetch therapists for the selected branch
             fetch(`/admin/branches/${branchId}/therapists`)
                 .then(response => response.json())
                 .then(data => {
@@ -107,15 +107,35 @@ document.addEventListener('DOMContentLoaded', function () {
                         therapistSelect.appendChild(option);
                     });
                     therapistSelect.disabled = false;
-                })
-                .catch(error => {
-                    console.error('Error fetching therapists:', error);
-                    therapistSelect.innerHTML = '<option value="">Could not load therapists</option>';
                 });
         } else {
             therapistSelect.innerHTML = '<option value="">Select a branch first</option>';
         }
     });
+
+    // --- NEW: Logic for dynamic time input ---
+    function updateMinTime() {
+        const today = new Date();
+        const selectedDate = new Date(dateInput.value);
+        
+        // Check if the selected date is today
+        if (selectedDate.toDateString() === today.toDateString()) {
+            // Format the current time to HH:MM for the min attribute
+            const now = new Date();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            timeInput.min = `${hours}:${minutes}`;
+        } else {
+            // If it's a future date, remove the min attribute
+            timeInput.min = '';
+        }
+    }
+
+    // Add event listener to the date input
+    dateInput.addEventListener('change', updateMinTime);
+
+    // Run the function once on page load
+    updateMinTime();
 });
 </script>
 @endsection

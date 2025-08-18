@@ -5,43 +5,104 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Booking Confirmation</title>
+    {{-- We use a script tag for Tailwind, but many styles are also inlined for email client compatibility --}}
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { font-family: ui-sans-serif, system-ui, sans-serif; }
+        body {
+            font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+            background-color: #f3f4f6;
+            color: #374151;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            padding: 32px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+        .button {
+            display: inline-block;
+            background-color: #10B981;
+            color: #ffffff;
+            font-weight: bold;
+            padding: 12px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            transition: background-color 0.2s;
+        }
+        .button:hover {
+            background-color: #059669;
+        }
     </style>
 </head>
-<body class="bg-gray-100 p-4 sm:p-6">
-    <div class="max-w-2xl mx-auto bg-white p-8 rounded-lg shadow-md">
-        <div class="text-center mb-8">
-            <img src="{{ $message->embed(public_path('images/logo trans.png')) }}" alt="Renzman Logo" class="h-16 mx-auto">
+<body style="background-color: #f3f4f6; padding: 16px;">
+    <div class="container" style="max-width: 600px; margin: 0 auto; background-color: #ffffff; padding: 32px; border-radius: 8px;">
+        <div style="text-align: center; margin-bottom: 32px;">
+            {{-- Embedding the logo for email clients --}}
+            <img src="{{ $message->embed(public_path('images/logo trans.png')) }}" alt="Renzman Logo" style="height: 64px; margin: 0 auto;">
         </div>
-        <h1 class="text-2xl font-bold text-gray-800 mb-4">Hello, {{ $booking->client_name }}!</h1>
-        <p class="text-gray-600 mb-6">Your appointment with Renzman Blind Massage has been successfully confirmed. We look forward to seeing you.</p>
+        <h1 style="font-size: 24px; font-weight: bold; color: #111827; margin-bottom: 16px;">Hello, {{ $booking->client_name }}!</h1>
+        <p style="color: #4b5563; margin-bottom: 24px; line-height: 1.6;">
+            Your appointment with Renzman Blind Massage has been successfully confirmed. We are excited to welcome you and provide a relaxing and rejuvenating experience.
+        </p>
 
-        <div class="bg-gray-50 p-6 rounded-lg border">
-            <h2 class="text-xl font-semibold mb-4 text-gray-800">Your Booking Details:</h2>
-            <div class="space-y-3 text-gray-700">
-                <div class="flex justify-between"><span>Branch:</span><span class="font-semibold">{{ $booking->branch->name }}</span></div>
-                <div class="flex justify-between"><span>Service:</span><span class="font-semibold">{{ $booking->service->name }}</span></div>
-                <div class="flex justify-between"><span>Therapist:</span><span class="font-semibold">{{ $booking->therapist->name }}</span></div>
-                <div class="flex justify-between"><span>Date:</span><span class="font-semibold">{{ $booking->start_time->format('F j, Y') }}</span></div>
-                <div class="flex justify-between"><span>Time:</span><span class="font-semibold">{{ $booking->start_time->format('g:i A') }}</span></div>
-                <div class="flex justify-between border-t pt-3 mt-3"><span class="text-lg font-bold">Total Price:</span><span class="text-lg font-bold text-emerald-600">₱{{ number_format($booking->price, 2) }}</span></div>
+        <div style="background-color: #f9fafb; padding: 24px; border-radius: 8px; border: 1px solid #e5e7eb;">
+            <h2 style="font-size: 20px; font-weight: 600; margin-bottom: 16px; color: #1f2937;">Your Booking Details:</h2>
+            <div style="font-size: 16px; color: #374151;">
+                <div style="display: flex; justify-content: space-between; padding-bottom: 8px;">
+                    <span>Branch:</span>
+                    <span style="font-weight: 600;">{{ $booking->branch->name }}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; padding-top: 8px; padding-bottom: 8px;">
+                    <span>Service:</span>
+                    <span style="font-weight: 600;">{{ $booking->service->name }}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; padding-top: 8px; padding-bottom: 8px;">
+                    <span>Therapist:</span>
+                    <span style="font-weight: 600;">{{ $booking->therapist->name }}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; padding-top: 8px; padding-bottom: 8px;">
+                    <span>Date:</span>
+                    <span style="font-weight: 600;">{{ $booking->start_time->format('F j, Y') }}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; padding-top: 8px; padding-bottom: 16px;">
+                    <span>Time:</span>
+                    <span style="font-weight: 600;">{{ $booking->start_time->format('g:i A') }}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; border-top: 1px solid #e5e7eb; padding-top: 16px; margin-top: 16px;">
+                    <span style="font-size: 18px; font-weight: bold;">Total Price:</span>
+                    <span style="font-size: 18px; font-weight: bold; color: #059669;">₱{{ number_format($booking->price, 2) }}</span>
+                </div>
+                 @if($booking->downpayment_amount > 0)
+                <div style="display: flex; justify-content: space-between; padding-top: 8px;">
+                    <span style="font-size: 16px;">Downpayment Paid:</span>
+                    <span style="font-size: 16px; font-weight: 600;">- ₱{{ number_format($booking->downpayment_amount, 2) }}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-weight: bold; padding-top: 8px;">
+                    <span style="font-size: 16px;">Remaining Balance:</span>
+                    <span style="font-size: 16px; font-weight: 600;">₱{{ number_format($booking->remaining_balance, 2) }}</span>
+                </div>
+                @endif
             </div>
         </div>
 
-        {{-- NEW FEEDBACK SECTION --}}
-        <div class="text-center mt-8 p-6 bg-emerald-50 rounded-lg">
-            <h3 class="font-semibold text-lg text-emerald-800">How was your experience?</h3>
-            <p class="text-emerald-700 mt-2">After your session, please take a moment to leave us your feedback. It helps us improve our service.</p>
-            <a href="{{ route('feedback.create', $booking->feedback_token) }}" class="mt-4 inline-block bg-emerald-600 text-white font-bold py-2 px-5 rounded-lg hover:bg-emerald-700 transition-colors">
+        <div style="text-align: center; margin-top: 32px; padding: 24px; background-color: #ECFDF5; border-radius: 8px;">
+            <h3 style="font-weight: 600; font-size: 18px; color: #065F46;">How was your experience?</h3>
+            <p style="color: #047857; margin-top: 8px;">After your session, please take a moment to leave us your feedback.</p>
+            <a href="{{ route('feedback.create', $booking->feedback_token) }}" class="button" style="margin-top: 16px; display: inline-block; background-color: #10B981; color: #ffffff; font-weight: bold; padding: 12px 24px; border-radius: 8px; text-decoration: none;">
                 Leave Feedback
             </a>
         </div>
 
-        <p class="text-gray-600 mt-8 text-sm">
+        <p style="color: #4b5563; margin-top: 32px; font-size: 14px; line-height: 1.6;">
             If you need to cancel or reschedule, please contact us at least 24 hours in advance. You can reach us at 0932-423-3517 or 0977-392-6564.
         </p>
+
+        <div style="text-align: center; margin-top: 32px; font-size: 12px; color: #9ca3af;">
+            <p>Renzman Blind Massage Therapy</p>
+            <p>&copy; {{ date('Y') }} All rights reserved.</p>
+        </div>
     </div>
 </body>
 </html>

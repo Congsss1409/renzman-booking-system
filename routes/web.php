@@ -10,7 +10,9 @@ use App\Http\Controllers\FeedbackController;
 
 // --- Public Routes ---
 Route::get('/', [LandingPageController::class, 'index'])->name('landing');
-Route::get('/services', [LandingPageController::class, 'services'])->name('services'); // NEW ROUTE
+Route::get('/services', [LandingPageController::class, 'services'])->name('services');
+Route::get('/about', [LandingPageController::class, 'about'])->name('about'); // NEW ROUTE
+
 // --- Auth Routes ---
 Route::get('login', [LoginController::class, 'create'])->name('login');
 Route::post('login', [LoginController::class, 'store'])->name('login.store');
@@ -49,12 +51,10 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
     Route::get('/analytics', [AdminController::class, 'analytics'])->name('analytics');
     Route::get('/bookings/{booking}/edit', [AdminController::class, 'editBooking'])->name('bookings.edit');
     Route::put('/bookings/{booking}', [AdminController::class, 'updateBooking'])->name('bookings.update');
-
-    // --- Therapist Management Routes ---
     Route::get('/therapists', [AdminController::class, 'listTherapists'])->name('therapists.index');
-    Route::get('/therapists/create', [AdminController::class, 'createTherapist'])->name('therapists.create'); // NEW
-    Route::post('/therapists', [AdminController::class, 'storeTherapist'])->name('therapists.store'); // NEW
+    Route::get('/therapists/create', [AdminController::class, 'createTherapist'])->name('therapists.create');
+    Route::post('/therapists', [AdminController::class, 'storeTherapist'])->name('therapists.store');
     Route::get('/therapists/{therapist}/edit', [AdminController::class, 'editTherapist'])->name('therapists.edit');
     Route::put('/therapists/{therapist}', [AdminController::class, 'updateTherapist'])->name('therapists.update');
-    Route::delete('/therapists/{therapist}', [AdminController::class, 'destroyTherapist'])->name('therapists.destroy'); // NEW
+    Route::delete('/therapists/{therapist}', [AdminController::class, 'destroyTherapist'])->name('therapists.destroy');
 });

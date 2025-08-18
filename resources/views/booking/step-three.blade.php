@@ -124,7 +124,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     const formattedDate = `${yearStr}-${monthStr}-${dayStr}`;
                     hiddenDateInput.value = formattedDate;
 
-                    renderTimeSlots(cellDate); // Pass the full cellDate object now
+                    renderTimeSlots(cellDate);
                     checkFormCompletion();
                 });
             }
@@ -161,20 +161,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 timeSlotBtn.textContent = time;
                 timeSlotBtn.className = 'p-2 border rounded-lg hover:border-emerald-500 transition';
 
-                // --- NEW: LOGIC TO DISABLE PAST TIMES FOR TODAY ---
+                // --- NEW: More precise logic to disable past times ---
                 let isDisabled = false;
                 if (isToday) {
-                    const [hour, minutePart] = time.split(':');
-                    const [minute, period] = minutePart.split(' ');
-                    let hour24 = parseInt(hour, 10);
-                    if (period === 'PM' && hour24 !== 12) {
-                        hour24 += 12;
-                    }
-                    if (period === 'AM' && hour24 === 12) { // Midnight case
-                        hour24 = 0;
-                    }
+                    // Create a full Date object for the time slot to compare it accurately
+                    const timeSlotDate = new Date(selectedDate.toDateString() + ' ' + time);
                     
-                    if (hour24 < now.getHours()) {
+                    // Disable if the time slot is in the past
+                    if (timeSlotDate < now) {
                         isDisabled = true;
                     }
                 }

@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Mail;
 use App\Mail\BookingConfirmed;
 use Illuminate\Support\Str;
 use App\Events\BookingCreated;
+use Illuminate\Validation\Rule;
 
 class BookingController extends Controller
 {
@@ -36,26 +37,22 @@ class BookingController extends Controller
         return redirect()->route('booking.create.step-two');
     }
 
-    // Step 2: Show Therapist Selection (with Status)
+    // Step 2: Show Therapist Selection
     public function createStepTwo(Request $request)
     {
         $booking = $request->session()->get('booking');
         if (empty($booking->branch_id)) {
             return redirect()->route('booking.create.step-one');
         }
-
-        $branch = Branch::find($booking->branch_id);
         $therapists = Therapist::where('branch_id', $booking->branch_id)->get();
+        $branch = Branch::find($booking->branch_id);
         $now = Carbon::now();
-
-        // Determine the status of each therapist
         foreach ($therapists as $therapist) {
             $currentBooking = Booking::where('therapist_id', $therapist->id)
                 ->where('start_time', '<=', $now)
                 ->where('end_time', '>=', $now)
                 ->where('status', '!=', 'Cancelled')
                 ->first();
-
             if ($currentBooking) {
                 $therapist->status = 'In Session';
                 $therapist->available_at = Carbon::parse($currentBooking->end_time)->format('g:i A');
@@ -64,7 +61,6 @@ class BookingController extends Controller
                 $therapist->available_at = null;
             }
         }
-
         return view('booking.step-two', compact('therapists', 'branch', 'booking'));
     }
 
@@ -92,7 +88,16 @@ class BookingController extends Controller
     // Step 3: Store Date & Time Selection
     public function storeStepThree(Request $request)
     {
-        $validated = $request->validate(['booking_date' => 'required|date|after_or_equal:today', 'booking_time' => 'required|string']);
+        $validated = $request->validate([
+            'booking_date' => 'required|date|after_or_equal:today',
+            'booking_time' => 'required|string',
+        ]);
+
+        $selectedDateTime = Carbon::parse($validated['booking_date'] . ' ' . $validated['booking_time']);
+        if ($selectedDateTime->isPast()) {
+            return back()->withErrors(['booking_time' => 'You cannot book an appointment in the past.'])->withInput();
+        }
+
         $booking = $request->session()->get('booking');
         $booking->date = $validated['booking_date'];
         $booking->time = $validated['booking_time'];
@@ -112,7 +117,7 @@ class BookingController extends Controller
         $therapist = Therapist::find($booking->therapist_id);
         return view('booking.step-four', compact('booking', 'branch', 'service', 'therapist'));
     }
-
+    
     // Step 4: Store Client Details and Proceed to Payment
     public function storeStepFour(Request $request)
     {
@@ -196,9 +201,6 @@ class BookingController extends Controller
         return view('booking.success');
     }
 
-    /**
-     * Get the availability for a given therapist on a specific date.
-     */
     public function getAvailability(Request $request, Therapist $therapist, $date)
     {
         try {
