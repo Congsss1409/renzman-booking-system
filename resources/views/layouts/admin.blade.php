@@ -13,11 +13,15 @@
 
     <style> body { font-family: 'Inter', sans-serif; } </style>
 </head>
-<body class="bg-gray-100">
-    <div class="flex h-screen bg-gray-100">
+<body class="">
+    <div class="flex h-screen ">
         <div class="w-64 bg-gray-800 text-white flex flex-col">
-            <div class="p-6 text-2xl font-bold border-b border-gray-700">
-                Renzman Admin
+            
+            {{-- NEW: Replaced text header with logo --}}
+            <div class="p-4 flex justify-center items-center border-b ">
+                <a href="{{ route('admin.dashboard') }}">
+                    <img src="{{ asset('images/admin.png') }}" alt="Renzman Logo" class="h-16">
+                </a>
             </div>
             <nav class="flex-1 p-4 space-y-2">
                 <a href="{{ route('admin.dashboard') }}" class="flex items-center px-4 py-2 rounded-lg text-gray-300 hover:bg-gray-700 hover:text-white {{ request()->routeIs('admin.dashboard*') ? 'bg-emerald-700 !text-white' : '' }}">

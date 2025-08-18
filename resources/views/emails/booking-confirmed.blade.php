@@ -40,7 +40,7 @@
     <div class="container" style="max-width: 600px; margin: 0 auto; background-color: #ffffff; padding: 32px; border-radius: 8px;">
         <div style="text-align: center; margin-bottom: 32px;">
             {{-- Embedding the logo for email clients --}}
-            <img src="{{ $message->embed(public_path('images/logo trans.png')) }}" alt="Renzman Logo" style="height: 64px; margin: 0 auto;">
+            <img src="{{ $message->embed(public_path('images/new.png')) }}" alt="Renzman Logo" style="height: 64px; margin: 0 auto;">
         </div>
         <h1 style="font-size: 24px; font-weight: bold; color: #111827; margin-bottom: 16px;">Hello, {{ $booking->client_name }}!</h1>
         <p style="color: #4b5563; margin-bottom: 24px; line-height: 1.6;">
