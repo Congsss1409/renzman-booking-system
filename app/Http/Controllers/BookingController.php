@@ -155,6 +155,12 @@ class BookingController extends Controller
         ]);
 
         $bookingData = $request->session()->get('booking');
+
+        // *** FIX: Check if session data exists before proceeding ***
+        if (!$bookingData) {
+            return redirect()->route('booking.create.step-one')->with('error', 'Your session has expired. Please start your booking again.');
+        }
+
         $service = Service::find($bookingData->service_id);
         $startTime = Carbon::parse($bookingData->date . ' ' . $bookingData->time);
         $endTime = $startTime->copy()->addMinutes($service->duration);
@@ -221,3 +227,4 @@ class BookingController extends Controller
         return response()->json($bookedTimes);
     }
 }
+

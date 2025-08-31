@@ -1,90 +1,73 @@
-{{-- resources/views/admin/dashboard.blade.php --}}
 @extends('layouts.admin')
 
-@section('header', 'Appointments Dashboard')
+@section('title', 'Admin Dashboard')
 
 @section('content')
 <div class="bg-white p-6 rounded-lg shadow-lg">
+    {{-- *** FIX: Re-added "Create New Booking" button *** --}}
     <div class="flex justify-between items-center mb-6">
         <h2 class="text-2xl font-bold text-gray-800">All Bookings</h2>
-        <a href="{{ route('admin.bookings.create') }}" class="bg-emerald-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-emerald-700 transition-colors shadow-md">
-            + New Booking
+        <a href="{{ route('admin.bookings.create') }}" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-4 rounded">
+            Create New Booking
         </a>
     </div>
-    
+
+    @if (session('success'))
+        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4" role="alert">
+            <span class="block sm:inline">{{ session('success') }}</span>
+        </div>
+    @endif
+
     <div class="overflow-x-auto">
         <table class="min-w-full bg-white">
             <thead class="bg-gray-800 text-white">
                 <tr>
-                    <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Client & Contact</th>
-                    <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Service & Branch</th>
-                    <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Date & Time</th>
+                    <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Client Name</th>
+                    <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Service</th>
                     <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Therapist</th>
+                    <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Branch</th>
+                    <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Date & Time</th>
                     <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Status</th>
                     <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Actions</th>
                 </tr>
             </thead>
             <tbody class="text-gray-700">
                 @forelse ($bookings as $booking)
-                    <tr class="border-b hover:bg-gray-50">
+                    <tr class="border-b">
+                        <td class="py-3 px-4">{{ $booking->client_name }}</td>
+                        <td class="py-3 px-4">{{ $booking->service->name }}</td>
+                        <td class="py-3 px-4">{{ $booking->therapist->name }}</td>
+                        <td class="py-3 px-4">{{ $booking->branch->name }}</td>
+                        <td class="py-3 px-4">{{ $booking->start_time->format('M d, Y, g:i A') }}</td>
                         <td class="py-3 px-4">
-                            <div class="font-semibold">{{ $booking->client_name }}</div>
-                            <div class="text-sm text-gray-500">{{ $booking->client_phone }}</div>
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                                {{ $booking->status == 'Confirmed' ? 'bg-green-100 text-green-800' : '' }}
+                                {{ $booking->status == 'Cancelled' ? 'bg-red-100 text-red-800' : '' }}
+                                {{ $booking->status == 'Completed' ? 'bg-blue-100 text-blue-800' : '' }}">
+                                {{ $booking->status }}
+                            </span>
                         </td>
                         <td class="py-3 px-4">
-                            <div>{{ $booking->service->name }}</div>
-                            <div class="text-sm text-gray-500">at {{ $booking->branch->name ?? 'N/A' }}</div>
-                        </td>
-                        <td class="py-3 px-4">{{ \Carbon\Carbon::parse($booking->start_time)->format('M j, Y - g:i A') }}</td>
-                        <td class="py-3 px-4">{{ $booking->therapist->name ?? 'Not Assigned' }}</td>
-                        <td class="py-3 px-4">
-                            @if($booking->status == 'Confirmed')
-                                <span class="bg-emerald-200 text-emerald-800 py-1 px-3 rounded-full text-xs font-semibold">{{ $booking->status }}</span>
-                            @elseif($booking->status == 'Cancelled')
-                                <span class="bg-red-200 text-red-800 py-1 px-3 rounded-full text-xs font-semibold">{{ $booking->status }}</span>
-                            @else
-                                <span class="bg-gray-200 text-gray-800 py-1 px-3 rounded-full text-xs font-semibold">{{ $booking->status }}</span>
-                            @endif
-                        </td>
-                        <td class="py-3 px-4 flex items-center space-x-4">
-                            <a href="{{ route('admin.bookings.edit', $booking) }}" class="text-blue-500 hover:text-blue-700 font-semibold">Edit</a>
-                            @if($booking->status == 'Confirmed')
-                                <form action="{{ route('admin.bookings.cancel', $booking) }}" method="POST" class="cancel-form">
+                             @if ($booking->status !== 'Cancelled')
+                                <form action="{{ route('admin.bookings.cancel', $booking) }}" method="POST" onsubmit="return confirm('Are you sure you want to cancel this booking?');">
                                     @csrf
-                                    <button type="submit" class="text-red-500 hover:text-red-700 font-semibold">Cancel</button>
+                                    <button type="submit" class="text-red-500 hover:text-red-700">Cancel</button>
                                 </form>
                             @endif
                         </td>
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="6" class="text-center py-4">No bookings have been made yet.</td>
+                        <td colspan="7" class="text-center py-4">No bookings found.</td>
                     </tr>
                 @endforelse
             </tbody>
         </table>
     </div>
-</div>
 
-<script>
-// SweetAlert2 confirmation for cancellation
-document.querySelectorAll('.cancel-form').forEach(form => {
-    form.addEventListener('submit', function (event) {
-        event.preventDefault(); // Stop the form from submitting immediately
-        Swal.fire({
-            title: 'Are you sure?',
-            text: "You won't be able to revert this!",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#10B981',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Yes, cancel it!'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                this.submit(); // If confirmed, submit the form
-            }
-        })
-    });
-});
-</script>
+    <div class="mt-6">
+        {{ $bookings->links() }}
+    </div>
+</div>
 @endsection
+
