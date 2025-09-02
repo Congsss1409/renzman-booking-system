@@ -1,5 +1,4 @@
 <?php
-// app/Events/BookingCreated.php
 
 namespace App\Events;
 
@@ -12,37 +11,33 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
+// *** FIX: Implement ShouldBroadcast to make this event broadcastable ***
 class BookingCreated implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    /**
-     * The booking instance.
-     *
-     * @var \App\Models\Booking
-     */
     public $booking;
 
     /**
      * Create a new event instance.
+     *
+     * @return void
      */
     public function __construct(Booking $booking)
     {
         // Eager load the relationships so they are included in the broadcast
-        $this->booking = $booking->load('service', 'therapist', 'branch');
+        $this->booking = $booking->load(['branch', 'service', 'therapist']);
     }
 
     /**
      * Get the channels the event should broadcast on.
      *
-     * @return array<int, \Illuminate\Broadcasting\Channel>
+     * We use a PrivateChannel to ensure only authenticated admins can receive this event.
+     *
+     * @return \Illuminate\Broadcasting\Channel|array
      */
-    public function broadcastOn(): array
+    public function broadcastOn()
     {
-        // Broadcast on a private channel named 'admin'
-        // Only authenticated admins will be able to listen
-        return [
-            new PrivateChannel('admin'),
-        ];
+        return new PrivateChannel('admin-dashboard');
     }
 }
