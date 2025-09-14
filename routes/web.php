@@ -6,7 +6,8 @@ use App\Http\Controllers\BookingController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\FeedbackController;
-use App\Http\Controllers\Admin\PayrollController;
+use App\Http\Controllers\Admin\ServiceController;
+use App\Http\Controllers\Admin\TherapistController;
 
 /*
 |--------------------------------------------------------------------------
@@ -55,25 +56,19 @@ Route::get('/api/therapists/{therapist}/availability/{date}/{service}', [Booking
 Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
     
-    // --- Booking Management (Simplified for Modal) ---
+    // --- Booking Management ---
     Route::post('/bookings', [AdminController::class, 'storeBooking'])->name('bookings.store');
     Route::post('/bookings/{booking}/cancel', [AdminController::class, 'cancelBooking'])->name('bookings.cancel');
 
     // --- Therapist Management ---
-    Route::get('/therapists', [AdminController::class, 'listTherapists'])->name('therapists.index');
-    Route::get('/therapists/create', [AdminController::class, 'createTherapist'])->name('therapists.create');
-    Route::post('/therapists', [AdminController::class, 'storeTherapist'])->name('therapists.store');
-    Route::get('/therapists/{therapist}/edit', [AdminController::class, 'editTherapist'])->name('therapists.edit');
-    Route::put('/therapists/{therapist}', [AdminController::class, 'updateTherapist'])->name('therapists.update');
-    Route::delete('/therapists/{therapist}', [AdminController::class, 'destroyTherapist'])->name('therapists.destroy');
+    Route::resource('therapists', TherapistController::class);
+
+    // --- Service Management ---
+    Route::resource('services', ServiceController::class);
     
     // --- Other Admin Routes ---
     Route::get('/branches/{branch}/therapists', [AdminController::class, 'getTherapistsByBranch'])->name('branches.therapists');
     Route::get('/feedback', [AdminController::class, 'feedback'])->name('feedback');
-    Route::get('/analytics', [AdminController::class, 'analytics'])->name('analytics');
-    
-    // --- Payroll Routes ---
-    Route::get('/payroll', [PayrollController::class, 'index'])->name('payroll.index');
-    Route::post('/payroll', [PayrollController::class, 'generate'])->name('payroll.generate');
+    Route::post('/feedback/{booking}/toggle', [AdminController::class, 'toggleFeedbackDisplay'])->name('feedback.toggle');
 });
 

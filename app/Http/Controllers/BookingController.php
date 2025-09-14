@@ -18,8 +18,13 @@ class BookingController extends Controller
     {
         $branches = Branch::all();
         $services = Service::all();
-        $booking = $request->session()->get('booking');
-        return view('booking.step-one', compact('branches', 'services', 'booking'));
+        $booking = $request->session()->get('booking', new \stdClass());
+        return view('booking.step-one', [
+            'branches' => $branches,
+            'services' => $services,
+            'booking' => $booking,
+            'currentStep' => 1
+        ]);
     }
 
     public function storeStepOne(Request $request)
@@ -28,7 +33,7 @@ class BookingController extends Controller
             'branch_id' => 'required|exists:branches,id',
             'service_id' => 'required|exists:services,id'
         ]);
-        $booking = new \stdClass();
+        $booking = $request->session()->get('booking', new \stdClass());
         $booking->branch_id = $validated['branch_id'];
         $booking->service_id = $validated['service_id'];
         $request->session()->put('booking', $booking);
@@ -48,9 +53,8 @@ class BookingController extends Controller
         $now = Carbon::now('Asia/Manila');
 
         foreach ($therapists as $therapist) {
-            // Check 1: Is the therapist currently in a session?
             $currentBooking = Booking::where('therapist_id', $therapist->id)
-                ->where('status', '!=', 'Cancelled')
+                ->whereIn('status', ['Confirmed', 'In Progress']) // Consider multiple active statuses
                 ->where('start_time', '<=', $now)
                 ->where('end_time', '>', $now)
                 ->first();
@@ -59,47 +63,17 @@ class BookingController extends Controller
                 $therapist->current_status = 'In Session';
                 $therapist->available_at = Carbon::parse($currentBooking->end_time)->format('h:i A');
             } else {
-                // Check 2: If not in a session, do they have any availability left today?
-                $therapist->current_status = 'Available'; // Default status
+                $therapist->current_status = 'Available';
                 $therapist->available_at = null;
-
-                $todayString = $now->toDateString();
-                $existingBookings = Booking::where('therapist_id', $therapist->id)
-                    ->whereDate('start_time', $todayString)
-                    ->where('status', '!=', 'Cancelled')
-                    ->get();
-
-                $unavailableSlots = [];
-                foreach ($existingBookings as $booking) {
-                    $start = Carbon::parse($booking->start_time);
-                    $end = Carbon::parse($booking->end_time);
-                    while ($start < $end) {
-                        $unavailableSlots[] = $start->format('H:i');
-                        $start->addMinutes(30);
-                    }
-                }
-                
-                $closingTime = $now->copy()->hour(21)->minute(0)->second(0);
-                $hasFutureSlot = false;
-                for ($hour = 8; $hour < 21; $hour++) {
-                    $slotTime = $now->copy()->hour($hour)->minute(0);
-                    $slotTime24 = $slotTime->format('H:i');
-
-                    if ($slotTime > $now && !in_array($slotTime24, $unavailableSlots)) {
-                        if ($slotTime->copy()->addMinutes($service->duration) <= $closingTime) {
-                            $hasFutureSlot = true;
-                            break;
-                        }
-                    }
-                }
-
-                if (!$hasFutureSlot) {
-                    $therapist->current_status = 'Fully Booked';
-                }
             }
         }
         
-        return view('booking.step-two', ['therapists' => $therapists, 'branch' => $branch, 'booking' => $bookingData]);
+        return view('booking.step-two', [
+            'therapists' => $therapists, 
+            'branch' => $branch, 
+            'booking' => $bookingData,
+            'currentStep' => 2
+        ]);
     }
     
     public function storeStepTwo(Request $request)
@@ -118,7 +92,13 @@ class BookingController extends Controller
             return redirect()->route('booking.create.step-two')->with('error', 'Please select a therapist first.');
         }
         $therapist = Therapist::find($booking->therapist_id);
-        return view('booking.step-three', compact('therapist', 'booking'));
+        $service = Service::find($booking->service_id); // Pass service for duration
+        return view('booking.step-three', [
+            'therapist' => $therapist, 
+            'service' => $service,
+            'booking' => $booking,
+            'currentStep' => 3
+        ]);
     }
 
     public function storeStepThree(Request $request)
@@ -147,7 +127,13 @@ class BookingController extends Controller
         $branch = Branch::find($booking->branch_id);
         $service = Service::find($booking->service_id);
         $therapist = Therapist::find($booking->therapist_id);
-        return view('booking.step-four', compact('booking', 'branch', 'service', 'therapist'));
+        return view('booking.step-four', [
+            'booking' => $booking, 
+            'branch' => $branch, 
+            'service' => $service, 
+            'therapist' => $therapist,
+            'currentStep' => 4
+        ]);
     }
 
     public function storeStepFour(Request $request)
@@ -167,12 +153,20 @@ class BookingController extends Controller
 
     public function createStepFive(Request $request)
     {
-        $booking = $request->session()->get('booking');
-        if (empty($booking->client_name)) {
+        $bookingData = $request->session()->get('booking');
+        if (empty($bookingData->client_name)) {
             return redirect()->route('booking.create.step-four')->with('error', 'Please enter your details.');
         }
-        $service = Service::find($booking->service_id);
-        return view('booking.step-five', compact('booking', 'service'));
+        $service = Service::find($bookingData->service_id);
+        $branch = Branch::find($bookingData->branch_id);
+        $therapist = Therapist::find($bookingData->therapist_id);
+        return view('booking.step-five', [
+            'booking' => $bookingData, 
+            'service' => $service,
+            'branch' => $branch,
+            'therapist' => $therapist,
+            'currentStep' => 5
+        ]);
     }
 
     public function storeStepFive(Request $request)
@@ -225,7 +219,7 @@ class BookingController extends Controller
         Mail::to($booking->client_email)->send(new BookingConfirmed($booking));
         
         $request->session()->forget('booking');
-        return redirect()->route('landing')->with('success', 'Your booking has been confirmed! We have sent the details to your email.');
+        return redirect()->route('booking.success');
     }
 
     public function success()
@@ -236,7 +230,7 @@ class BookingController extends Controller
     public function getAvailability(Request $request, Therapist $therapist, $date, Service $service)
     {
         try {
-            $selectedDate = Carbon::parse($date);
+            $selectedDate = Carbon::parse($date, 'Asia/Manila');
         } catch (\Exception $e) {
             return response()->json(['error' => 'Invalid date format'], 400);
         }
@@ -247,7 +241,6 @@ class BookingController extends Controller
             ->get();
 
         $unavailableSlots = [];
-
         foreach ($existingBookings as $booking) {
             $start = Carbon::parse($booking->start_time);
             $end = Carbon::parse($booking->end_time);
@@ -256,18 +249,7 @@ class BookingController extends Controller
                 $start->addMinutes(30);
             }
         }
-
-        $closingTime = $selectedDate->copy()->hour(21)->minute(0)->second(0);
-        $serviceDuration = $service->duration;
-
-        for ($hour = 8; $hour < 21; $hour++) {
-            $slotTime = $selectedDate->copy()->hour($hour)->minute(0);
-            if ($slotTime->copy()->addMinutes($serviceDuration) > $closingTime) {
-                $unavailableSlots[] = $slotTime->format('H:i');
-            }
-        }
         
         return response()->json(array_unique($unavailableSlots));
     }
 }
-

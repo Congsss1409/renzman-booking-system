@@ -1,5 +1,4 @@
 <?php
-// app/Models/Booking.php
 
 namespace App\Models;
 
@@ -25,14 +24,15 @@ class Booking extends Model
         'start_time',
         'end_time',
         'price',
-        'downpayment_amount', // Add this
-        'remaining_balance',  // Add this
+        'downpayment_amount',
+        'remaining_balance',
         'payment_method',
         'payment_status',
         'status',
         'feedback_token',
         'rating',
         'feedback',
+        'show_on_landing', // This field is required to be fillable
     ];
 
     /**
@@ -43,6 +43,7 @@ class Booking extends Model
     protected $casts = [
         'start_time' => 'datetime',
         'end_time' => 'datetime',
+        'show_on_landing' => 'boolean', // Casting to boolean is good practice
     ];
 
     public function branch()

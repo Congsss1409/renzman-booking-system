@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\Booking;
 use App\Models\Branch;
 use App\Models\Service;
-use App\Models\Therapist;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -14,42 +13,60 @@ use App\Mail\BookingCancelled;
 use App\Mail\BookingConfirmed;
 use Illuminate\Support\Facades\Cache;
 use App\Events\BookingCreated;
-use Illuminate\Support\Str; // Import the Str facade
+use Illuminate\Support\Str;
 
 class AdminController extends Controller
 {
     public function dashboard(Request $request)
     {
-        $sortBy = $request->query('sort_by', 'start_time');
-        $sortOrder = $request->query('sort_order', 'desc');
-        $validSorts = ['client_name', 'service_name', 'therapist_name', 'branch_name', 'start_time', 'status'];
-        
-        if (!in_array($sortBy, $validSorts)) {
-            $sortBy = 'start_time';
-        }
+        $dashboardData = Cache::remember('admin_dashboard_data', now()->addMinutes(10), function () {
+            // Data for Stat Cards
+            $totalRevenue = Booking::where('status', '!=', 'Cancelled')->sum('price');
+            $totalBookings = Booking::count();
+            $todaysBookings = Booking::whereDate('start_time', Carbon::today())->count();
+            $averageRating = Booking::whereNotNull('rating')->avg('rating');
 
-        $query = Booking::with(['branch', 'service', 'therapist']);
+            // Data for Charts
+            $bookingsByMonth = Booking::select(DB::raw('count(id) as `count`'), DB::raw('DATE_FORMAT(start_time, "%Y-%m") as month_year'))
+                ->where('start_time', '>', now()->subYear())
+                ->groupBy('month_year')
+                ->orderBy('month_year', 'asc')
+                ->get();
 
-        switch ($sortBy) {
-            case 'service_name':
-                $query->join('services', 'bookings.service_id', '=', 'services.id')->orderBy('services.name', $sortOrder);
-                break;
-            case 'therapist_name':
-                $query->join('therapists', 'bookings.therapist_id', '=', 'therapists.id')->orderBy('therapists.name', $sortOrder);
-                break;
-            case 'branch_name':
-                $query->join('branches', 'bookings.branch_id', '=', 'branches.id')->orderBy('branches.name', $sortOrder);
-                break;
-            default:
-                $query->orderBy($sortBy, $sortOrder);
-        }
+            $servicesBreakdown = Booking::whereNotNull('service_id')->with('service')
+                ->select('service_id', DB::raw('count(*) as count'))
+                ->groupBy('service_id')
+                ->orderBy('count', 'desc')
+                ->take(5)
+                ->get();
 
-        $bookings = $query->select('bookings.*')->paginate(15);
-        
+            $therapistsBreakdown = Booking::whereNotNull('therapist_id')->with('therapist')
+                ->select('therapist_id', DB::raw('count(*) as count'))
+                ->groupBy('therapist_id')
+                ->orderBy('count', 'desc')
+                ->take(5)
+                ->get();
+
+            return [
+                'totalRevenue' => $totalRevenue,
+                'totalBookings' => $totalBookings,
+                'todaysBookings' => $todaysBookings,
+                'averageRating' => $averageRating,
+                'bookingsByMonthLabels' => $bookingsByMonth->pluck('month_year'),
+                'bookingsByMonthData' => $bookingsByMonth->pluck('count'),
+                'popularServicesLabels' => $servicesBreakdown->map(fn($item) => $item->service->name ?? 'Unknown'),
+                'popularServicesData' => $servicesBreakdown->pluck('count'),
+                'busiestTherapistsLabels' => $therapistsBreakdown->map(fn($item) => $item->therapist->name ?? 'Unknown'),
+                'busiestTherapistsData' => $therapistsBreakdown->pluck('count'),
+            ];
+        });
+
+        $bookings = Booking::with(['branch', 'service', 'therapist'])->latest('start_time')->paginate(5);
+
         $branches = Branch::all();
         $services = Service::all();
 
-        return view('admin.dashboard', compact('bookings', 'sortBy', 'sortOrder', 'branches', 'services'));
+        return view('admin.dashboard', compact('bookings', 'branches', 'services', 'dashboardData'));
     }
 
     public function storeBooking(Request $request)
@@ -94,11 +111,11 @@ class AdminController extends Controller
             'status' => 'Confirmed',
             'payment_status' => 'Pending',
             'payment_method' => 'On-Site',
-            'feedback_token' => Str::uuid(), // *** FIX: Generate the missing feedback token ***
+            'feedback_token' => Str::uuid(),
         ]);
 
         Mail::to($booking->client_email)->send(new BookingConfirmed($booking));
-        Cache::forget('admin_dashboard_bookings_page_1');
+        Cache::forget('admin_dashboard_data');
         broadcast(new BookingCreated($booking));
 
         $request->session()->forget('show_modal');
@@ -109,101 +126,14 @@ class AdminController extends Controller
     {
         $booking->update(['status' => 'Cancelled']);
         Mail::to($booking->client_email)->send(new BookingCancelled($booking));
-        Cache::flush();
+        Cache::forget('admin_dashboard_data');
         return redirect()->route('admin.dashboard')->with('success', 'Booking cancelled successfully.');
-    }
-
-    // --- Therapist Management ---
-
-    public function listTherapists(Request $request)
-    {
-        $sortBy = $request->get('sort_by', 'created_at');
-        $sortOrder = $request->get('sort_order', 'desc');
-
-        $query = Therapist::with('branch');
-
-        if ($sortBy == 'name') {
-            $query->orderBy('name', $sortOrder);
-        } elseif ($sortBy == 'branch') {
-            $query->join('branches', 'therapists.branch_id', '=', 'branches.id')
-                  ->orderBy('branches.name', $sortOrder)
-                  ->select('therapists.*');
-        } else {
-            $query->orderBy($sortBy, $sortOrder);
-        }
-
-        $therapists = $query->paginate(10);
-        return view('admin.therapists', compact('therapists', 'sortBy', 'sortOrder'));
-    }
-
-    public function createTherapist()
-    {
-        $branches = Branch::all();
-        return view('admin.create-therapist', compact('branches'));
-    }
-
-    public function storeTherapist(Request $request)
-    {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'branch_id' => 'required|exists:branches,id',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
-        ]);
-
-        $imagePath = null;
-        if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->store('therapists', 'public');
-        }
-
-        Therapist::create([
-            'name' => $validated['name'],
-            'branch_id' => $validated['branch_id'],
-            'image' => $imagePath
-        ]);
-
-        return redirect()->route('admin.therapists.index')->with('success', 'Therapist created successfully.');
-    }
-
-    public function editTherapist(Therapist $therapist)
-    {
-        $branches = Branch::all();
-        return view('admin.edit-therapist', compact('therapist', 'branches'));
-    }
-
-    public function updateTherapist(Request $request, Therapist $therapist)
-    {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'branch_id' => 'required|exists:branches,id',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
-        ]);
-
-        $imagePath = $therapist->image;
-        if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->store('therapists', 'public');
-        }
-
-        $therapist->update([
-            'name' => $validated['name'],
-            'branch_id' => $validated['branch_id'],
-            'image' => $imagePath
-        ]);
-
-        return redirect()->route('admin.therapists.index')->with('success', 'Therapist updated successfully.');
-    }
-
-    public function destroyTherapist(Therapist $therapist)
-    {
-        $therapist->delete();
-        return redirect()->route('admin.therapists.index')->with('success', 'Therapist deleted successfully.');
     }
 
     public function getTherapistsByBranch(Branch $branch)
     {
         return $branch->therapists()->orderBy('name')->get();
     }
-
-    // --- Other Admin Functions ---
 
     public function feedback()
     {
@@ -214,29 +144,15 @@ class AdminController extends Controller
         return view('admin.feedback', compact('feedbacks'));
     }
 
-    public function analytics()
+    public function toggleFeedbackDisplay(Booking $booking)
     {
-        $analyticsData = Cache::remember('admin_analytics_data', now()->addMinutes(10), function () {
-            $totalBookings = Booking::count();
-            $totalRevenue = Booking::where('status', '!=', 'Cancelled')->sum('price');
-            $averageRating = Booking::whereNotNull('rating')->avg('rating');
-            $bookingsByMonth = Booking::select(DB::raw('count(id) as `count`'), DB::raw('DATE_FORMAT(start_time, "%Y-%m") as month_year'))->where('start_time', '>', now()->subYear())->groupBy('month_year')->orderBy('month_year', 'asc')->get();
-            $servicesBreakdown = Booking::whereNotNull('service_id')->with('service')->select('service_id', DB::raw('count(*) as count'))->groupBy('service_id')->orderBy('count', 'desc')->get();
-            $therapistsBreakdown = Booking::whereNotNull('therapist_id')->with('therapist')->select('therapist_id', DB::raw('count(*) as count'))->groupBy('therapist_id')->orderBy('count', 'desc')->get();
-            
-            return [
-                'totalBookings' => $totalBookings,
-                'totalRevenue' => $totalRevenue,
-                'averageRating' => $averageRating,
-                'bookingsByMonthLabels' => $bookingsByMonth->pluck('month_year'),
-                'bookingsByMonthData' => $bookingsByMonth->pluck('count'),
-                'popularServicesLabels' => $servicesBreakdown->map(fn($item) => $item->service->name ?? 'Unknown'),
-                'popularServicesData' => $servicesBreakdown->pluck('count'),
-                'busiestTherapistsLabels' => $therapistsBreakdown->map(fn($item) => $item->therapist->name ?? 'Unknown'),
-                'busiestTherapistsData' => $therapistsBreakdown->pluck('count'),
-            ];
-        });
-        return view('admin.analytics', $analyticsData);
+        if ($booking->rating == 5 && !empty($booking->feedback)) {
+            $booking->update(['show_on_landing' => !$booking->show_on_landing]);
+            Cache::forget('landing_page_testimonials'); // Invalidate cache
+            return back()->with('success', 'Testimonial display status updated.');
+        }
+
+        return back()->with('error', 'Only 5-star reviews with feedback can be featured.');
     }
 }
 

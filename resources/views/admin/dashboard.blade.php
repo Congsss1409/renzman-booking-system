@@ -1,191 +1,139 @@
 @extends('layouts.admin')
 
+@section('title', 'Admin Dashboard')
+
+@push('scripts')
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+@endpush
+
 @section('content')
-<div class="flex justify-between items-center mb-6">
-    <h2 class="text-2xl font-bold text-gray-800">All Bookings</h2>
-    {{-- This button now opens the modal --}}
-    <button id="open-booking-modal" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-4 rounded-lg">
-        Create New Booking
-    </button>
-</div>
-
-<div class="bg-white p-6 rounded-lg shadow-lg">
-    <div class="overflow-x-auto">
-        <table class="min-w-full bg-white">
-            <thead class="bg-gray-800 text-white">
-                <tr>
-                    {{-- Sorting headers from our previous implementation --}}
-                    @php
-                        function render_sortable_header($label, $column_name, $sortBy, $sortOrder) {
-                            $order = ($sortBy == $column_name && $sortOrder == 'asc') ? 'desc' : 'asc';
-                            $arrow = $sortBy == $column_name ? ($sortOrder == 'asc' ? '▲' : '▼') : '';
-                            $url = route('admin.dashboard', ['sort_by' => $column_name, 'sort_order' => $order]);
-                            echo "<th class='text-left py-3 px-4 uppercase font-semibold text-sm'><a href='{$url}'>{$label} <span class='text-xs'>{$arrow}</span></a></th>";
-                        }
-                    @endphp
-                    {!! render_sortable_header('Client Name', 'client_name', $sortBy, $sortOrder) !!}
-                    {!! render_sortable_header('Service', 'service_name', $sortBy, $sortOrder) !!}
-                    {!! render_sortable_header('Therapist', 'therapist_name', $sortBy, $sortOrder) !!}
-                    {!! render_sortable_header('Branch', 'branch_name', $sortBy, $sortOrder) !!}
-                    {!! render_sortable_header('Date & Time', 'start_time', $sortBy, $sortOrder) !!}
-                    {!! render_sortable_header('Status', 'status', $sortBy, $sortOrder) !!}
-                    <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Actions</th>
-                </tr>
-            </thead>
-            <tbody id="bookings-table-body" class="text-gray-700">
-                @forelse ($bookings as $booking)
-                    <tr class="border-b hover:bg-gray-100">
-                        <td class="py-3 px-4">{{ $booking->client_name }}</td>
-                        <td class="py-3 px-4">{{ optional($booking->service)->name ?? 'N/A' }}</td>
-                        <td class="py-3 px-4">{{ optional($booking->therapist)->name ?? 'N/A' }}</td>
-                        <td class="py-3 px-4">{{ optional($booking->branch)->name ?? 'N/A' }}</td>
-                        <td class="py-3 px-4">{{ $booking->start_time->format('M d, Y @ h:i A') }}</td>
-                        <td class="py-3 px-4">
-                             <span class="px-2 py-1 text-xs font-semibold rounded-full
-                                @if($booking->status == 'Confirmed') bg-green-200 text-green-800
-                                @elseif($booking->status == 'Completed') bg-blue-200 text-blue-800
-                                @elseif($booking->status == 'Cancelled') bg-red-200 text-red-800
-                                @else bg-yellow-200 text-yellow-800 @endif">
-                                {{ $booking->status }}
-                            </span>
-                        </td>
-                        <td class="py-3 px-4">
-                            {{-- The Edit link has been removed --}}
-                            <form action="{{ route('admin.bookings.cancel', $booking) }}" method="POST" onsubmit="return confirm('Are you sure you want to cancel this booking?');">
-                                @csrf
-                                <button type="submit" class="text-red-600 hover:text-red-800">Cancel</button>
-                            </form>
-                        </td>
-                    </tr>
-                @empty
-                    <tr id="no-bookings-row">
-                        <td colspan="7" class="text-center py-6 text-gray-500">No bookings found.</td>
-                    </tr>
-                @endforelse
-            </tbody>
-        </table>
-    </div>
-    <div class="mt-6">
-        {{ $bookings->appends(request()->query())->links() }}
-    </div>
-</div>
-
-{{-- MODAL FOR CREATING A NEW BOOKING --}}
-<div id="booking-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
-    <div class="relative top-20 mx-auto p-5 border w-full max-w-2xl shadow-lg rounded-md bg-white">
-        <div class="flex justify-between items-center pb-3 border-b">
-            <p class="text-2xl font-bold">Create New Booking</p>
-            <button id="close-booking-modal" class="cursor-pointer z-50">
-                <svg class="fill-current text-black" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18"><path d="M14.53 4.53l-1.06-1.06L9 7.94 4.53 3.47 3.47 4.53 7.94 9l-4.47 4.47 1.06 1.06L9 10.06l4.47 4.47 1.06-1.06L10.06 9z"></path></svg>
+<div class="p-4 sm:p-6 lg:p-8 space-y-8">
+    <!-- Header -->
+    <div class="sm:flex sm:items-center sm:justify-between">
+        <div>
+            <h2 class="text-2xl font-bold text-gray-900 sm:text-3xl">Dashboard</h2>
+            <p class="mt-1.5 text-sm text-gray-500">Welcome back, Admin! Here's your business overview. ✨</p>
+        </div>
+        <div class="mt-4 sm:mt-0">
+             <button onclick="document.getElementById('createBookingModal').showModal()" class="inline-flex items-center justify-center w-full px-5 py-3 text-sm font-medium text-white bg-indigo-600 rounded-lg shadow-sm hover:bg-indigo-700 sm:w-auto">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-2 -ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                </svg>
+                New Booking
             </button>
         </div>
-        <div class="mt-5">
-            <form action="{{ route('admin.bookings.store') }}" method="POST">
-                @csrf
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                        <label for="client_name" class="block text-sm font-medium text-gray-700">Client Name</label>
-                        <input type="text" name="client_name" id="client_name" value="{{ old('client_name') }}" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-emerald-500 focus:border-emerald-500">
-                        @error('client_name') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
-                    </div>
-                    <div>
-                        <label for="client_phone" class="block text-sm font-medium text-gray-700">Client Phone</label>
-                        <input type="text" name="client_phone" id="client_phone" value="{{ old('client_phone') }}" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-emerald-500 focus:border-emerald-500">
-                        @error('client_phone') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
-                    </div>
-                    <div class="md:col-span-2">
-                        <label for="client_email" class="block text-sm font-medium text-gray-700">Client Email</label>
-                        <input type="email" name="client_email" id="client_email" value="{{ old('client_email') }}" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-emerald-500 focus:border-emerald-500">
-                        @error('client_email') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
-                    </div>
-                    <div>
-                        <label for="branch_id" class="block text-sm font-medium text-gray-700">Branch</label>
-                        <select name="branch_id" id="branch_id_modal" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-emerald-500 focus:border-emerald-500">
-                            <option value="">Select Branch</option>
-                            @foreach($branches as $branch)
-                                <option value="{{ $branch->id }}" {{ old('branch_id') == $branch->id ? 'selected' : '' }}>{{ $branch->name }}</option>
-                            @endforeach
-                        </select>
-                        @error('branch_id') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
-                    </div>
-                    <div>
-                        <label for="therapist_id" class="block text-sm font-medium text-gray-700">Therapist</label>
-                        <select name="therapist_id" id="therapist_id_modal" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-emerald-500 focus:border-emerald-500" disabled>
-                            <option value="">Select branch first</option>
-                        </select>
-                        @error('therapist_id') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
-                    </div>
-                     <div class="md:col-span-2">
-                        <label for="service_id" class="block text-sm font-medium text-gray-700">Service</label>
-                        <select name="service_id" id="service_id_modal" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-emerald-500 focus:border-emerald-500">
-                            <option value="">Select Service</option>
-                            @foreach($services as $service)
-                                <option value="{{ $service->id }}" {{ old('service_id') == $service->id ? 'selected' : '' }}>{{ $service->name }} ({{$service->duration}} mins)</option>
-                            @endforeach
-                        </select>
-                        @error('service_id') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
-                    </div>
-                     <div>
-                        <label for="booking_date" class="block text-sm font-medium text-gray-700">Date</label>
-                        <input type="date" name="booking_date" id="booking_date" value="{{ old('booking_date') }}" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-emerald-500 focus:border-emerald-500">
-                        @error('booking_date') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
-                    </div>
-                     <div>
-                        <label for="booking_time" class="block text-sm font-medium text-gray-700">Time</label>
-                        <input type="time" name="booking_time" id="booking_time" value="{{ old('booking_time') }}" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-emerald-500 focus:border-emerald-500">
-                        @error('booking_time') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
-                    </div>
-                </div>
-                <div class="mt-6 pt-4 border-t flex justify-end">
-                    <button type="submit" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-6 rounded-lg">Save Booking</button>
-                </div>
-            </form>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        <div class="p-6 bg-white border border-gray-200 rounded-xl">
+            <p class="text-sm font-medium text-gray-500">Total Revenue</p>
+            <p class="mt-2 text-3xl font-bold text-gray-900">₱{{ number_format($dashboardData['totalRevenue'], 2) }}</p>
+        </div>
+        <div class="p-6 bg-white border border-gray-200 rounded-xl">
+            <p class="text-sm font-medium text-gray-500">Total Bookings</p>
+            <p class="mt-2 text-3xl font-bold text-gray-900">{{ $dashboardData['totalBookings'] }}</p>
+        </div>
+        <div class="p-6 bg-white border border-gray-200 rounded-xl">
+            <p class="text-sm font-medium text-gray-500">Today's Bookings</p>
+            <p class="mt-2 text-3xl font-bold text-gray-900">{{ $dashboardData['todaysBookings'] }}</p>
+        </div>
+        <div class="p-6 bg-white border border-gray-200 rounded-xl">
+             <p class="text-sm font-medium text-gray-500">Average Rating</p>
+            <p class="mt-2 text-3xl font-bold text-gray-900 flex items-center">
+                {{ number_format($dashboardData['averageRating'], 2) }}
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 ml-2 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                </svg>
+            </p>
+        </div>
+    </div>
+
+    <!-- Main Content Grid -->
+    <div class="grid grid-cols-1 gap-8 lg:grid-cols-3">
+        
+        <!-- Recent Bookings Table -->
+        <div class="lg:col-span-2 bg-white border border-gray-200 rounded-xl">
+            <div class="p-4 sm:p-6 border-b border-gray-200">
+                <h3 class="text-lg font-semibold text-gray-800">Recent Bookings</h3>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="min-w-full text-sm divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 font-semibold text-left text-gray-600 uppercase tracking-wider">Client</th>
+                            <th class="px-6 py-3 font-semibold text-left text-gray-600 uppercase tracking-wider">Service</th>
+                            <th class="px-6 py-3 font-semibold text-left text-gray-600 uppercase tracking-wider">Date & Time</th>
+                            <th class="px-6 py-3 font-semibold text-left text-gray-600 uppercase tracking-wider">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        @forelse ($bookings as $booking)
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="font-medium text-gray-900">{{ $booking->client_name }}</div>
+                                    <div class="text-gray-500">{{ $booking->therapist->name }}</div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="font-medium text-gray-900">{{ $booking->service->name }}</div>
+                                    <div class="text-gray-500">{{ $booking->branch->name }}</div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-gray-800">{{ $booking->start_time->format('M d, Y, h:i A') }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    @if ($booking->status == 'Confirmed')
+                                        <span class="inline-flex px-2 text-xs font-semibold leading-5 text-green-800 bg-green-100 rounded-full">Confirmed</span>
+                                    @else
+                                        <span class="inline-flex px-2 text-xs font-semibold leading-5 text-red-800 bg-red-100 rounded-full">Cancelled</span>
+                                    @endif
+                                </td>
+                            </tr>
+                        @empty
+                            <tr><td colspan="4" class="px-6 py-12 text-center text-gray-500">No bookings found.</td></tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+             @if ($bookings->hasPages())
+                <div class="p-4 border-t border-gray-200">{{ $bookings->links() }}</div>
+            @endif
+        </div>
+
+        <!-- Bookings per Month Chart -->
+        <div class="p-6 bg-white border border-gray-200 rounded-xl">
+            <h3 class="text-lg font-semibold text-gray-800">Bookings per Month</h3>
+            <div class="mt-4"><canvas id="bookingsByMonthChart"></canvas></div>
         </div>
     </div>
 </div>
+
+<!-- Include the modal for creating a booking -->
+@include('admin.create-booking')
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    const modal = document.getElementById('booking-modal');
-    const openBtn = document.getElementById('open-booking-modal');
-    const closeBtn = document.getElementById('close-booking-modal');
+    const brandColor = '#4f46e5'; // Indigo-600
 
-    openBtn.addEventListener('click', () => modal.classList.remove('hidden'));
-    closeBtn.addEventListener('click', () => modal.classList.add('hidden'));
-
-    modal.addEventListener('click', (e) => {
-        if (e.target.id === 'booking-modal') {
-            modal.classList.add('hidden');
-        }
-    });
-
-    @if(session('show_modal') && $errors->any())
-        modal.classList.remove('hidden');
-    @endif
-
-    const branchSelect = document.getElementById('branch_id_modal');
-    const therapistSelect = document.getElementById('therapist_id_modal');
-    
-    branchSelect.addEventListener('change', function () {
-        const branchId = this.value;
-        therapistSelect.innerHTML = '<option value="">Loading...</option>';
-        therapistSelect.disabled = true;
-
-        if (branchId) {
-            fetch(`/admin/branches/${branchId}/therapists`)
-                .then(response => response.json())
-                .then(data => {
-                    therapistSelect.innerHTML = '<option value="">Select Therapist</option>';
-                    data.forEach(therapist => {
-                        const option = document.createElement('option');
-                        option.value = therapist.id;
-                        option.textContent = therapist.name;
-                        therapistSelect.appendChild(option);
-                    });
-                    therapistSelect.disabled = false;
-                });
-        }
-    });
+    // Bookings by Month Chart (Bar)
+    if (document.getElementById('bookingsByMonthChart')) {
+        const bookingsByMonthCtx = document.getElementById('bookingsByMonthChart').getContext('2d');
+        new Chart(bookingsByMonthCtx, {
+            type: 'bar',
+            data: {
+                labels: @json($dashboardData['bookingsByMonthLabels']),
+                datasets: [{
+                    label: 'Bookings',
+                    data: @json($dashboardData['bookingsByMonthData']),
+                    backgroundColor: brandColor,
+                    borderRadius: 4,
+                }]
+            },
+            options: { 
+                responsive: true, 
+                plugins: { legend: { display: false } }, 
+                scales: { y: { beginAtZero: true } } 
+            }
+        });
+    }
 });
 </script>
 @endsection

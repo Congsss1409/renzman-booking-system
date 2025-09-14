@@ -1,5 +1,4 @@
 <?php
-// app/Models/Therapist.php
 
 namespace App\Models;
 
@@ -17,7 +16,7 @@ class Therapist extends Model
      */
     protected $fillable = [
         'name',
-        'image_url', // Add this
+        'image', // Corrected from 'image_url'
         'branch_id',
     ];
 

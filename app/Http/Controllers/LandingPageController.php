@@ -1,39 +1,31 @@
 <?php
-// app/Http/Controllers/LandingPageController.php
 
 namespace App\Http\Controllers;
 
-use App\Models\Service;
-use App\Models\Branch; // Import the Branch model
+use App\Models\Booking;
 use Illuminate\Http\Request;
 
 class LandingPageController extends Controller
 {
-    /**
-     * Display the landing page.
-     */
     public function index()
     {
-        return view('landing');
+        $testimonials = Booking::where('rating', 5)
+            ->where('show_on_landing', true)
+            ->whereNotNull('feedback')
+            ->latest('start_time')
+            ->limit(3)
+            ->get();
+            
+        return view('landing', compact('testimonials'));
     }
 
-    /**
-     * Display the services page.
-     */
     public function services()
     {
-        $services = Service::orderBy('price')->get();
-        return view('services', compact('services'));
+        return view('services');
     }
 
-    /**
-     * NEW: Display the about page.
-     */
     public function about()
     {
-        // Fetch all branches to display their locations
-        $branches = Branch::all();
-        
-        return view('about', compact('branches'));
+        return view('about');
     }
 }
