@@ -23,53 +23,60 @@ class DashboardController extends Controller
      */
     public function dashboard(Request $request)
     {
-        $dashboardData = Cache::remember('admin_dashboard_data', now()->addMinutes(10), function () {
-            // Data for Stat Cards
-            $totalRevenue = Booking::where('status', '!=', 'Cancelled')->sum('price');
+        $dashboardData = Cache::remember('admin_dashboard_full_stats', now()->addMinutes(10), function () {
+            // Stats for the main cards
             $totalBookings = Booking::count();
-            $todaysBookings = Booking::whereDate('start_time', Carbon::today())->count();
-            $averageRating = Booking::whereNotNull('rating')->avg('rating');
+            $completedBookings = Booking::where('status', 'Completed')->orWhere(function ($query) {
+                $query->where('status', 'Confirmed')->where('end_time', '<', now());
+            })->count();
+            $pendingBookings = Booking::where('status', 'Confirmed')->where('start_time', '>=', now())->count();
+            $canceledBookings = Booking::where('status', 'Cancelled')->count();
 
-            // Data for Charts
-            $bookingsByMonth = Booking::select(DB::raw('count(id) as `count`'), DB::raw('DATE_FORMAT(start_time, "%Y-%m") as month_year'))
-                ->where('start_time', '>', now()->subYear())
-                ->groupBy('month_year')
-                ->orderBy('month_year', 'asc')
+            // Data for Income Chart (last 6 months)
+            $incomeByMonth = Booking::select(
+                DB::raw('SUM(price) as total'),
+                DB::raw("DATE_FORMAT(start_time, '%b') as month")
+            )
+            ->where('status', '!=', 'Cancelled')
+            ->where('start_time', '>=', Carbon::now()->subMonths(5)->startOfMonth())
+            ->groupBy('month')
+            ->orderBy('start_time')
+            ->get();
+
+            // Data for Booking Source Chart
+            $bookingSources = Booking::select('payment_method', DB::raw('count(*) as count'))
+                ->groupBy('payment_method')
                 ->get();
-
-            $servicesBreakdown = Booking::whereNotNull('service_id')->with('service')
-                ->select('service_id', DB::raw('count(*) as count'))
-                ->groupBy('service_id')
-                ->orderBy('count', 'desc')
+            
+            // Recent Bookings
+            $recentBookings = Booking::with(['service', 'therapist', 'branch'])
+                ->latest('start_time')
                 ->take(5)
                 ->get();
 
-            $therapistsBreakdown = Booking::whereNotNull('therapist_id')->with('therapist')
-                ->select('therapist_id', DB::raw('count(*) as count'))
-                ->groupBy('therapist_id')
-                ->orderBy('count', 'desc')
+            // Top Therapists
+            $topTherapists = \App\Models\Therapist::withCount(['bookings' => function ($query) {
+                    $query->where('status', '!=', 'Cancelled');
+                }])
+                ->orderBy('bookings_count', 'desc')
                 ->take(5)
                 ->get();
 
             return [
-                'totalRevenue' => $totalRevenue,
                 'totalBookings' => $totalBookings,
-                'todaysBookings' => $todaysBookings,
-                'averageRating' => $averageRating,
-                'bookingsByMonthLabels' => $bookingsByMonth->pluck('month_year'),
-                'bookingsByMonthData' => $bookingsByMonth->pluck('count'),
-                'popularServicesLabels' => $servicesBreakdown->map(fn($item) => $item->service->name ?? 'Unknown'),
-                'popularServicesData' => $servicesBreakdown->pluck('count'),
-                'busiestTherapistsLabels' => $therapistsBreakdown->map(fn($item) => $item->therapist->name ?? 'Unknown'),
-                'busiestTherapistsData' => $therapistsBreakdown->pluck('count'),
+                'completedBookings' => $completedBookings,
+                'pendingBookings' => $pendingBookings,
+                'canceledBookings' => $canceledBookings,
+                'incomeLabels' => $incomeByMonth->pluck('month'),
+                'incomeData' => $incomeByMonth->pluck('total'),
+                'sourceLabels' => $bookingSources->pluck('payment_method'),
+                'sourceData' => $bookingSources->pluck('count'),
+                'recentBookings' => $recentBookings,
+                'topTherapists' => $topTherapists,
             ];
         });
 
-        $bookings = Booking::with(['branch', 'service', 'therapist'])->latest('start_time')->paginate(5);
-        $branches = Branch::all();
-        $services = Service::all();
-
-        return view('admin.dashboard', compact('bookings', 'branches', 'services', 'dashboardData'));
+        return view('admin.dashboard', $dashboardData);
     }
 
     /**
@@ -129,7 +136,7 @@ class DashboardController extends Controller
         ]);
 
         Mail::to($booking->client_email)->send(new BookingConfirmed($booking));
-        Cache::forget('admin_dashboard_data');
+        Cache::forget('admin_dashboard_full_stats');
         broadcast(new BookingCreated($booking));
 
         return redirect()->route('admin.dashboard')->with('success', 'Booking created successfully!');
@@ -142,7 +149,7 @@ class DashboardController extends Controller
     {
         $booking->update(['status' => 'Cancelled']);
         Mail::to($booking->client_email)->send(new BookingCancelled($booking));
-        Cache::forget('admin_dashboard_data');
+        Cache::forget('admin_dashboard_full_stats');
         return redirect()->route('admin.dashboard')->with('success', 'Booking cancelled successfully.');
     }
 
@@ -180,5 +187,3 @@ class DashboardController extends Controller
         return back()->with('error', 'Only 5-star reviews with feedback can be featured.');
     }
 }
-
-    

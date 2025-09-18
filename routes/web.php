@@ -1,11 +1,12 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\LandingPageController;
 use App\Http\Controllers\BookingController;
-use App\Http\Controllers\AdminController;
-use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\FeedbackController;
+use App\Http\Controllers\LandingPageController;
+use App\Http\Controllers\Auth\LoginController;
+// Corrected: Import all Admin controllers from the Admin subfolder
+use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\ServiceController;
 use App\Http\Controllers\Admin\TherapistController;
 
@@ -54,11 +55,13 @@ Route::get('/api/therapists/{therapist}/availability/{date}/{service}', [Booking
 
 // --- Protected Admin Routes ---
 Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
-    Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
+    // Corrected: Point to the new DashboardController
+    Route::get('/dashboard', [DashboardController::class, 'dashboard'])->name('dashboard');
     
     // --- Booking Management ---
-    Route::post('/bookings', [AdminController::class, 'storeBooking'])->name('bookings.store');
-    Route::post('/bookings/{booking}/cancel', [AdminController::class, 'cancelBooking'])->name('bookings.cancel');
+    Route::get('/bookings/create', [DashboardController::class, 'createBooking'])->name('bookings.create');
+    Route::post('/bookings', [DashboardController::class, 'storeBooking'])->name('bookings.store');
+    Route::post('/bookings/{booking}/cancel', [DashboardController::class, 'cancelBooking'])->name('bookings.cancel');
 
     // --- Therapist Management ---
     Route::resource('therapists', TherapistController::class);
@@ -67,8 +70,7 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
     Route::resource('services', ServiceController::class);
     
     // --- Other Admin Routes ---
-    Route::get('/branches/{branch}/therapists', [AdminController::class, 'getTherapistsByBranch'])->name('branches.therapists');
-    Route::get('/feedback', [AdminController::class, 'feedback'])->name('feedback');
-    Route::post('/feedback/{booking}/toggle', [AdminController::class, 'toggleFeedbackDisplay'])->name('feedback.toggle');
+    Route::get('/branches/{branch}/therapists', [DashboardController::class, 'getTherapistsByBranch'])->name('branches.therapists');
+    Route::get('/feedback', [DashboardController::class, 'feedback'])->name('feedback');
+    Route::post('/feedback/{booking}/toggle', [DashboardController::class, 'toggleFeedbackDisplay'])->name('feedback.toggle');
 });
-

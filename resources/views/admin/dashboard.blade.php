@@ -1,140 +1,191 @@
 @extends('layouts.admin')
 
-@section('title', 'Admin Dashboard')
-
-@push('scripts')
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-@endpush
+@section('title', 'Dashboard')
+@section('page-title', 'Dashboard')
 
 @section('content')
-<div class="p-4 sm:p-6 lg:p-8 space-y-8">
+<div class="space-y-8">
     <!-- Header -->
-    <div class="sm:flex sm:items-center sm:justify-between">
+    <div class="flex items-center justify-between">
         <div>
-            <h2 class="text-2xl font-bold text-gray-900 sm:text-3xl">Dashboard</h2>
-            <p class="mt-1.5 text-sm text-gray-500">Welcome back, Admin! Here's your business overview. ✨</p>
+            <h1 class="text-2xl font-bold text-gray-800">Hello {{ Auth::user()->name }}!</h1>
+            <p class="text-gray-500">{{ \Carbon\Carbon::now()->format('l, F j, Y') }}</p>
         </div>
-        <div class="mt-4 sm:mt-0">
-             <button onclick="document.getElementById('createBookingModal').showModal()" class="inline-flex items-center justify-center w-full px-5 py-3 text-sm font-medium text-white bg-indigo-600 rounded-lg shadow-sm hover:bg-indigo-700 sm:w-auto">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-2 -ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                </svg>
-                New Booking
-            </button>
-        </div>
+        <a href="{{ route('admin.bookings.create') }}" class="bg-indigo-600 text-white font-semibold px-5 py-2.5 rounded-lg hover:bg-indigo-700 transition-colors">
+            + New Booking
+        </a>
     </div>
 
     <!-- Stats Cards -->
-    <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-        <div class="p-6 bg-white border border-gray-200 rounded-xl">
-            <p class="text-sm font-medium text-gray-500">Total Revenue</p>
-            <p class="mt-2 text-3xl font-bold text-gray-900">₱{{ number_format($dashboardData['totalRevenue'], 2) }}</p>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div class="bg-white p-6 rounded-xl border border-gray-200 flex items-center gap-5">
+            <div class="bg-blue-100 text-blue-600 p-4 rounded-full"><svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg></div>
+            <div>
+                <p class="text-gray-500 font-medium">Total Bookings</p>
+                <p class="text-2xl font-bold text-gray-800">{{ $totalBookings }}</p>
+            </div>
         </div>
-        <div class="p-6 bg-white border border-gray-200 rounded-xl">
-            <p class="text-sm font-medium text-gray-500">Total Bookings</p>
-            <p class="mt-2 text-3xl font-bold text-gray-900">{{ $dashboardData['totalBookings'] }}</p>
+        <div class="bg-white p-6 rounded-xl border border-gray-200 flex items-center gap-5">
+            <div class="bg-green-100 text-green-600 p-4 rounded-full"><svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></div>
+            <div>
+                <p class="text-gray-500 font-medium">Completed</p>
+                <p class="text-2xl font-bold text-gray-800">{{ $completedBookings }}</p>
+            </div>
         </div>
-        <div class="p-6 bg-white border border-gray-200 rounded-xl">
-            <p class="text-sm font-medium text-gray-500">Today's Bookings</p>
-            <p class="mt-2 text-3xl font-bold text-gray-900">{{ $dashboardData['todaysBookings'] }}</p>
+        <div class="bg-white p-6 rounded-xl border border-gray-200 flex items-center gap-5">
+            <div class="bg-yellow-100 text-yellow-600 p-4 rounded-full"><svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></div>
+            <div>
+                <p class="text-gray-500 font-medium">Pending</p>
+                <p class="text-2xl font-bold text-gray-800">{{ $pendingBookings }}</p>
+            </div>
         </div>
-        <div class="p-6 bg-white border border-gray-200 rounded-xl">
-             <p class="text-sm font-medium text-gray-500">Average Rating</p>
-            <p class="mt-2 text-3xl font-bold text-gray-900 flex items-center">
-                {{ number_format($dashboardData['averageRating'], 2) }}
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 ml-2 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
-                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                </svg>
-            </p>
+        <div class="bg-white p-6 rounded-xl border border-gray-200 flex items-center gap-5">
+            <div class="bg-red-100 text-red-600 p-4 rounded-full"><svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"></path></svg></div>
+            <div>
+                <p class="text-gray-500 font-medium">Canceled</p>
+                <p class="text-2xl font-bold text-gray-800">{{ $canceledBookings }}</p>
+            </div>
         </div>
     </div>
 
-    <!-- Main Content Grid -->
-    <div class="grid grid-cols-1 gap-8 lg:grid-cols-3">
-        
-        <!-- Recent Bookings Table -->
-        <div class="lg:col-span-2 bg-white border border-gray-200 rounded-xl">
-            <div class="p-4 sm:p-6 border-b border-gray-200">
-                <h3 class="text-lg font-semibold text-gray-800">Recent Bookings</h3>
-            </div>
+    <!-- Charts -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div class="lg:col-span-2 bg-white p-6 rounded-xl border border-gray-200">
+            <canvas id="barChart"></canvas>
+        </div>
+        <div class="bg-white p-6 rounded-xl border border-gray-200">
+            <canvas id="doughnutChart"></canvas>
+        </div>
+    </div>
+
+    <!-- Recent Bookings and Top Employees -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div class="lg:col-span-2 bg-white p-6 rounded-xl border border-gray-200">
+            <h3 class="text-lg font-bold text-gray-800 mb-4">Recent Bookings</h3>
             <div class="overflow-x-auto">
-                <table class="min-w-full text-sm divide-y divide-gray-200">
-                    <thead class="bg-gray-50">
+                <table class="w-full text-sm text-left">
+                    <thead class="text-gray-500 border-b">
                         <tr>
-                            <th class="px-6 py-3 font-semibold text-left text-gray-600 uppercase tracking-wider">Client</th>
-                            <th class="px-6 py-3 font-semibold text-left text-gray-600 uppercase tracking-wider">Service</th>
-                            <th class="px-6 py-3 font-semibold text-left text-gray-600 uppercase tracking-wider">Date & Time</th>
-                            <th class="px-6 py-3 font-semibold text-left text-gray-600 uppercase tracking-wider">Status</th>
+                            <th class="py-3 px-4 font-semibold">Name</th>
+                            <th class="py-3 px-4 font-semibold">Service</th>
+                            <th class="py-3 px-4 font-semibold">Date</th>
+                            <th class="py-3 px-4 font-semibold">Status</th>
                         </tr>
                     </thead>
-                    <tbody class="bg-white divide-y divide-gray-200">
-                        @forelse ($bookings as $booking)
-                            <tr>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="font-medium text-gray-900">{{ $booking->client_name }}</div>
-                                    <div class="text-gray-500">{{ $booking->therapist->name }}</div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="font-medium text-gray-900">{{ $booking->service->name }}</div>
-                                    <div class="text-gray-500">{{ $booking->branch->name }}</div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-gray-800">{{ $booking->start_time->format('M d, Y, h:i A') }}</td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    @if ($booking->status == 'Confirmed')
-                                        <span class="inline-flex px-2 text-xs font-semibold leading-5 text-green-800 bg-green-100 rounded-full">Confirmed</span>
-                                    @else
-                                        <span class="inline-flex px-2 text-xs font-semibold leading-5 text-red-800 bg-red-100 rounded-full">Cancelled</span>
-                                    @endif
-                                </td>
-                            </tr>
+                    <tbody>
+                        @forelse ($recentBookings as $booking)
+                        <tr class="border-b">
+                            <td class="py-3 px-4 font-semibold text-gray-800">{{ $booking->client_name }}</td>
+                            <td class="py-3 px-4 text-gray-600">{{ $booking->service->name }}</td>
+                            <td class="py-3 px-4 text-gray-600">{{ $booking->start_time->format('M d, Y') }}</td>
+                            <td class="py-3 px-4">
+                                @if($booking->status == 'Cancelled')
+                                    <span class="bg-red-100 text-red-700 text-xs font-semibold px-2.5 py-1 rounded-full">Cancelled</span>
+                                @elseif($booking->status == 'Completed' || $booking->end_time < now())
+                                    <span class="bg-green-100 text-green-700 text-xs font-semibold px-2.5 py-1 rounded-full">Completed</span>
+                                @else
+                                    <span class="bg-yellow-100 text-yellow-700 text-xs font-semibold px-2.5 py-1 rounded-full">Pending</span>
+                                @endif
+                            </td>
+                        </tr>
                         @empty
-                            <tr><td colspan="4" class="px-6 py-12 text-center text-gray-500">No bookings found.</td></tr>
+                        <tr>
+                            <td colspan="4" class="text-center py-10 text-gray-500">No recent bookings found.</td>
+                        </tr>
                         @endforelse
                     </tbody>
                 </table>
             </div>
-             @if ($bookings->hasPages())
-                <div class="p-4 border-t border-gray-200">{{ $bookings->links() }}</div>
-            @endif
         </div>
-
-        <!-- Bookings per Month Chart -->
-        <div class="p-6 bg-white border border-gray-200 rounded-xl">
-            <h3 class="text-lg font-semibold text-gray-800">Bookings per Month</h3>
-            <div class="mt-4"><canvas id="bookingsByMonthChart"></canvas></div>
+        <div class="bg-white p-6 rounded-xl border border-gray-200">
+            <h3 class="text-lg font-bold text-gray-800 mb-4">Top Employees</h3>
+            <div class="space-y-4">
+                @forelse($topTherapists as $therapist)
+                <div class="flex items-center gap-4">
+                    <img src="{{ $therapist->image ? Illuminate\Support\Facades\Storage::url($therapist->image) : asset('images/admin.png') }}" alt="{{ $therapist->name }}" class="w-12 h-12 rounded-full object-cover">
+                    <div>
+                        <p class="font-bold text-gray-800">{{ $therapist->name }}</p>
+                        <p class="text-sm text-gray-500">{{ $therapist->bookings_count }} Bookings</p>
+                    </div>
+                </div>
+                @empty
+                <p class="text-center py-10 text-gray-500">No therapist data available.</p>
+                @endforelse
+            </div>
         </div>
     </div>
 </div>
-
-<!-- Include the modal for creating a booking -->
-@include('admin.create-booking')
-
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-    const brandColor = '#4f46e5'; // Indigo-600
-
-    // Bookings by Month Chart (Bar)
-    if (document.getElementById('bookingsByMonthChart')) {
-        const bookingsByMonthCtx = document.getElementById('bookingsByMonthChart').getContext('2d');
-        new Chart(bookingsByMonthCtx, {
-            type: 'bar',
-            data: {
-                labels: @json($dashboardData['bookingsByMonthLabels']),
-                datasets: [{
-                    label: 'Bookings',
-                    data: @json($dashboardData['bookingsByMonthData']),
-                    backgroundColor: brandColor,
-                    borderRadius: 4,
-                }]
-            },
-            options: { 
-                responsive: true, 
-                plugins: { legend: { display: false } }, 
-                scales: { y: { beginAtZero: true } } 
-            }
-        });
-    }
-});
-</script>
 @endsection
+
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        Chart.defaults.font.family = "'Poppins', sans-serif";
+        
+        // Bar Chart - Income
+        const barCtx = document.getElementById('barChart')?.getContext('2d');
+        if (barCtx) {
+            new Chart(barCtx, {
+                type: 'bar',
+                data: {
+                    labels: @json($incomeLabels),
+                    datasets: [{
+                        label: 'Income',
+                        data: @json($incomeData),
+                        backgroundColor: '#4f46e5', // indigo-600
+                        borderRadius: 5,
+                        barThickness: 20,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        title: { display: true, text: 'Monthly Income (PHP)', font: { size: 16, weight: '600' }, color: '#334155', align: 'start', padding: { bottom: 20 } }
+                    },
+                    scales: {
+                        y: { 
+                            beginAtZero: true,
+                            grid: {
+                                color: '#e5e7eb'
+                            }
+                        },
+                        x: {
+                             grid: {
+                                display: false
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Doughnut Chart - Booking Source
+        const doughnutCtx = document.getElementById('doughnutChart')?.getContext('2d');
+        if (doughnutCtx) {
+            new Chart(doughnutCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: @json($sourceLabels),
+                    datasets: [{
+                        data: @json($sourceData),
+                        backgroundColor: ['#4f46e5', '#34d399', '#f59e0b'],
+                        borderColor: '#fff',
+                        borderWidth: 2,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom', labels: { padding: 20 } },
+                        title: { display: true, text: 'Booking Source', font: { size: 16, weight: '600' }, color: '#334155', align: 'start', padding: { bottom: 20 } }
+                    }
+                }
+            });
+        }
+    });
+</script>
+@endpush
 
