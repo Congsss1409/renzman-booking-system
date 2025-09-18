@@ -54,7 +54,7 @@ class BookingController extends Controller
 
         foreach ($therapists as $therapist) {
             $currentBooking = Booking::where('therapist_id', $therapist->id)
-                ->whereIn('status', ['Confirmed', 'In Progress']) // Consider multiple active statuses
+                ->whereIn('status', ['Confirmed', 'In Progress'])
                 ->where('start_time', '<=', $now)
                 ->where('end_time', '>', $now)
                 ->first();
@@ -71,6 +71,7 @@ class BookingController extends Controller
         return view('booking.step-two', [
             'therapists' => $therapists, 
             'branch' => $branch, 
+            'service' => $service,
             'booking' => $bookingData,
             'currentStep' => 2
         ]);
@@ -88,11 +89,12 @@ class BookingController extends Controller
     public function createStepThree(Request $request)
     {
         $booking = $request->session()->get('booking');
-        if (empty($booking->therapist_id)) {
+        if (empty($booking->therapist_id) || empty($booking->service_id)) {
             return redirect()->route('booking.create.step-two')->with('error', 'Please select a therapist first.');
         }
         $therapist = Therapist::find($booking->therapist_id);
-        $service = Service::find($booking->service_id); // Pass service for duration
+        $service = Service::find($booking->service_id);
+        
         return view('booking.step-three', [
             'therapist' => $therapist, 
             'service' => $service,
@@ -127,6 +129,7 @@ class BookingController extends Controller
         $branch = Branch::find($booking->branch_id);
         $service = Service::find($booking->service_id);
         $therapist = Therapist::find($booking->therapist_id);
+        
         return view('booking.step-four', [
             'booking' => $booking, 
             'branch' => $branch, 
@@ -153,17 +156,18 @@ class BookingController extends Controller
 
     public function createStepFive(Request $request)
     {
-        $bookingData = $request->session()->get('booking');
-        if (empty($bookingData->client_name)) {
+        $booking = $request->session()->get('booking');
+        if (empty($booking->client_name)) {
             return redirect()->route('booking.create.step-four')->with('error', 'Please enter your details.');
         }
-        $service = Service::find($bookingData->service_id);
-        $branch = Branch::find($bookingData->branch_id);
-        $therapist = Therapist::find($bookingData->therapist_id);
+        $branch = Branch::find($booking->branch_id);
+        $service = Service::find($booking->service_id);
+        $therapist = Therapist::find($booking->therapist_id);
+
         return view('booking.step-five', [
-            'booking' => $bookingData, 
-            'service' => $service,
+            'booking' => $booking,
             'branch' => $branch,
+            'service' => $service,
             'therapist' => $therapist,
             'currentStep' => 5
         ]);
@@ -224,13 +228,13 @@ class BookingController extends Controller
 
     public function success()
     {
-        return view('booking.success');
+        return view('booking.success', ['currentStep' => 6]);
     }
 
     public function getAvailability(Request $request, Therapist $therapist, $date, Service $service)
     {
         try {
-            $selectedDate = Carbon::parse($date, 'Asia/Manila');
+            $selectedDate = Carbon::parse($date);
         } catch (\Exception $e) {
             return response()->json(['error' => 'Invalid date format'], 400);
         }
@@ -241,12 +245,25 @@ class BookingController extends Controller
             ->get();
 
         $unavailableSlots = [];
+
         foreach ($existingBookings as $booking) {
             $start = Carbon::parse($booking->start_time);
             $end = Carbon::parse($booking->end_time);
             while ($start < $end) {
                 $unavailableSlots[] = $start->format('H:i');
                 $start->addMinutes(30);
+            }
+        }
+
+        $closingTime = $selectedDate->copy()->hour(21)->minute(0)->second(0);
+        $serviceDuration = $service->duration;
+
+        for ($hour = 8; $hour < 21; $hour++) {
+            for ($minute = 0; $minute < 60; $minute += 30) {
+                 $slotTime = $selectedDate->copy()->hour($hour)->minute($minute);
+                if ($slotTime->copy()->addMinutes($serviceDuration) > $closingTime) {
+                    $unavailableSlots[] = $slotTime->format('H:i');
+                }
             }
         }
         

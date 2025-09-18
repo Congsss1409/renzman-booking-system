@@ -1,22 +1,26 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Admin;
 
+use App\Http\Controllers\Controller;
 use App\Models\Booking;
 use App\Models\Branch;
 use App\Models\Service;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Mail;
-use App\Mail\BookingCancelled;
-use App\Mail\BookingConfirmed;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\BookingConfirmed;
+use App\Mail\BookingCancelled;
 use App\Events\BookingCreated;
 use Illuminate\Support\Str;
 
-class AdminController extends Controller
+class DashboardController extends Controller
 {
+    /**
+     * Display the admin dashboard.
+     */
     public function dashboard(Request $request)
     {
         $dashboardData = Cache::remember('admin_dashboard_data', now()->addMinutes(10), function () {
@@ -62,17 +66,27 @@ class AdminController extends Controller
         });
 
         $bookings = Booking::with(['branch', 'service', 'therapist'])->latest('start_time')->paginate(5);
-
         $branches = Branch::all();
         $services = Service::all();
 
         return view('admin.dashboard', compact('bookings', 'branches', 'services', 'dashboardData'));
     }
 
+    /**
+     * Show the form for creating a new booking.
+     */
+    public function createBooking()
+    {
+        $branches = Branch::all();
+        $services = Service::all();
+        return view('admin.create-booking', compact('branches', 'services'));
+    }
+
+    /**
+     * Store a newly created booking in storage.
+     */
     public function storeBooking(Request $request)
     {
-        $request->session()->flash('show_modal', true);
-
         $validated = $request->validate([
             'client_name' => 'required|string|max:255',
             'client_email' => 'required|email|max:255',
@@ -118,10 +132,12 @@ class AdminController extends Controller
         Cache::forget('admin_dashboard_data');
         broadcast(new BookingCreated($booking));
 
-        $request->session()->forget('show_modal');
         return redirect()->route('admin.dashboard')->with('success', 'Booking created successfully!');
     }
 
+    /**
+     * Cancel the specified booking.
+     */
     public function cancelBooking(Booking $booking)
     {
         $booking->update(['status' => 'Cancelled']);
@@ -130,11 +146,17 @@ class AdminController extends Controller
         return redirect()->route('admin.dashboard')->with('success', 'Booking cancelled successfully.');
     }
 
+    /**
+     * Get therapists for a specific branch (for AJAX calls).
+     */
     public function getTherapistsByBranch(Branch $branch)
     {
         return $branch->therapists()->orderBy('name')->get();
     }
 
+    /**
+     * Display a listing of the feedback.
+     */
     public function feedback()
     {
         $feedbacks = Booking::whereNotNull('rating')
@@ -144,11 +166,14 @@ class AdminController extends Controller
         return view('admin.feedback', compact('feedbacks'));
     }
 
+    /**
+     * Toggle the display status of a testimonial.
+     */
     public function toggleFeedbackDisplay(Booking $booking)
     {
         if ($booking->rating == 5 && !empty($booking->feedback)) {
             $booking->update(['show_on_landing' => !$booking->show_on_landing]);
-            Cache::forget('landing_page_testimonials'); // Invalidate cache
+            Cache::forget('landing_page_testimonials');
             return back()->with('success', 'Testimonial display status updated.');
         }
 
@@ -156,3 +181,4 @@ class AdminController extends Controller
     }
 }
 
+    

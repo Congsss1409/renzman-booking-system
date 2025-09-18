@@ -7,65 +7,59 @@
 
     <title>Book an Appointment - Renzman</title>
 
-    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=inter:400,500,600,700&display=swap" rel="stylesheet" />
     
-    <!-- Scripts -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-    <style>
-        /* Simple transition for a smoother feel */
-        .transition-all {
-            transition: all 0.3s ease-in-out;
-        }
-    </style>
 </head>
 <body class="font-sans antialiased bg-gray-50 text-gray-800">
-    <div class="min-h-screen flex flex-col items-center justify-center p-4">
+    <div class="h-screen w-full bg-white grid grid-cols-1 md:grid-cols-12">
         
-        <a href="{{ route('landing') }}" class="mb-8">
-            <img class="h-12 w-auto" src="{{ asset('images/logo trans.png') }}" alt="Renzman Logo">
-        </a>
-
-        <div class="w-full max-w-4xl">
-            <!-- Progress Bar -->
+        <div class="md:col-span-4 bg-indigo-700 text-white p-8 flex flex-col">
+            <a href="{{ route('landing') }}" class="mb-10 block flex-shrink-0">
+                <img class="h-10 w-auto" src="{{ asset('images/logo trans.png') }}" alt="Renzman Logo">
+            </a>
+            
             @php
                 $steps = [
-                    1 => 'Service',
-                    2 => 'Therapist',
-                    3 => 'Date & Time',
-                    4 => 'Details',
-                    5 => 'Confirm'
+                    1 => ['title' => 'Service', 'description' => 'Select a branch and the service you would like to book.'],
+                    2 => ['title' => 'Therapist', 'description' => 'Choose from our available professional therapists.'],
+                    3 => ['title' => 'Date & Time', 'description' => 'Pick a convenient date and time for your appointment.'],
+                    4 => ['title' => 'Your Details', 'description' => 'Please provide your contact information.'],
+                    5 => ['title' => 'Confirm & Pay', 'description' => 'Review your booking details and confirm your appointment.']
                 ];
             @endphp
-            <div class="mb-8 px-4">
-                <div class="flex items-center">
-                    @foreach ($steps as $step => $title)
-                        <div class="flex items-center {{ $step <= $currentStep ? 'text-indigo-600' : 'text-gray-400' }} relative">
-                            <div class="rounded-full transition-all duration-500 flex items-center justify-center h-10 w-10 border-2 {{ $step <= $currentStep ? 'bg-indigo-600 border-indigo-600 text-white' : 'border-gray-300 bg-white' }}">
-                                @if ($step < $currentStep)
-                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                                @else
-                                    <span>{{ $step }}</span>
-                                @endif
-                            </div>
-                            <div class="absolute top-0 -ml-10 text-center mt-12 w-32 text-xs font-medium uppercase {{ $step <= $currentStep ? 'text-gray-800' : 'text-gray-400' }}">{{ $title }}</div>
+            <nav class="space-y-4">
+                @foreach ($steps as $step => $details)
+                <div class="flex items-start">
+                    <div class="flex flex-col items-center mr-4">
+                        <div class="flex items-center justify-center w-8 h-8 rounded-full border-2 {{ $step <= $currentStep ? 'bg-white border-white text-indigo-700' : 'border-indigo-400 text-indigo-300' }} transition-all duration-300 flex-shrink-0">
+                            @if ($step < $currentStep)
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                            @else
+                                <span class="font-bold">{{ $step }}</span>
+                            @endif
                         </div>
                         @if (!$loop->last)
-                            <div class="flex-auto border-t-2 transition-all duration-500 {{ $step < $currentStep ? 'border-indigo-600' : 'border-gray-300' }}"></div>
+                            <div class="w-px h-12 bg-indigo-400 mt-2"></div>
                         @endif
-                    @endforeach
+                    </div>
+                    <div>
+                        <p class="font-semibold {{ $step <= $currentStep ? 'text-white' : 'text-indigo-300' }} transition-all duration-300">{{ $details['title'] }}</p>
+                        @if ($step == $currentStep)
+                            <p class="text-sm text-indigo-200 mt-1">{{ $details['description'] }}</p>
+                        @endif
+                    </div>
                 </div>
-            </div>
+                @endforeach
+            </nav>
+        </div>
 
-            <!-- Card Content -->
-            <div class="bg-white rounded-2xl shadow-lg p-6 sm:p-10">
+        <div class="md:col-span-8 p-8 flex flex-col">
+            <div class="flex-grow overflow-y-auto">
                 @yield('content')
-            </div>
-            <div class="text-center mt-4">
-                <a href="{{ route('landing') }}" class="text-sm text-gray-500 hover:text-indigo-600">Cancel and return to homepage</a>
             </div>
         </div>
     </div>
