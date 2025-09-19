@@ -67,9 +67,19 @@
                                 <td class="px-4 py-4 font-medium text-gray-900">{{ $booking->client_name }}</td>
                                 <td class="px-4 py-4"><p class="font-semibold text-xs">{{ $booking->service->name ?? 'N/A' }}</p><p class="text-xs text-gray-500">{{ $booking->therapist->name ?? 'N/A' }} at {{ $booking->branch->name ?? 'N/A' }}</p></td>
                                 <td class="px-4 py-4"><p class="text-xs">{{ $booking->start_time->format('M d, Y') }}</p><p class="text-xs text-gray-500">{{ $booking->start_time->format('g:i A') }}</p></td>
-                                <td class="px-4 py-4 text-xs text-gray-500">{{ $booking->created_at->diffForHumans() }}</td>
+                                <td class="px-4 py-4 text-xs text-gray-500">
+                                    <p>{{ $booking->created_at->format('M d, Y') }}</p>
+                                    <p class="text-gray-400">{{ $booking->created_at->format('g:i A') }}</p>
+                                </td>
                                 <td class="px-4 py-4"><span class="font-semibold text-xs px-3 py-1 rounded-full {{ $booking->status == 'Confirmed' ? 'bg-green-100 text-green-800' : ($booking->status == 'Cancelled' ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800') }}">{{ $booking->status }}</span></td>
-                                <td class="px-4 py-4">@if($booking->status !== 'Cancelled' && $booking->status !== 'Completed')<form action="{{ route('admin.bookings.cancel', $booking) }}" method="POST" class="cancel-form">@csrf<button type="submit" class="font-medium text-red-600 hover:underline text-xs">Cancel</button></form>@endif</td>
+                                <td class="px-4 py-4">
+                                    @if($booking->status !== 'Cancelled' && $booking->status !== 'Completed')
+                                    <form action="{{ route('admin.bookings.cancel', $booking) }}" method="POST" class="cancel-form">
+                                        @csrf
+                                        <button type="button" class="font-medium text-red-600 hover:underline text-xs cancel-button">Cancel</button>
+                                    </form>
+                                    @endif
+                                </td>
                             </tr>
                         @empty
                             <tr><td colspan="6" class="text-center py-12 text-gray-500"><p class="font-bold text-lg">No bookings found.</p><p>Try adjusting your search or filter.</p></td></tr>
@@ -175,11 +185,41 @@ document.addEventListener('DOMContentLoaded', () => {
     Chart.defaults.font.family = "'Poppins', sans-serif"; Chart.defaults.color = '#64748b';
     const sourceCtx = document.getElementById('sourceChart')?.getContext('2d');
     if (sourceCtx) { new Chart(sourceCtx, { type: 'doughnut', data: { labels: @json($sourceLabels), datasets: [{ label: 'Booking Source', data: @json($sourceData), backgroundColor: ['#2dd4bf', '#22d3ee', '#60a5fa', '#a78bfa', '#f87171'], borderColor: '#FFFFFF', borderWidth: 4, }] }, options: { responsive: true, cutout: '70%', plugins: { legend: { position: 'bottom' }, title: { display: true, text: 'Booking Sources', font: { size: 18, weight: '600' }, padding: { bottom: 20 } } } } }); }
-    const cancelForms = document.querySelectorAll('.cancel-form');
-    cancelForms.forEach(form => {
-        form.addEventListener('submit', function(e) {
+    
+    // SweetAlert2 for cancellation confirmation
+    const cancelButtons = document.querySelectorAll('.cancel-button');
+    cancelButtons.forEach(button => {
+        button.addEventListener('click', function(e) {
             e.preventDefault();
-            Swal.fire({ title: 'Are you sure?', text: "This booking will be cancelled.", icon: 'warning', showCancelButton: true, confirmButtonColor: '#14b8a6', cancelButtonColor: '#d33', confirmButtonText: 'Yes, cancel it!' }).then((result) => { if (result.isConfirmed) { this.submit(); } })
+            const form = this.closest('form');
+            Swal.fire({ 
+                title: 'Are you sure?', 
+                text: "This booking will be cancelled.", 
+                icon: 'warning', 
+                showCancelButton: true, 
+                confirmButtonColor: '#14b8a6', 
+                cancelButtonColor: '#d33', 
+                confirmButtonText: 'Yes, cancel it!',
+                didOpen: () => {
+                    // This is a fix for SweetAlert2 focus trapping in modals
+                    const sweetAlertModal = document.querySelector('.swal2-container');
+                    if (sweetAlertModal) {
+                        sweetAlertModal.style.zIndex = '9999';
+                    }
+                }
+            }).then((result) => { 
+                if (result.isConfirmed) {
+                    Swal.fire({
+                        title: 'Processing...',
+                        text: 'Please wait while we cancel the booking.',
+                        allowOutsideClick: false,
+                        didOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
+                    form.submit(); 
+                } 
+            })
         });
     });
 });

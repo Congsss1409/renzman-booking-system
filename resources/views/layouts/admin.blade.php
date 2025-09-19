@@ -37,7 +37,7 @@
         <!-- Sidebar -->
         <aside :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'" class="fixed inset-y-0 left-0 w-64 flex-shrink-0 bg-gradient-to-b from-teal-600 to-cyan-700 text-teal-100 flex flex-col transform transition-transform duration-300 ease-in-out z-30 lg:relative lg:translate-x-0">
             <div class="h-20 flex items-center justify-center text-2xl font-bold text-white">
-                <img src="{{ asset('images/logo trans.png') }}" alt="Logo" class="h-12 w-auto">
+                <img src="{{ asset('images/logo_white.png') }}" alt="Logo" class="h-120 w-auto">
             </div>
             <nav class="flex-grow px-4">
                 <a href="{{ route('admin.dashboard') }}" class="sidebar-link flex items-center gap-4 px-4 py-3 rounded-lg transition-colors hover:bg-teal-700 @if(request()->routeIs('admin.dashboard')) active @endif">
