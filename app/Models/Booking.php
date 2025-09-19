@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str; // Import the Str class for UUID generation
 
 class Booking extends Model
 {
@@ -32,7 +33,7 @@ class Booking extends Model
         'feedback_token',
         'rating',
         'feedback',
-        'show_on_landing', // This field is required to be fillable
+        'show_on_landing',
     ];
 
     /**
@@ -43,21 +44,47 @@ class Booking extends Model
     protected $casts = [
         'start_time' => 'datetime',
         'end_time' => 'datetime',
-        'show_on_landing' => 'boolean', // Casting to boolean is good practice
+        'show_on_landing' => 'boolean',
     ];
 
-    public function branch()
+    /**
+     * Boot the model.
+     *
+     * This method is called when the model is bootstrapped.
+     * We use it to automatically generate a feedback_token when a new booking is being created.
+     */
+    protected static function boot()
     {
-        return $this->belongsTo(Branch::class);
+        parent::boot();
+
+        static::creating(function ($booking) {
+            if (empty($booking->feedback_token)) {
+                $booking->feedback_token = (string) Str::uuid();
+            }
+        });
     }
 
+    /**
+     * Get the service associated with the booking.
+     */
     public function service()
     {
         return $this->belongsTo(Service::class);
     }
 
+    /**
+     * Get the therapist associated with the booking.
+     */
     public function therapist()
     {
         return $this->belongsTo(Therapist::class);
+    }
+
+    /**
+     * Get the branch associated with the booking.
+     */
+    public function branch()
+    {
+        return $this->belongsTo(Branch::class);
     }
 }

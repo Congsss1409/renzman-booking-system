@@ -1,127 +1,127 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>@yield('title', 'Admin Panel') - {{ config('app.name', 'Laravel') }}</title>
 
-    <title>@yield('title', 'Admin Panel') - Renzman Booking</title>
-
-    <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=inter:400,500,600,700&display=swap" rel="stylesheet" />
-    
-    <!-- Tailwind CSS CDN -->
+    <!-- Tailwind CSS & Fonts -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 
-    <!-- Scripts -->
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-    @stack('scripts')
+    <!-- SweetAlert2 CSS -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <!-- HoldOn.js CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/holdon.js/dist/HoldOn.min.css">
+
+    <!-- Alpine.js -->
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        body { font-family: 'Poppins', sans-serif; }
+        [x-cloak] { display: none !important; }
+        .sidebar-link.active { background-color: #0d9488; color: white; }
+        .sidebar-link.active svg { color: white; }
+    </style>
 </head>
-<body class="font-sans antialiased bg-gray-50">
-    <div x-data="{ sidebarOpen: false }" class="flex h-screen bg-gray-50">
+<body class="bg-gray-100">
+
+    <div x-data="{ sidebarOpen: false }" class="flex h-screen bg-gray-100">
         <!-- Sidebar -->
-        <aside 
-            x-show="sidebarOpen" 
-            @click.away="sidebarOpen = false"
-            x-transition:enter="transition ease-in-out duration-300"
-            x-transition:enter-start="-translate-x-full"
-            x-transition:enter-end="translate-x-0"
-            x-transition:leave="transition ease-in-out duration-300"
-            x-transition:leave-start="translate-x-0"
-            x-transition:leave-end="-translate-x-full"
-            class="fixed inset-y-0 left-0 z-30 flex flex-col w-64 h-full bg-white border-r border-gray-200 shadow-sm lg:static lg:translate-x-0 lg:shadow-none"
-        >
-            <div class="flex items-center justify-center px-6 py-4 border-b border-gray-200">
-                <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-2">
-                    <img class="h-8 w-auto" src="{{ asset('images/logo trans.png') }}" alt="Renzman Logo">
-                    <span class="text-lg font-semibold text-gray-800">Admin Panel</span>
-                </a>
+        <aside :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'" class="fixed inset-y-0 left-0 w-64 flex-shrink-0 bg-gradient-to-b from-teal-600 to-cyan-700 text-teal-100 flex flex-col transform transition-transform duration-300 ease-in-out z-30 lg:relative lg:translate-x-0">
+            <div class="h-20 flex items-center justify-center text-2xl font-bold text-white">
+                <img src="{{ asset('images/logo trans.png') }}" alt="Logo" class="h-12 w-auto">
             </div>
-
-            <nav class="flex-1 px-4 py-4 space-y-2">
-                <a href="{{ route('admin.dashboard') }}"
-                   class="flex items-center gap-3 px-4 py-2 text-sm font-medium rounded-lg {{ request()->routeIs('admin.dashboard') ? 'bg-indigo-50 text-indigo-700' : 'text-gray-600 hover:bg-gray-100 hover:text-gray-800' }}">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-                    </svg>
-                    Dashboard
+            <nav class="flex-grow px-4">
+                <a href="{{ route('admin.dashboard') }}" class="sidebar-link flex items-center gap-4 px-4 py-3 rounded-lg transition-colors hover:bg-teal-700 @if(request()->routeIs('admin.dashboard')) active @endif">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+                    <span>Dashboard</span>
                 </a>
-
-                <a href="{{ route('admin.therapists.index') }}"
-                   class="flex items-center gap-3 px-4 py-2 text-sm font-medium rounded-lg {{ request()->routeIs('admin.therapists.*') ? 'bg-indigo-50 text-indigo-700' : 'text-gray-600 hover:bg-gray-100 hover:text-gray-800' }}">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                    </svg>
-                    Therapists
+                <a href="{{ route('admin.therapists.index') }}" class="sidebar-link flex items-center gap-4 px-4 py-3 rounded-lg transition-colors hover:bg-teal-700 @if(request()->routeIs('admin.therapists.*')) active @endif">
+                     <svg class="w-6 h-6 text-teal-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                    <span>Therapists</span>
                 </a>
-
-                <a href="{{ route('admin.services.index') }}"
-                   class="flex items-center gap-3 px-4 py-2 text-sm font-medium rounded-lg {{ request()->routeIs('admin.services.*') ? 'bg-indigo-50 text-indigo-700' : 'text-gray-600 hover:bg-gray-100 hover:text-gray-800' }}">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
-                    </svg>
-                    Services
+                <a href="{{ route('admin.services.index') }}" class="sidebar-link flex items-center gap-4 px-4 py-3 rounded-lg transition-colors hover:bg-teal-700 @if(request()->routeIs('admin.services.*')) active @endif">
+                    <svg class="w-6 h-6 text-teal-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                    <span>Services</span>
                 </a>
-                
-                <a href="{{ route('admin.feedback') }}"
-                   class="flex items-center gap-3 px-4 py-2 text-sm font-medium rounded-lg {{ request()->routeIs('admin.feedback') ? 'bg-indigo-50 text-indigo-700' : 'text-gray-600 hover:bg-gray-100 hover:text-gray-800' }}">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
-                    </svg>
-                    Feedback
+                <a href="{{ route('admin.feedback') }}" class="sidebar-link flex items-center gap-4 px-4 py-3 rounded-lg transition-colors hover:bg-teal-700 @if(request()->routeIs('admin.feedback')) active @endif">
+                    <svg class="w-6 h-6 text-teal-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path></svg>
+                    <span>Feedback</span>
                 </a>
             </nav>
-
-            <div class="px-4 py-4 mt-auto border-t border-gray-200">
+            <div class="p-4">
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
-                    <button type="submit" class="flex items-center w-full gap-3 px-4 py-2 text-sm font-medium text-gray-600 rounded-lg hover:bg-gray-100 hover:text-gray-800">
-                         <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                        </svg>
-                        Logout
+                    <button type="submit" class="w-full flex items-center justify-center gap-4 px-4 py-3 rounded-lg transition-colors bg-teal-700 hover:bg-teal-600 text-white">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                        <span>Logout</span>
                     </button>
                 </form>
             </div>
         </aside>
 
-        <!-- Main content -->
-        <div class="flex flex-col flex-1 w-full overflow-y-auto">
-            <header class="flex items-center justify-between px-6 py-3 bg-white border-b border-gray-200 lg:justify-end">
-                 <!-- Hamburger menu button -->
-                <button @click="sidebarOpen = !sidebarOpen" class="text-gray-500 lg:hidden focus:outline-none">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
-                    </svg>
+        <!-- Main content & Header -->
+        <div class="flex-1 flex flex-col overflow-hidden">
+            <header class="flex justify-between items-center p-6 bg-white border-b-2 border-gray-200 lg:justify-end">
+                <button @click="sidebarOpen = !sidebarOpen" class="text-gray-500 focus:outline-none lg:hidden">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
                 </button>
-
-                <div class="flex items-center gap-4">
-                    <div class="text-right">
-                        <p class="text-sm font-medium text-gray-800">{{ Auth::user()->name }}</p>
-                        <p class="text-xs text-gray-500">{{ Auth::user()->email }}</p>
-                    </div>
-                </div>
+                <div class="font-semibold">Welcome, {{ Auth::user()->name }}</div>
             </header>
-
-            <main class="flex-1">
-                 <!-- Flash Messages -->
-                @if (session('success'))
-                    <div class="px-6 py-4 mx-4 my-4 text-sm text-green-700 bg-green-100 border border-green-200 rounded-lg" role="alert">
-                        <span class="font-bold">Success!</span> {{ session('success') }}
-                    </div>
-                @endif
-
-                @if (session('error'))
-                     <div class="px-6 py-4 mx-4 my-4 text-sm text-red-700 bg-red-100 border border-red-200 rounded-lg" role="alert">
-                        <span class="font-bold">Error!</span> {{ session('error') }}
-                    </div>
-                @endif
-
+            
+            <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 p-8">
                 @yield('content')
             </main>
         </div>
     </div>
+
+    <!-- jQuery & HoldOn.js -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/holdon.js/dist/HoldOn.min.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // --- SweetAlert2 Toast Notifications ---
+            const Toast = Swal.mixin({
+                toast: true, position: 'top-end', showConfirmButton: false, timer: 3000, timerProgressBar: true,
+                didOpen: (toast) => { toast.addEventListener('mouseenter', Swal.stopTimer); toast.addEventListener('mouseleave', Swal.resumeTimer); }
+            });
+            @if(session('success'))
+                Toast.fire({ icon: 'success', title: '{{ session('success') }}' });
+            @endif
+            @if(session('error'))
+                Toast.fire({ icon: 'error', title: '{{ session('error') }}' });
+            @endif
+            @if($errors->bookingCreation->any())
+                 Swal.fire({ icon: 'error', title: 'Oops...', html: `<p class="mb-2">There were some problems with your input:</p><ul class="text-left list-disc list-inside">@foreach ($errors->bookingCreation->all() as $error)<li>{{ $error }}</li>@endforeach</ul>` });
+            @endif
+
+            // --- HoldOn.js Loading Indicator ---
+            const loadingOptions = {
+                theme: "sk-circle",
+                message: 'Please wait...',
+                backgroundColor: "#0d9488", // teal-600
+                textColor: "white"
+            };
+            document.querySelectorAll('form').forEach(form => {
+                form.addEventListener('submit', function() { HoldOn.open(loadingOptions); });
+            });
+            document.querySelectorAll('.sidebar-link').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    if (!this.classList.contains('active')) { HoldOn.open(loadingOptions); }
+                });
+            });
+        });
+    </script>
+    @stack('scripts')
 </body>
 </html>
 
