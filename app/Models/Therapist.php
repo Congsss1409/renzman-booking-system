@@ -11,17 +11,19 @@ class Therapist extends Model
 
     /**
      * The attributes that are mass assignable.
+     * This is a security feature to prevent unwanted data from being saved.
      *
      * @var array<int, string>
      */
     protected $fillable = [
         'name',
-        'image', // Corrected from 'image_url'
+        'image_url', // The name was changed from 'image' to 'image_url' for clarity
         'branch_id',
     ];
 
     /**
-     * Get the branch that the therapist belongs to.
+     * Defines the relationship that a Therapist belongs to one Branch.
+     * This allows you to easily get a therapist's branch details, like: $therapist->branch->name
      */
     public function branch()
     {
@@ -29,7 +31,8 @@ class Therapist extends Model
     }
 
     /**
-     * Get the bookings for the therapist.
+     * Defines the relationship that a Therapist can have many Bookings.
+     * This allows you to get all bookings for a therapist, like: $therapist->bookings
      */
     public function bookings()
     {

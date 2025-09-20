@@ -7,114 +7,112 @@ use App\Models\Therapist;
 use App\Models\Branch;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule;
 
 class TherapistController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Display a listing of the therapists.
      */
-    public function index(Request $request)
+    public function index()
     {
-        $sortBy = $request->get('sort_by', 'created_at');
-        $sortOrder = $request->get('sort_order', 'desc');
-
-        $query = Therapist::with('branch');
-
-        if ($sortBy == 'name') {
-            $query->orderBy('name', $sortOrder);
-        } elseif ($sortBy == 'branch') {
-            $query->join('branches', 'therapists.branch_id', '=', 'branches.id')
-                  ->orderBy('branches.name', $sortOrder)
-                  ->select('therapists.*');
-        } else {
-            $query->orderBy($sortBy, $sortOrder);
-        }
-
-        $therapists = $query->paginate(12);
-        return view('admin.therapists', compact('therapists', 'sortBy', 'sortOrder'));
+        $therapists = Therapist::with('branch')->orderBy('name')->paginate(12);
+        return view('admin.therapists', compact('therapists'));
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Show the form for creating a new therapist.
      */
     public function create()
     {
-        $branches = Branch::all();
+        $branches = Branch::orderBy('name')->get();
         return view('admin.create-therapist', compact('branches'));
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Store a newly created therapist in storage.
      */
     public function store(Request $request)
     {
-        $validated = $request->validate([
+        $request->validate([
             'name' => 'required|string|max:255',
             'branch_id' => 'required|exists:branches,id',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:10240',
         ]);
 
-        $imagePath = null;
+        $imageUrl = null;
         if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->store('therapists', 'public');
+            // Corrected: Explicitly use the 'public' disk and store in the 'therapists' directory.
+            $path = $request->file('image')->store('therapists', 'public');
+            $imageUrl = Storage::disk('public')->url($path);
+        } else {
+            $nameForAvatar = urlencode($request->name);
+            $imageUrl = "https://ui-avatars.com/api/?name={$nameForAvatar}&color=FFFFFF&background=059669&size=128";
         }
 
         Therapist::create([
-            'name' => $validated['name'],
-            'branch_id' => $validated['branch_id'],
-            'image' => $imagePath
+            'name' => $request->name,
+            'branch_id' => $request->branch_id,
+            'image_url' => $imageUrl,
         ]);
 
-        return redirect()->route('admin.therapists.index')->with('success', 'Therapist created successfully.');
+        return redirect()->route('admin.therapists.index')->with('success', 'Therapist added successfully.');
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * Show the form for editing the specified therapist.
      */
     public function edit(Therapist $therapist)
     {
-        $branches = Branch::all();
+        $branches = Branch::orderBy('name')->get();
         return view('admin.edit-therapist', compact('therapist', 'branches'));
     }
 
     /**
-     * Update the specified resource in storage.
+     * Update the specified therapist in storage.
      */
     public function update(Request $request, Therapist $therapist)
     {
-        $validated = $request->validate([
+        $request->validate([
             'name' => 'required|string|max:255',
             'branch_id' => 'required|exists:branches,id',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:10240',
         ]);
 
-        $imagePath = $therapist->image;
+        $imageUrl = $therapist->image_url;
         if ($request->hasFile('image')) {
-            // Delete old image if it exists
-            if ($therapist->image) {
-                Storage::disk('public')->delete($therapist->image);
+            // Delete old image if it exists and is not a UI Avatar
+            if ($therapist->image_url && !str_contains($therapist->image_url, 'ui-avatars.com')) {
+                Storage::disk('public')->delete(str_replace('/storage/', '', $therapist->image_url));
             }
-            $imagePath = $request->file('image')->store('therapists', 'public');
+            // Corrected: Explicitly use the 'public' disk.
+            $path = $request->file('image')->store('therapists', 'public');
+            $imageUrl = Storage::disk('public')->url($path);
         }
 
         $therapist->update([
-            'name' => $validated['name'],
-            'branch_id' => $validated['branch_id'],
-            'image' => $imagePath
+            'name' => $request->name,
+            'branch_id' => $request->branch_id,
+            'image_url' => $imageUrl,
         ]);
 
         return redirect()->route('admin.therapists.index')->with('success', 'Therapist updated successfully.');
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Remove the specified therapist from storage.
      */
     public function destroy(Therapist $therapist)
     {
-        if ($therapist->image) {
-            Storage::disk('public')->delete($therapist->image);
+        try {
+            if ($therapist->image_url && !str_contains($therapist->image_url, 'ui-avatars.com')) {
+                Storage::disk('public')->delete(str_replace('/storage/', '', $therapist->image_url));
+            }
+            $therapist->delete();
+            return redirect()->route('admin.therapists.index')->with('success', 'Therapist deleted successfully.');
+        } catch (\Illuminate\Database\QueryException $e) {
+            return redirect()->route('admin.therapists.index')->with('error', 'Cannot delete therapist. They may have existing bookings.');
         }
-        $therapist->delete();
-        return redirect()->route('admin.therapists.index')->with('success', 'Therapist deleted successfully.');
     }
 }
+

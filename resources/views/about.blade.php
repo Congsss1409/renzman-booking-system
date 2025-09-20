@@ -1,53 +1,54 @@
-{{-- resources/views/about.blade.php --}}
 @extends('layouts.app')
+
+@section('title', 'About Us')
 
 @section('content')
 <div class="bg-white">
-    <div class="relative bg-emerald-700 text-white text-center py-20">
-        <div class="absolute inset-0">
-            <img class="w-full h-full object-cover opacity-20" src="https://images.unsplash.com/photo-1519823551278-64ac92734fb1?q=80&w=1974&auto=format&fit=crop" alt="Abstract background of hands">
+    <!-- Header -->
+    <header class="bg-white shadow-md sticky top-0 z-20">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="{{ route('landing') }}">
+                <img src="{{ asset('images/logo trans.png') }}" alt="Renzman Logo" class="h-10">
+            </a>
+            <nav class="hidden md:flex items-center space-x-6 text-gray-700">
+                <a href="{{ route('landing') }}" class="hover:text-teal-500 transition-colors">Home</a>
+                <a href="{{ route('services') }}" class="hover:text-teal-500 transition-colors">Services</a>
+                <a href="{{ route('about') }}" class="font-bold text-teal-600">About Us</a>
+            </nav>
+            <a href="{{ route('booking.create.step-one') }}" class="bg-teal-500 text-white font-bold py-2 px-6 rounded-full shadow-md hover:bg-teal-600 transition-all transform hover:scale-105">
+                Book Now
+            </a>
         </div>
-        <div class="relative container mx-auto px-4">
-            <h1 class="text-4xl md:text-5xl font-bold">About Renzman Blind Massage</h1>
-            <p class="mt-4 text-lg text-emerald-100 max-w-3xl mx-auto">
-                Discover our story, our mission, and our commitment to providing an exceptional and inclusive wellness experience.
-            </p>
-        </div>
-    </div>
+    </header>
 
-    <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div class="max-w-4xl mx-auto">
-            
-            <div class="mb-12" data-aos="fade-up">
-                <h2 class="text-3xl font-bold text-gray-800 mb-4">Our Story & Mission</h2>
-                <p class="text-gray-600 leading-relaxed mb-4">
-                    Renzman Blind Massage Therapy was founded on a simple yet powerful principle: the healing power of touch is a sense that can be uniquely perfected. Our founders recognized the exceptional tactile sensitivity that visually impaired individuals often possess and sought to create a professional, empowering environment where these unique talents could flourish.
+    <!-- Main Content -->
+    <main class="container mx-auto px-6 py-16">
+        <div class="text-center max-w-4xl mx-auto">
+            <h1 class="text-4xl md:text-5xl font-bold text-gray-800">About Renzman</h1>
+            <p class="mt-4 text-lg text-gray-600">Your trusted partner in relaxation and wellness since our inception.</p>
+        </div>
+
+        <div class="mt-16 grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+            <div>
+                <img src="https://placehold.co/600x400/0d9488/FFFFFF?text=Our+Sanctuary&font=poppins" alt="A relaxing spa environment" class="rounded-2xl shadow-xl">
+            </div>
+            <div>
+                <h2 class="text-3xl font-bold text-gray-800">Our Mission</h2>
+                <p class="mt-4 text-gray-600">
+                    At Renzman, our mission is to provide an accessible escape from the stresses of daily life. We believe in the power of touch and the importance of self-care. Our team of expert therapists is dedicated to delivering personalized treatments that not only soothe tired muscles but also restore balance to your mind and spirit. We are committed to creating a serene and welcoming environment where every client can find their moment of peace.
                 </p>
-                <p class="text-gray-600 leading-relaxed">
-                    Our mission is two-fold: to provide our clients with the most intuitive, effective, and deeply relaxing massage therapy available, and to offer meaningful, professional careers for certified visually impaired therapists. Every booking you make supports our commitment to inclusivity and excellence in the wellness industry.
+                <h2 class="text-3xl font-bold text-gray-800 mt-8">Our Story</h2>
+                <p class="mt-4 text-gray-600">
+                    Founded on the principles of quality, care, and community, Renzman started as a small, local massage parlor with a big dream: to make professional wellness services available to everyone. Through years of dedication and the trust of our loyal clients, we have grown into a well-loved establishment with multiple branches, yet we've never lost the personal touch that defines us.
                 </p>
             </div>
-
-            <div data-aos="fade-up">
-                <h2 class="text-3xl font-bold text-gray-800 mb-6 text-center">Visit Our Branches</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    @forelse ($branches as $index => $branch)
-                        <div class="p-6 border rounded-xl shadow-md bg-gray-50 text-center" data-aos="fade-up" data-aos-delay="{{ $index * 100 }}">
-                            <h3 class="text-xl font-bold text-emerald-700">{{ $branch->name }}</h3>
-                            <p class="mt-2 text-gray-600">{{ $branch->address }}</p>
-                        </div>
-                    @empty
-                        <p class="md:col-span-2 text-center text-gray-500 py-10">Branch information is currently unavailable.</p>
-                    @endforelse
-                </div>
-            </div>
-
-            <div class="text-center mt-16" data-aos="fade-in">
-                <a href="{{ route('booking.create.step-one') }}" class="bg-emerald-600 text-white font-bold py-4 px-10 rounded-full text-lg hover:bg-emerald-700 transition-transform transform hover:scale-105 shadow-lg">
-                    Ready to Book?
-                </a>
-            </div>
         </div>
-    </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white text-center py-8 mt-16">
+        <p>&copy; {{ date('Y') }} Renzman. All rights reserved.</p>
+    </footer>
 </div>
 @endsection
+    

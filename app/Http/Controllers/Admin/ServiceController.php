@@ -13,7 +13,7 @@ class ServiceController extends Controller
      */
     public function index()
     {
-        $services = Service::latest()->paginate(8);
+        $services = Service::orderBy('name')->paginate(12);
         return view('admin.services.index', compact('services'));
     }
 
@@ -30,14 +30,14 @@ class ServiceController extends Controller
      */
     public function store(Request $request)
     {
-        $validated = $request->validate([
+        $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
             'price' => 'required|numeric|min:0',
             'duration' => 'required|integer|min:1',
         ]);
 
-        Service::create($validated);
+        Service::create($request->all());
 
         return redirect()->route('admin.services.index')->with('success', 'Service created successfully.');
     }
@@ -55,14 +55,14 @@ class ServiceController extends Controller
      */
     public function update(Request $request, Service $service)
     {
-        $validated = $request->validate([
+        $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
             'price' => 'required|numeric|min:0',
             'duration' => 'required|integer|min:1',
         ]);
 
-        $service->update($validated);
+        $service->update($request->all());
 
         return redirect()->route('admin.services.index')->with('success', 'Service updated successfully.');
     }
@@ -72,12 +72,12 @@ class ServiceController extends Controller
      */
     public function destroy(Service $service)
     {
-        // Add a check to prevent deletion if the service has associated bookings
-        if ($service->bookings()->exists()) {
-            return back()->with('error', 'Cannot delete this service because it has existing bookings.');
+        try {
+            $service->delete();
+            return redirect()->route('admin.services.index')->with('success', 'Service deleted successfully.');
+        } catch (\Illuminate\Database\QueryException $e) {
+            // Handle cases where the service cannot be deleted due to existing bookings
+            return redirect()->route('admin.services.index')->with('error', 'Cannot delete service. It may be associated with existing bookings.');
         }
-        
-        $service->delete();
-        return redirect()->route('admin.services.index')->with('success', 'Service deleted successfully.');
     }
 }

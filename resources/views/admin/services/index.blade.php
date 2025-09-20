@@ -1,69 +1,83 @@
-    @extends('layouts.admin')
+@extends('layouts.admin')
 
-    @section('title', 'Manage Services')
+@section('title', 'Services Management')
 
-    @section('content')
-    <div class="p-4 sm:p-6 lg:p-8">
-        <div class="sm:flex sm:items-center sm:justify-between">
-            <div>
-                <h2 class="text-2xl font-bold text-gray-900 sm:text-3xl">Service Management</h2>
-                <p class="mt-1.5 text-sm text-gray-500">Manage the services offered at your locations.</p>
-            </div>
-
-            <div class="mt-4 sm:mt-0">
-                <a href="{{ route('admin.services.create') }}" class="inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-2 -ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                    </svg>
-                    Add Service
-                </a>
-            </div>
+@section('content')
+<div class="space-y-8">
+    <!-- Page Header -->
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+            <h1 class="text-4xl font-bold text-gray-800">Services <span class="text-teal-500">Management</span></h1>
+            <p class="text-gray-500 mt-1">Add, edit, or remove the services you offer.</p>
         </div>
-
-        <div class="mt-8">
-            @if($services->isEmpty())
-                <div class="py-20 text-center bg-white border border-gray-200 rounded-xl">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-12 h-12 mx-auto text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
-                    </svg>
-                    <h3 class="mt-4 text-lg font-semibold text-gray-800">No Services Found</h3>
-                    <p class="mt-1 text-sm text-gray-500">Get started by adding your first service.</p>
-                </div>
-            @else
-                <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                    @foreach ($services as $service)
-                        <div class="flex flex-col bg-white border border-gray-200 shadow-sm rounded-xl transition hover:shadow-lg">
-                            <div class="flex flex-col flex-1 p-6">
-                                <h3 class="text-xl font-bold text-gray-900">{{ $service->name }}</h3>
-                                <p class="mt-2 text-sm text-gray-500">Duration: {{ $service->duration }} minutes</p>
-                                <p class="mt-4 text-2xl font-semibold text-indigo-600">₱{{ number_format($service->price, 2) }}</p>
-
-                                <div class="flex-grow"></div>
-
-                                <div class="flex items-center gap-2 mt-6">
-                                    <a href="{{ route('admin.services.edit', $service) }}" class="inline-flex items-center justify-center flex-1 px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50">
-                                        Edit
-                                    </a>
-                                    <form action="{{ route('admin.services.destroy', $service) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this service?');" class="flex-1">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="inline-flex items-center justify-center w-full px-3 py-2 text-sm font-medium text-red-700 bg-red-100 border border-transparent rounded-md hover:bg-red-200">
-                                            Delete
-                                        </button>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-                    @endforeach
-                </div>
-
-                @if ($services->hasPages())
-                    <div class="mt-8">
-                        {{ $services->links() }}
-                    </div>
-                @endif
-            @endif
-        </div>
+        <a href="{{ route('admin.services.create') }}" class="font-semibold bg-gradient-to-r from-teal-400 to-cyan-600 hover:from-teal-500 hover:to-cyan-700 text-white py-3 px-6 rounded-full shadow-lg transition-transform transform hover:scale-105 whitespace-nowrap">
+            + ADD SERVICE
+        </a>
     </div>
-    @endsection
-    
+
+    <!-- Services Grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        @forelse($services as $service)
+            <div class="bg-stone-50 rounded-2xl p-6 text-center shadow-lg border hover:shadow-xl transition-shadow duration-300 flex flex-col justify-between">
+                <div>
+                    <h3 class="text-xl font-bold text-gray-800">{{ $service->name }}</h3>
+                    <p class="text-gray-500 mb-2 text-sm">{{ $service->description }}</p>
+                    <p class="font-semibold text-teal-500">Duration: {{ $service->duration }} mins</p>
+                    <p class="text-4xl font-bold text-gray-800 my-4">₱{{ number_format($service->price, 2) }}</p>
+                </div>
+                <div class="mt-6 flex justify-center gap-4">
+                    <a href="{{ route('admin.services.edit', $service->id) }}" class="font-semibold bg-cyan-400 text-white py-2 px-8 rounded-full shadow-md transition-transform transform hover:scale-105">EDIT</a>
+                    <form action="{{ route('admin.services.destroy', $service->id) }}" method="POST" class="delete-form">
+                        @csrf
+                        @method('DELETE')
+                        <button type="button" class="font-semibold bg-red-500 text-white py-2 px-8 rounded-full shadow-md transition-transform transform hover:scale-105 delete-button">DELETE</button>
+                    </form>
+                </div>
+            </div>
+        @empty
+            <div class="col-span-full text-center py-12 text-gray-500">
+                <p class="font-bold text-lg">No services found.</p>
+                <p>Click the "Add Service" button to get started.</p>
+            </div>
+        @endforelse
+    </div>
+
+    <!-- Pagination Links -->
+    <div class="mt-8">
+        {{ $services->links() }}
+    </div>
+</div>
+@endsection
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const deleteButtons = document.querySelectorAll('.delete-button');
+    deleteButtons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            const form = this.closest('form');
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#14b8a6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Swal.fire({
+                        title: 'Deleting...',
+                        text: 'Please wait.',
+                        allowOutsideClick: false,
+                        didOpen: () => { Swal.showLoading(); }
+                    });
+                    form.submit();
+                }
+            })
+        });
+    });
+});
+</script>
+@endpush
