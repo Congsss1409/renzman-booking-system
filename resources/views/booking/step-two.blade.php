@@ -67,12 +67,12 @@
                                     </div>
                                     @if($therapist->current_status == 'Available')
                                         <div class="text-right">
-                                            <span class="px-3 py-1 text-xs font-semibold text-green-800 bg-green-200 rounded-full">Available</span>
+                                            <span class="px-3 py-1 text-xs font-semibold text-green-800 bg-green-200 rounded-full">Available Now</span>
                                         </div>
                                     @else
                                         <div class="text-right">
-                                            <span class="px-3 py-1 text-xs font-semibold text-red-800 bg-red-200 rounded-full">In Session</span>
-                                            <p class="text-xs opacity-80 mt-1">Free at {{ $therapist->available_at }}</p>
+                                            <span class="px-3 py-1 text-xs font-semibold text-yellow-800 bg-yellow-200 rounded-full">Currently Busy</span>
+                                            <p class="text-xs opacity-80 mt-1">Available after {{ $therapist->available_at }}</p>
                                         </div>
                                     @endif
                                 </div>
