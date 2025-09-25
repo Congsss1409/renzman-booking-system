@@ -1,79 +1,73 @@
-@extends('layouts.booking')
+@extends('layouts.Booking')
+
+@section('title', 'Step 5: Verify Your Booking')
 
 @section('content')
-<form action="{{ route('booking.store.step-five') }}" method="POST">
-    @csrf
-    <div class="text-center mb-8">
-        <h2 class="text-2xl font-bold text-gray-800">Review & Confirm</h2>
-        <p class="text-gray-500">Please confirm your appointment details.</p>
-    </div>
+<div class="glass-panel rounded-3xl max-w-6xl mx-auto overflow-hidden shadow-2xl">
+    <div class="grid md:grid-cols-2">
+        
+        <div class="hidden md:block relative">
+            <img src="https://placehold.co/800x1200/0d9488/FFFFFF?text=Secure+Your+Spot&font=poppins" class="absolute h-full w-full object-cover" alt="A locked icon representing security">
+            <div class="absolute inset-0 bg-teal-800/50"></div>
+            <div class="relative z-10 p-12 text-white flex flex-col h-full">
+                <div>
+                    <h2 class="text-3xl font-bold">Final Confirmation</h2>
+                    <p class="mt-2 text-cyan-100">We've sent a 6-digit verification code to your email address to secure your appointment.</p>
+                </div>
+                <div class="mt-auto text-cyan-200 text-sm">
+                    <p>This code will expire in 10 minutes. Please check your inbox (and spam folder).</p>
+                </div>
+            </div>
+        </div>
 
-    <!-- Booking Summary -->
-    <div class="bg-gray-50 border border-gray-200 rounded-lg p-6 space-y-4">
-        <div class="flex justify-between items-center">
-            <span class="text-gray-600">Service:</span>
-            <span class="font-semibold text-gray-900">{{ $service->name }}</span>
-        </div>
-        <div class="flex justify-between items-center">
-            <span class="text-gray-600">Therapist:</span>
-            <span class="font-semibold text-gray-900">{{ $therapist->name }}</span>
-        </div>
-        <div class="flex justify-between items-center">
-            <span class="text-gray-600">Location:</span>
-            <span class="font-semibold text-gray-900">{{ $branch->name }}</span>
-        </div>
-        <div class="flex justify-between items-center">
-            <span class="text-gray-600">Date & Time:</span>
-            <span class="font-semibold text-gray-900">
-                {{ \Carbon\Carbon::parse($booking->date . ' ' . $booking->time)->format('F j, Y \a\t h:i A') }}
-            </span>
-        </div>
-        <div class="border-t border-gray-200 my-4"></div>
-        <div class="flex justify-between items-center text-xl">
-            <span class="text-gray-600 font-medium">Total Price:</span>
-            <span class="font-bold text-indigo-600">₱{{ number_format($service->price, 2) }}</span>
-        </div>
-    </div>
+        <div class="p-8 md:p-12">
+            <div class="mb-8">
+                <div class="flex justify-between items-center text-sm font-semibold text-cyan-100 mb-2">
+                    <span>Step 5/5: Verification</span>
+                    <span>100%</span>
+                </div>
+                <div class="w-full bg-white/20 rounded-full h-2.5">
+                    <div class="bg-white h-2.5 rounded-full" style="width: 100%"></div>
+                </div>
+            </div>
 
-    <!-- Payment Method -->
-    <div class="mt-8">
-        <h3 class="text-lg font-medium text-gray-900">Payment Method</h3>
-        <p class="text-sm text-gray-500 mb-4">Online payments require a 50% downpayment. The rest is payable on-site.</p>
-        <div class="space-y-3">
-             <label class="flex items-center p-4 border border-gray-200 rounded-lg cursor-pointer hover:border-indigo-500 hover:bg-indigo-50">
-                <input type="radio" name="payment_method" value="On-Site" class="h-5 w-5 text-indigo-600 border-gray-300 focus:ring-indigo-500" required checked>
-                <div class="ml-4">
-                    <span class="font-semibold text-gray-800">Pay On-Site</span>
-                    <span class="block text-sm text-gray-500">Pay the full amount in person.</span>
+            <div class="text-left mb-8">
+                <h1 class="text-3xl md:text-4xl font-bold">Enter Verification Code</h1>
+                <p class="mt-2 text-lg text-cyan-100">A code has been sent to {{ $booking->client_email }}.</p>
+            </div>
+
+            @if (session('error'))
+                <div class="mb-4 bg-red-500/30 border border-red-400 text-white px-4 py-3 rounded-lg relative" role="alert">
+                    <span class="block sm:inline">{{ session('error') }}</span>
                 </div>
-            </label>
-            <label class="flex items-center p-4 border border-gray-200 rounded-lg cursor-pointer hover:border-indigo-500 hover:bg-indigo-50">
-                <input type="radio" name="payment_method" value="GCash" class="h-5 w-5 text-indigo-600 border-gray-300 focus:ring-indigo-500" required>
-                <div class="ml-4">
-                    <span class="font-semibold text-gray-800">Pay with GCash</span>
-                    <span class="block text-sm text-gray-500">Downpayment: ₱{{ number_format($service->price * 0.5, 2) }}</span>
+            @endif
+             @error('verification_code')
+                <div class="mb-4 bg-red-500/30 border border-red-400 text-white px-4 py-3 rounded-lg relative" role="alert">
+                    <span class="block sm:inline">{{ $message }}</span>
                 </div>
-            </label>
-            <label class="flex items-center p-4 border border-gray-200 rounded-lg cursor-pointer hover:border-indigo-500 hover:bg-indigo-50">
-                <input type="radio" name="payment_method" value="Maya" class="h-5 w-5 text-indigo-600 border-gray-300 focus:ring-indigo-500" required>
-                <div class="ml-4">
-                    <span class="font-semibold text-gray-800">Pay with Maya</span>
-                    <span class="block text-sm text-gray-500">Downpayment: ₱{{ number_format($service->price * 0.5, 2) }}</span>
+            @enderror
+
+            <form action="{{ route('booking.store.step-five') }}" method="POST">
+                @csrf
+                <div class="space-y-6">
+                    <div>
+                        <label for="verification_code" class="block text-lg font-semibold mb-2">6-Digit Code</label>
+                        <input type="text" name="verification_code" id="verification_code" required
+                               class="w-full p-4 bg-white/10 rounded-lg border border-white/30 focus:outline-none focus:ring-2 focus:ring-white text-center text-2xl tracking-[1em]" 
+                               placeholder="______" maxlength="6" pattern="[0-9]{6}">
+                    </div>
                 </div>
-            </label>
+
+                <div class="mt-10 flex justify-between">
+                    <a href="{{ route('booking.create.step-four') }}" class="bg-white/20 text-white font-bold py-3 px-10 rounded-full shadow-md hover:bg-white/30 transition-all transform hover:scale-105">
+                        &larr; Back
+                    </a>
+                    <button type="submit" class="bg-white text-teal-600 font-bold py-3 px-10 rounded-full shadow-md hover:bg-cyan-100 transition-all transform hover:scale-105">
+                        Confirm Booking
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
-    
-    <div class="mt-8 flex items-center justify-between">
-        <a href="{{ route('booking.create.step-four') }}" class="text-sm font-medium text-gray-600 hover:text-indigo-500">
-            &larr; Back to Details
-        </a>
-        <button type="submit" class="inline-flex items-center px-8 py-3 border border-transparent text-base font-medium rounded-lg shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
-             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
-            </svg>
-            Confirm Booking
-        </button>
-    </div>
-</form>
+</div>
 @endsection

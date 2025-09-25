@@ -1,45 +1,81 @@
-@extends('layouts.booking')
+@extends('layouts.Booking')
+
+@section('title', 'Step 4: Your Details')
 
 @section('content')
-<form action="{{ route('booking.store.step-four') }}" method="POST">
-    @csrf
-    <h2 class="text-2xl font-bold text-gray-800">Your Contact Information</h2>
-    <p class="mt-2 text-gray-600">We're almost there! Please provide your details below so we can send you a confirmation and keep you updated about your appointment.</p>
-
-    <div class="mt-8 space-y-6">
-        <div>
-            <label for="client_name" class="block text-sm font-medium text-gray-700">Full Name</label>
-            <input type="text" name="client_name" id="client_name" value="{{ old('client_name', $booking->client_name ?? '') }}" required
-                   class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm py-3 px-4">
-            @error('client_name') <span class="text-sm text-red-500">{{ $message }}</span> @enderror
+<div class="glass-panel rounded-3xl max-w-6xl mx-auto overflow-hidden shadow-2xl">
+    <div class="grid md:grid-cols-2">
+        
+        <div class="hidden md:block relative">
+            <img src="https://placehold.co/800x1200/0d9488/FFFFFF?text=Final+Details&font=poppins" class="absolute h-full w-full object-cover" alt="A customer happily checking in at the front desk">
+            <div class="absolute inset-0 bg-teal-800/50"></div>
+            <div class="relative z-10 p-12 text-white flex flex-col h-full">
+                <div>
+                    <h2 class="text-3xl font-bold">You're Almost Done!</h2>
+                    <p class="mt-2 text-cyan-100">Please provide your contact information to finalize and confirm your appointment.</p>
+                </div>
+                <div class="mt-auto text-cyan-200 text-sm">
+                    <p>We'll send a confirmation email and reminders to the address you provide.</p>
+                </div>
+            </div>
         </div>
 
-        <div>
-            <label for="client_email" class="block text-sm font-medium text-gray-700">Email Address</label>
-            <input type="email" name="client_email" id="client_email" value="{{ old('client_email', $booking->client_email ?? '') }}" required
-                   class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm py-3 px-4">
-            @error('client_email') <span class="text-sm text-red-500">{{ $message }}</span> @enderror
-        </div>
+        <div class="p-8 md:p-12">
+            <div class="mb-8">
+                <div class="flex justify-between items-center text-sm font-semibold text-cyan-100 mb-2">
+                    <span>Step 4/5: Your Details</span>
+                    <span>80%</span>
+                </div>
+                <div class="w-full bg-white/20 rounded-full h-2.5">
+                    <div class="bg-white h-2.5 rounded-full" style="width: 80%"></div>
+                </div>
+            </div>
 
-        <div>
-            <label for="client_phone" class="block text-sm font-medium text-gray-700">Phone Number</label>
-            <input type="tel" name="client_phone" id="client_phone" value="{{ old('client_phone', $booking->client_phone ?? '') }}" required
-                   class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm py-3 px-4">
-            @error('client_phone') <span class="text-sm text-red-500">{{ $message }}</span> @enderror
+            <div class="text-left mb-8">
+                <h1 class="text-3xl md:text-4xl font-bold">Enter Your Details</h1>
+                <p class="mt-2 text-lg text-cyan-100">This information will be used to confirm your booking.</p>
+            </div>
+
+            @if ($errors->any())
+                <div class="mb-4 bg-red-500/30 border border-red-400 text-white px-4 py-3 rounded-lg relative" role="alert">
+                    <ul>
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
+            <form action="{{ route('booking.store.step-four') }}" method="POST">
+                @csrf
+                <div class="space-y-6">
+                    <div>
+                        <label for="client_name" class="block text-lg font-semibold mb-2">Full Name</label>
+                        <input type="text" name="client_name" id="client_name" value="{{ old('client_name', $booking->client_name ?? '') }}" required
+                               class="w-full p-4 bg-white/10 rounded-lg border border-white/30 focus:outline-none focus:ring-2 focus:ring-white" placeholder="e.g., Jane Doe">
+                    </div>
+                    <div>
+                        <label for="client_email" class="block text-lg font-semibold mb-2">Email Address</label>
+                        <input type="email" name="client_email" id="client_email" value="{{ old('client_email', $booking->client_email ?? '') }}" required
+                               class="w-full p-4 bg-white/10 rounded-lg border border-white/30 focus:outline-none focus:ring-2 focus:ring-white" placeholder="you@example.com">
+                    </div>
+                     <div>
+                        <label for="client_phone" class="block text-lg font-semibold mb-2">Phone Number</label>
+                        <input type="tel" name="client_phone" id="client_phone" value="{{ old('client_phone', $booking->client_phone ?? '') }}" required
+                               class="w-full p-4 bg-white/10 rounded-lg border border-white/30 focus:outline-none focus:ring-2 focus:ring-white" placeholder="e.g., 09171234567">
+                    </div>
+                </div>
+
+                <div class="mt-10 flex justify-between">
+                    <a href="{{ route('booking.create.step-three') }}" class="bg-white/20 text-white font-bold py-3 px-10 rounded-full shadow-md hover:bg-white/30 transition-all transform hover:scale-105">
+                        &larr; Back
+                    </a>
+                    <button type="submit" class="bg-white text-teal-600 font-bold py-3 px-10 rounded-full shadow-md hover:bg-cyan-100 transition-all transform hover:scale-105">
+                        Next Step &rarr;
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
-
-    <div class="mt-10 flex items-center justify-between">
-        <a href="{{ route('booking.create.step-three') }}" class="inline-flex items-center text-sm font-medium text-gray-600 hover:text-indigo-500">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
-            Back to Date & Time
-        </a>
-        <button type="submit" class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-lg shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-            Next: Confirm & Pay
-            <svg xmlns="http://www.w3.org/2000/svg" class="ml-3 -mr-1 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-            </svg>
-        </button>
-    </div>
-</form>
+</div>
 @endsection

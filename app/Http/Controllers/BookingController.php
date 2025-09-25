@@ -10,7 +10,9 @@ use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\BookingConfirmed;
+use App\Mail\BookingVerificationMail;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Log;
 
 class BookingController extends Controller
 {
@@ -19,12 +21,7 @@ class BookingController extends Controller
         $branches = Branch::all();
         $services = Service::all();
         $booking = $request->session()->get('booking', new \stdClass());
-        return view('booking.step-one', [
-            'branches' => $branches,
-            'services' => $services,
-            'booking' => $booking,
-            'currentStep' => 1
-        ]);
+        return view('booking.step-one', compact('branches', 'services', 'booking'));
     }
 
     public function storeStepOne(Request $request)
@@ -43,22 +40,15 @@ class BookingController extends Controller
     public function createStepTwo(Request $request)
     {
         $bookingData = $request->session()->get('booking');
-        if (empty($bookingData->branch_id) || empty($bookingData->service_id)) {
+        if (empty($bookingData->branch_id)) {
             return redirect()->route('booking.create.step-one')->with('error', 'Please select a branch and service first.');
         }
-
         $therapists = Therapist::where('branch_id', $bookingData->branch_id)->get();
-        $branch = Branch::find($bookingData->branch_id);
-        $service = Service::find($bookingData->service_id);
         $now = Carbon::now('Asia/Manila');
-
         foreach ($therapists as $therapist) {
             $currentBooking = Booking::where('therapist_id', $therapist->id)
                 ->whereIn('status', ['Confirmed', 'In Progress'])
-                ->where('start_time', '<=', $now)
-                ->where('end_time', '>', $now)
-                ->first();
-
+                ->where('start_time', '<=', $now)->where('end_time', '>', $now)->first();
             if ($currentBooking) {
                 $therapist->current_status = 'In Session';
                 $therapist->available_at = Carbon::parse($currentBooking->end_time)->format('h:i A');
@@ -67,20 +57,21 @@ class BookingController extends Controller
                 $therapist->available_at = null;
             }
         }
-        
-        return view('booking.step-two', [
-            'therapists' => $therapists, 
-            'branch' => $branch, 
-            'service' => $service,
-            'booking' => $bookingData,
-            'currentStep' => 2
-        ]);
+        return view('booking.step-two', compact('therapists', 'bookingData'));
     }
     
     public function storeStepTwo(Request $request)
     {
         $validated = $request->validate(['therapist_id' => 'required|exists:therapists,id']);
-        $booking = $request->session()->get('booking');
+        $therapist = Therapist::find($validated['therapist_id']);
+        $now = Carbon::now('Asia/Manila');
+        $currentBooking = Booking::where('therapist_id', $therapist->id)
+            ->whereIn('status', ['Confirmed', 'In Progress'])
+            ->where('start_time', '<=', $now)->where('end_time', '>', $now)->first();
+        if ($currentBooking) {
+            return redirect()->back()->withErrors(['therapist_id' => 'Sorry, ' . $therapist->name . ' is currently in a session. Please select another therapist.']);
+        }
+        $booking = $request->session()->get('booking', new \stdClass());
         $booking->therapist_id = $validated['therapist_id'];
         $request->session()->put('booking', $booking);
         return redirect()->route('booking.create.step-three');
@@ -94,13 +85,8 @@ class BookingController extends Controller
         }
         $therapist = Therapist::find($booking->therapist_id);
         $service = Service::find($booking->service_id);
-        
-        return view('booking.step-three', [
-            'therapist' => $therapist, 
-            'service' => $service,
-            'booking' => $booking,
-            'currentStep' => 3
-        ]);
+        $now = Carbon::now('Asia/Manila')->toIso8601String();
+        return view('booking.step-three', compact('therapist', 'service', 'booking', 'now'));
     }
 
     public function storeStepThree(Request $request)
@@ -113,7 +99,7 @@ class BookingController extends Controller
         if ($selectedDateTime->isPast()) {
             return back()->withErrors(['booking_time' => 'You cannot book an appointment in the past.'])->withInput();
         }
-        $booking = $request->session()->get('booking');
+        $booking = $request->session()->get('booking', new \stdClass());
         $booking->date = $validated['booking_date'];
         $booking->time = $validated['booking_time'];
         $request->session()->put('booking', $booking);
@@ -126,17 +112,7 @@ class BookingController extends Controller
         if (empty($booking->date)) {
             return redirect()->route('booking.create.step-three')->with('error', 'Please select a date and time.');
         }
-        $branch = Branch::find($booking->branch_id);
-        $service = Service::find($booking->service_id);
-        $therapist = Therapist::find($booking->therapist_id);
-        
-        return view('booking.step-four', [
-            'booking' => $booking, 
-            'branch' => $branch, 
-            'service' => $service, 
-            'therapist' => $therapist,
-            'currentStep' => 4
-        ]);
+        return view('booking.step-four', compact('booking'));
     }
 
     public function storeStepFour(Request $request)
@@ -146,62 +122,16 @@ class BookingController extends Controller
             'client_email' => 'required|email|max:255',
             'client_phone' => 'required|string|max:20',
         ]);
-        $booking = $request->session()->get('booking');
-        $booking->client_name = $validated['client_name'];
-        $booking->client_email = $validated['client_email'];
-        $booking->client_phone = $validated['client_phone'];
-        $request->session()->put('booking', $booking);
-        return redirect()->route('booking.create.step-five');
-    }
+        
+        $bookingData = $request->session()->get('booking', new \stdClass());
+        $bookingData->client_name = $validated['client_name'];
+        $bookingData->client_email = $validated['client_email'];
+        $bookingData->client_phone = $validated['client_phone'];
 
-    public function createStepFive(Request $request)
-    {
-        $booking = $request->session()->get('booking');
-        if (empty($booking->client_name)) {
-            return redirect()->route('booking.create.step-four')->with('error', 'Please enter your details.');
-        }
-        $branch = Branch::find($booking->branch_id);
-        $service = Service::find($booking->service_id);
-        $therapist = Therapist::find($booking->therapist_id);
-
-        return view('booking.step-five', [
-            'booking' => $booking,
-            'branch' => $branch,
-            'service' => $service,
-            'therapist' => $therapist,
-            'currentStep' => 5
-        ]);
-    }
-
-    public function storeStepFive(Request $request)
-    {
-        $validated = $request->validate([
-            'payment_method' => 'required|string|in:GCash,Maya,On-Site',
-        ]);
-        $bookingData = $request->session()->get('booking');
-        if (!$bookingData) {
-            return redirect()->route('booking.create.step-one')->with('error', 'Your session has expired. Please start again.');
-        }
         $service = Service::find($bookingData->service_id);
         $startTime = Carbon::parse($bookingData->date . ' ' . $bookingData->time, 'Asia/Manila');
         $endTime = $startTime->copy()->addMinutes($service->duration);
-        $conflictingBooking = Booking::where('therapist_id', $bookingData->therapist_id)
-            ->where('start_time', '<', $endTime)
-            ->where('end_time', '>', $startTime)
-            ->where('status', '!=', 'Cancelled')
-            ->exists();
-        if ($conflictingBooking) {
-            return redirect()->route('booking.create.step-three')
-                ->with('error', 'Sorry, that time slot was just booked by someone else. Please select another time.');
-        }
-        $downpaymentAmount = 0;
-        $remainingBalance = $service->price;
-        $paymentStatus = 'Pending';
-        if ($validated['payment_method'] !== 'On-Site') {
-            $downpaymentAmount = $service->price * 0.50;
-            $remainingBalance = $service->price - $downpaymentAmount;
-            $paymentStatus = 'Paid Downpayment';
-        }
+
         $booking = Booking::create([
             'client_name' => $bookingData->client_name,
             'client_email' => $bookingData->client_email,
@@ -212,40 +142,75 @@ class BookingController extends Controller
             'start_time' => $startTime,
             'end_time' => $endTime,
             'price' => $service->price,
-            'downpayment_amount' => $downpaymentAmount,
-            'remaining_balance' => $remainingBalance,
-            'payment_method' => $validated['payment_method'],
-            'payment_status' => $paymentStatus,
-            'status' => 'Confirmed',
-            'feedback_token' => Str::uuid(),
+            'status' => 'Pending Verification',
+            'verification_code' => rand(100000, 999999),
+            'verification_expires_at' => Carbon::now()->addMinutes(10),
         ]);
-        
-        Mail::to($booking->client_email)->send(new BookingConfirmed($booking));
+
+        try {
+            Mail::to($booking->client_email)->send(new BookingVerificationMail($booking));
+        } catch (\Exception $e) {
+            Log::error("Verification email failed for booking ID {$booking->id}: " . $e->getMessage());
+            $booking->delete();
+            return redirect()->route('booking.create.step-four')->with('error', 'Could not send verification email. Please check the address and try again.');
+        }
         
         $request->session()->forget('booking');
-        return redirect()->route('booking.success');
+        $request->session()->put('booking_id_for_verification', $booking->id);
+
+        return redirect()->route('booking.create.step-five');
     }
 
-    public function success()
+    public function createStepFive(Request $request)
     {
-        return view('booking.success', ['currentStep' => 6]);
+        $bookingId = $request->session()->get('booking_id_for_verification');
+        if (!$bookingId) {
+            return redirect()->route('booking.create.step-one')->with('error', 'Your session has expired. Please start again.');
+        }
+        $booking = Booking::findOrFail($bookingId);
+        return view('booking.step-five', compact('booking'));
+    }
+
+    public function storeStepFive(Request $request)
+    {
+        $validated = $request->validate([ 'verification_code' => 'required|string|digits:6', ]);
+        $bookingId = $request->session()->get('booking_id_for_verification');
+        if (!$bookingId) {
+            return redirect()->route('booking.create.step-one')->with('error', 'Your session has expired. Please start again.');
+        }
+        $booking = Booking::findOrFail($bookingId);
+        if ($booking->verification_code !== $validated['verification_code'] || Carbon::now()->gt($booking->verification_expires_at)) {
+            return back()->with('error', 'Invalid or expired verification code. Please try again.');
+        }
+        $booking->update([
+            'status' => 'Confirmed', 'verification_code' => null, 'verification_expires_at' => null,
+        ]);
+        try {
+            Mail::to($booking->client_email)->send(new BookingConfirmed($booking));
+        } catch (\Exception $e) {
+            Log::error("Confirmation email failed for booking ID {$booking->id}: " . $e->getMessage());
+        }
+        $request->session()->forget('booking_id_for_verification');
+        return redirect()->route('booking.success')->with('booking_id', $booking->id);
+    }
+
+    public function success(Request $request)
+    {
+        $bookingId = $request->session()->get('booking_id');
+        if(!$bookingId) return redirect()->route('landing');
+        $booking = Booking::findOrFail($bookingId);
+        return view('booking.success', compact('booking'));
     }
 
     public function getAvailability(Request $request, Therapist $therapist, $date, Service $service)
     {
-        try {
-            $selectedDate = Carbon::parse($date);
-        } catch (\Exception $e) {
-            return response()->json(['error' => 'Invalid date format'], 400);
-        }
-
+        $selectedDate = Carbon::parse($date);
         $existingBookings = Booking::where('therapist_id', $therapist->id)
             ->whereDate('start_time', $selectedDate->toDateString())
-            ->where('status', '!=', 'Cancelled')
+            ->whereIn('status', ['Confirmed', 'In Progress', 'Pending Verification'])
             ->get();
-
+        
         $unavailableSlots = [];
-
         foreach ($existingBookings as $booking) {
             $start = Carbon::parse($booking->start_time);
             $end = Carbon::parse($booking->end_time);
@@ -254,19 +219,6 @@ class BookingController extends Controller
                 $start->addMinutes(30);
             }
         }
-
-        $closingTime = $selectedDate->copy()->hour(21)->minute(0)->second(0);
-        $serviceDuration = $service->duration;
-
-        for ($hour = 8; $hour < 21; $hour++) {
-            for ($minute = 0; $minute < 60; $minute += 30) {
-                 $slotTime = $selectedDate->copy()->hour($hour)->minute($minute);
-                if ($slotTime->copy()->addMinutes($serviceDuration) > $closingTime) {
-                    $unavailableSlots[] = $slotTime->format('H:i');
-                }
-            }
-        }
-        
         return response()->json(array_unique($unavailableSlots));
     }
 }

@@ -20,38 +20,29 @@ class UpdateBookingStatusCommand extends Command
      *
      * @var string
      */
-    protected $description = 'Finds confirmed bookings that have ended and updates their status to "Completed"';
+    protected $description = 'Update booking statuses based on current time (e.g., to In Progress or Completed)';
 
     /**
      * Execute the console command.
+     *
+     * @return int
      */
     public function handle()
     {
-        $this->info('Running booking status update task...');
+        $now = Carbon::now('Asia/Manila');
 
-        // Get the current time in the application's timezone (Asia/Manila)
-        $now = Carbon::now();
+        // 1. Update Confirmed bookings to 'In Progress' if the session has started but not ended
+        Booking::where('status', 'Confirmed')
+            ->where('start_time', '<=', $now)
+            ->where('end_time', '>', $now)
+            ->update(['status' => 'In Progress']);
 
-        // Find all bookings that are still marked as 'Confirmed' but their end_time has passed.
-        $bookingsToUpdate = Booking::where('status', 'Confirmed')
-                                   ->where('end_time', '<', $now)
-                                   ->get();
+        // 2. Update 'Confirmed' or 'In Progress' bookings to 'Completed' if the session end time is in the past
+        Booking::whereIn('status', ['Confirmed', 'In Progress'])
+            ->where('end_time', '<=', $now)
+            ->update(['status' => 'Completed']);
 
-        if ($bookingsToUpdate->isEmpty()) {
-            $this->info('No bookings found that need updating.');
-            return 0; // Command was successful, but there was nothing to do.
-        }
-
-        $count = $bookingsToUpdate->count();
-        $this->info("Found {$count} bookings to mark as completed.");
-
-        foreach ($bookingsToUpdate as $booking) {
-            $booking->status = 'Completed';
-            $booking->save();
-            $this->line("Updated Booking ID #{$booking->id} to Completed.");
-        }
-
-        $this->info('Booking status update task finished successfully.');
-        return 0; // Command was successful.
+        $this->info('Booking statuses have been updated successfully.');
+        return 0;
     }
 }

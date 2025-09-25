@@ -1,5 +1,4 @@
 <?php
-// app/Models/Service.php
 
 namespace App\Models;
 
@@ -20,6 +19,7 @@ class Service extends Model
         'description',
         'price',
         'duration',
+        'image_url', // Add the new image_url field here
     ];
 
     /**

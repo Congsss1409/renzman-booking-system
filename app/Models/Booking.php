@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Str; // Import the Str class for UUID generation
+use Illuminate\Support\Str;
 
 class Booking extends Model
 {
@@ -34,6 +34,8 @@ class Booking extends Model
         'rating',
         'feedback',
         'show_on_landing',
+        'verification_code', // Add this line
+        'verification_expires_at', // Add this line
     ];
 
     /**
@@ -45,13 +47,11 @@ class Booking extends Model
         'start_time' => 'datetime',
         'end_time' => 'datetime',
         'show_on_landing' => 'boolean',
+        'verification_expires_at' => 'datetime', // Add this line
     ];
 
     /**
      * Boot the model.
-     *
-     * This method is called when the model is bootstrapped.
-     * We use it to automatically generate a feedback_token when a new booking is being created.
      */
     protected static function boot()
     {

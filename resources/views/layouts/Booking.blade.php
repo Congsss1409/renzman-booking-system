@@ -1,67 +1,75 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@yield('title', 'Book Your Session') - Renzman</title>
 
-    <title>Book an Appointment - Renzman</title>
-
-    <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=inter:400,500,600,700&display=swap" rel="stylesheet" />
-    
     <script src="https://cdn.tailwindcss.com"></script>
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-</head>
-<body class="font-sans antialiased bg-gray-50 text-gray-800">
-    <div class="h-screen w-full bg-white grid grid-cols-1 md:grid-cols-12">
-        
-        <div class="md:col-span-4 bg-indigo-700 text-white p-8 flex flex-col">
-            <a href="{{ route('landing') }}" class="mb-10 block flex-shrink-0">
-                <img class="h-10 w-auto" src="{{ asset('images/logo trans.png') }}" alt="Renzman Logo">
-            </a>
-            
-            @php
-                $steps = [
-                    1 => ['title' => 'Service', 'description' => 'Select a branch and the service you would like to book.'],
-                    2 => ['title' => 'Therapist', 'description' => 'Choose from our available professional therapists.'],
-                    3 => ['title' => 'Date & Time', 'description' => 'Pick a convenient date and time for your appointment.'],
-                    4 => ['title' => 'Your Details', 'description' => 'Please provide your contact information.'],
-                    5 => ['title' => 'Confirm & Pay', 'description' => 'Review your booking details and confirm your appointment.']
-                ];
-            @endphp
-            <nav class="space-y-4">
-                @foreach ($steps as $step => $details)
-                <div class="flex items-start">
-                    <div class="flex flex-col items-center mr-4">
-                        <div class="flex items-center justify-center w-8 h-8 rounded-full border-2 {{ $step <= $currentStep ? 'bg-white border-white text-indigo-700' : 'border-indigo-400 text-indigo-300' }} transition-all duration-300 flex-shrink-0">
-                            @if ($step < $currentStep)
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
-                            @else
-                                <span class="font-bold">{{ $step }}</span>
-                            @endif
-                        </div>
-                        @if (!$loop->last)
-                            <div class="w-px h-12 bg-indigo-400 mt-2"></div>
-                        @endif
-                    </div>
-                    <div>
-                        <p class="font-semibold {{ $step <= $currentStep ? 'text-white' : 'text-indigo-300' }} transition-all duration-300">{{ $details['title'] }}</p>
-                        @if ($step == $currentStep)
-                            <p class="text-sm text-indigo-200 mt-1">{{ $details['description'] }}</p>
-                        @endif
-                    </div>
-                </div>
-                @endforeach
-            </nav>
-        </div>
 
-        <div class="md:col-span-8 p-8 flex flex-col">
-            <div class="flex-grow overflow-y-auto">
-                @yield('content')
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        body { 
+            font-family: 'Poppins', sans-serif; 
+            overflow-x: hidden;
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .header-glass {
+            background: rgba(0, 0, 0, 0.25);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .animate-blob { animation: blob 7s infinite; }
+        .animation-delay-2000 { animation-delay: 2s; }
+        .animation-delay-4000 { animation-delay: 4s; }
+        @keyframes blob {
+            0% { transform: translate(0px, 0px) scale(1); }
+            33% { transform: translate(30px, -50px) scale(1.1); }
+            66% { transform: translate(-20px, 20px) scale(0.9); }
+            100% { transform: translate(0px, 0px) scale(1); }
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+
+<div class="relative min-h-screen w-full bg-gradient-to-br from-cyan-500 via-teal-500 to-emerald-600 text-white">
+    
+    <div class="absolute top-0 -left-20 w-72 h-72 bg-teal-400 rounded-full mix-blend-soft-light filter blur-xl opacity-70 animate-blob"></div>
+    <div class="absolute top-0 -right-20 w-72 h-72 bg-cyan-400 rounded-full mix-blend-soft-light filter blur-xl opacity-70 animate-blob animation-delay-2000"></div>
+    <div class="absolute -bottom-8 left-20 w-72 h-72 bg-emerald-400 rounded-full mix-blend-soft-light filter blur-xl opacity-70 animate-blob animation-delay-4000"></div>
+
+    <div class="relative z-10">
+        <header class="p-4 sticky top-0 z-50">
+            <div class="container mx-auto flex justify-between items-center header-glass rounded-full p-2 px-6 shadow-lg">
+                <a href="{{ route('landing') }}"><img src="{{ asset('images/logo trans.png') }}" alt="Renzman Logo" class="h-10"></a>
+                <nav class="hidden md:flex items-center space-x-8 text-gray-200">
+                    <a href="{{ route('landing') }}" class="hover:text-white transition-colors">Home</a>
+                    <a href="{{ route('services') }}" class="hover:text-white transition-colors">Services</a>
+                    <a href="{{ route('about') }}" class="hover:text-white transition-colors">About Us</a>
+                </nav>
+                 <a href="{{ route('landing') }}" class="bg-white text-teal-600 font-bold py-3 px-8 rounded-full shadow-md hover:bg-cyan-100 transition-all transform hover:scale-105">
+                    Cancel Booking
+                </a>
             </div>
-        </div>
+        </header>
+
+        <main class="container mx-auto px-6 py-16">
+            @yield('content')
+        </main>
     </div>
+</div>
+
+@stack('scripts')
 </body>
 </html>
