@@ -15,7 +15,7 @@
             </div>
         </div>
 
-        <div class="p-8 md:p-12" x-data="dateTimePicker('{{ $now }}')">
+        <div class="p-8 md:p-12" x-data="dateTimePicker('{{ $now }}', {{ json_encode($todayForJs) }})">
             <div class="mb-8">
                 <div class="flex justify-between items-center text-sm font-semibold text-cyan-100 mb-2"><span>Step 3/5: Date & Time</span><span>60%</span></div>
                 <div class="w-full bg-white/20 rounded-full h-2.5"><div class="bg-white h-2.5 rounded-full" style="width: 60%"></div></div>
@@ -80,20 +80,22 @@
  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 @push('scripts')
 <script>
-function dateTimePicker(serverTime) {
+function dateTimePicker(serverTime, todayForJs) {
     return {
         month: '', year: '', dayCount: [], blankDays: [],
         days: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
         months: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
         selectedDate: '', selectedDateFormatted: '', selectedTime: '',
-        availableSlots: [], unavailableSlots: [], loading: false,
+        availableSlots: [], loading: false,
         serverTime: serverTime,
+        todayForJs: todayForJs,
 
         init() {
-            const today = new Date(this.serverTime);
-            this.month = today.getMonth();
-            this.year = today.getFullYear();
-            this.selectedDate = this.formatDate(today);
+            // Use the server's definition of today for all initial calendar state
+            this.month = this.todayForJs.month;
+            this.year = this.todayForJs.year;
+            this.selectedDate = this.formatDate(new Date(this.todayForJs.year, this.todayForJs.month, this.todayForJs.day));
+
             this.getDays();
             this.fetchAvailability();
         },
@@ -108,8 +110,8 @@ function dateTimePicker(serverTime) {
         nextMonth() { if (this.month === 11) { this.month = 0; this.year++; } else { this.month++; } this.getDays(); },
         isSelected(day) { const d = new Date(this.year, this.month, day); return this.selectedDate === this.formatDate(d); },
         isPast(day) {
-            const today = new Date(this.serverTime);
-            today.setHours(0,0,0,0);
+            // Compare against the server's definition of today, ignoring time.
+            const today = new Date(this.todayForJs.year, this.todayForJs.month, this.todayForJs.day);
             const d = new Date(this.year, this.month, day);
             return d < today;
         },
@@ -122,39 +124,23 @@ function dateTimePicker(serverTime) {
         },
         selectTime(time) { this.selectedTime = time; },
         fetchAvailability() {
-            this.loading = true; this.availableSlots = [];
+            this.loading = true;
+            this.availableSlots = [];
             this.selectedDateFormatted = new Date(this.selectedDate + 'T00:00:00').toLocaleDateString('en-US', { month: 'long', day: 'numeric' });
-            fetch(`/api/therapists/{{ $therapist->id }}/availability/${this.selectedDate}/{{ $service->id }}`)
+            
+            const extendedParam = '{{ $extendedSession ? '1' : '0' }}';
+            const apiUrl = `/api/therapists/{{ $therapist->id }}/availability/${this.selectedDate}/{{ $service->id }}?extended=${extendedParam}`;
+
+            fetch(apiUrl)
                 .then(response => response.json())
-                .then(data => { this.unavailableSlots = data; this.generateTimeSlots(); })
+                .then(data => {
+                    this.availableSlots = data;
+                })
                 .catch(error => console.error('Error fetching availability:', error))
                 .finally(() => { this.loading = false; });
         },
-        generateTimeSlots() {
-            const slots = [];
-            const now = new Date(this.serverTime);
-            const todayStr = this.formatDate(now);
-            
-            // Generate slots on the hour from 8 AM to 8 PM
-            for (let hour = 8; hour < 21; hour++) {
-                const time = `${String(hour).padStart(2, '0')}:00`;
-                const slotStart = new Date(`${this.selectedDate}T${time}:00`);
-
-                // If the selected date is today, check if the slot has already passed
-                if (this.selectedDate === todayStr && slotStart < now) {
-                    continue;
-                }
-                
-                // Check if the slot is already booked (API returns 'HH:MM')
-                if (this.unavailableSlots.includes(time)) {
-                    continue; 
-                }
-
-                slots.push(time);
-            }
-            this.availableSlots = slots;
-        },
         formatTime(time) {
+            if (!time) return '';
             const [h, m] = time.split(':');
             const hour = parseInt(h, 10);
             const period = hour >= 12 ? 'PM' : 'AM';

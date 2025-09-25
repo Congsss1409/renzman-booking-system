@@ -62,18 +62,16 @@ class BookingController extends Controller
     
     public function storeStepTwo(Request $request)
     {
-        $validated = $request->validate(['therapist_id' => 'required|exists:therapists,id']);
-        $therapist = Therapist::find($validated['therapist_id']);
-        $now = Carbon::now('Asia/Manila');
-        $currentBooking = Booking::where('therapist_id', $therapist->id)
-            ->whereIn('status', ['Confirmed', 'In Progress'])
-            ->where('start_time', '<=', $now)->where('end_time', '>', $now)->first();
-        if ($currentBooking) {
-            return redirect()->back()->withErrors(['therapist_id' => 'Sorry, ' . $therapist->name . ' is currently in a session. Please select another therapist.']);
-        }
+        $validated = $request->validate([
+            'therapist_id' => 'required|exists:therapists,id',
+            'extended_session' => 'nullable|boolean',
+        ]);
+
         $booking = $request->session()->get('booking', new \stdClass());
         $booking->therapist_id = $validated['therapist_id'];
+        $booking->extended_session = !empty($validated['extended_session']);
         $request->session()->put('booking', $booking);
+
         return redirect()->route('booking.create.step-three');
     }
 
@@ -85,8 +83,17 @@ class BookingController extends Controller
         }
         $therapist = Therapist::find($booking->therapist_id);
         $service = Service::find($booking->service_id);
-        $now = Carbon::now('Asia/Manila')->toIso8601String();
-        return view('booking.step-three', compact('therapist', 'service', 'booking', 'now'));
+        $extendedSession = $booking->extended_session ?? false;
+        
+        $manilaTime = Carbon::now('Asia/Manila');
+        $now = $manilaTime->toIso8601String();
+        $todayForJs = [
+            'year' => $manilaTime->year,
+            'month' => $manilaTime->month - 1, // JS months are 0-indexed
+            'day' => $manilaTime->day
+        ];
+
+        return view('booking.step-three', compact('therapist', 'service', 'booking', 'now', 'extendedSession', 'todayForJs'));
     }
 
     public function storeStepThree(Request $request)
@@ -130,7 +137,10 @@ class BookingController extends Controller
 
         $service = Service::find($bookingData->service_id);
         $startTime = Carbon::parse($bookingData->date . ' ' . $bookingData->time, 'Asia/Manila');
-        $endTime = $startTime->copy()->addMinutes($service->duration);
+        
+        $isExtended = $bookingData->extended_session ?? false;
+        $durationInMinutes = $service->duration + ($isExtended ? 60 : 0);
+        $endTime = $startTime->copy()->addMinutes($durationInMinutes);
 
         $booking = Booking::create([
             'client_name' => $bookingData->client_name,
@@ -141,7 +151,7 @@ class BookingController extends Controller
             'therapist_id' => $bookingData->therapist_id,
             'start_time' => $startTime,
             'end_time' => $endTime,
-            'price' => $service->price,
+            'price' => $service->price, // Note: Price is not updated for extended session
             'status' => 'Pending Verification',
             'verification_code' => rand(100000, 999999),
             'verification_expires_at' => Carbon::now()->addMinutes(10),
@@ -204,21 +214,43 @@ class BookingController extends Controller
 
     public function getAvailability(Request $request, Therapist $therapist, $date, Service $service)
     {
-        $selectedDate = Carbon::parse($date);
+        $isExtended = $request->query('extended') === '1';
+        $durationInMinutes = $service->duration + ($isExtended ? 60 : 0);
+
+        $selectedDate = Carbon::parse($date, 'Asia/Manila')->startOfDay();
+        $dayStart = $selectedDate->copy()->hour(8); // Shop opens at 8 AM
+        $dayEnd = $selectedDate->copy()->hour(21); // Shop closes at 9 PM
+
         $existingBookings = Booking::where('therapist_id', $therapist->id)
             ->whereDate('start_time', $selectedDate->toDateString())
             ->whereIn('status', ['Confirmed', 'In Progress', 'Pending Verification'])
-            ->get();
-        
-        $unavailableSlots = [];
-        foreach ($existingBookings as $booking) {
-            $start = Carbon::parse($booking->start_time);
-            $end = Carbon::parse($booking->end_time);
-            while ($start < $end) {
-                $unavailableSlots[] = $start->format('H:i');
-                $start->addMinutes(30);
+            ->orderBy('start_time')
+            ->get(['start_time', 'end_time']);
+
+        $availableSlots = [];
+        $potentialSlotStart = $dayStart;
+
+        while ($potentialSlotStart->copy()->addMinutes($durationInMinutes) <= $dayEnd) {
+            $potentialSlotEnd = $potentialSlotStart->copy()->addMinutes($durationInMinutes);
+
+            $isConflict = false;
+            foreach ($existingBookings as $booking) {
+                $bookingStart = Carbon::parse($booking->start_time);
+                $bookingEnd = Carbon::parse($booking->end_time);
+
+                if ($potentialSlotStart < $bookingEnd && $potentialSlotEnd > $bookingStart) {
+                    $isConflict = true;
+                    break; 
+                }
             }
+
+            if (!$isConflict) {
+                $availableSlots[] = $potentialSlotStart->format('H:i');
+            }
+            
+            $potentialSlotStart->addMinutes(30);
         }
-        return response()->json(array_unique($unavailableSlots));
+
+        return response()->json($availableSlots);
     }
 }

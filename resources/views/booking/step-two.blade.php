@@ -3,7 +3,7 @@
 @section('title', 'Step 2: Choose Your Therapist')
 
 @section('content')
-<div class="glass-panel rounded-3xl max-w-6xl mx-auto overflow-hidden shadow-2xl">
+<div x-data="{ showModal: false }" class="glass-panel rounded-3xl max-w-6xl mx-auto overflow-hidden shadow-2xl">
     <div class="grid md:grid-cols-2">
         
         <!-- Left Column: Image & Branding -->
@@ -51,8 +51,9 @@
             @endif
 
             <!-- Form Content -->
-            <form action="{{ route('booking.store.step-two') }}" method="POST">
+            <form x-ref="stepTwoForm" action="{{ route('booking.store.step-two') }}" method="POST">
                 @csrf
+                <input type="hidden" name="extended_session" x-ref="extendedSessionInput" value="0">
                 <div class="space-y-4 max-h-[40vh] overflow-y-auto pr-4">
                     @forelse($therapists as $therapist)
                         <label class="block">
@@ -90,13 +91,28 @@
                     <a href="{{ route('booking.create.step-one') }}" class="bg-white/20 text-white font-bold py-3 px-10 rounded-full shadow-md hover:bg-white/30 transition-all transform hover:scale-105">
                         &larr; Back
                     </a>
-                    <button type="submit" class="bg-white text-teal-600 font-bold py-3 px-10 rounded-full shadow-md hover:bg-cyan-100 transition-all transform hover:scale-105">
+                    <button type="button" @click.prevent="showModal = true" class="bg-white text-teal-600 font-bold py-3 px-10 rounded-full shadow-md hover:bg-cyan-100 transition-all transform hover:scale-105">
                         Next Step &rarr;
                     </button>
                 </div>
             </form>
         </div>
     </div>
+
+    <!-- Extension Modal -->
+    <div x-show="showModal" @keydown.escape.window="showModal = false" class="fixed inset-0 z-50 flex items-center justify-center bg-black/70" style="display: none;">
+        <div x-show="showModal" x-transition class="bg-teal-700 text-white rounded-2xl shadow-2xl max-w-sm mx-auto p-8" @click.away="showModal = false">
+            <h3 class="text-2xl font-bold mb-2">Extend Your Session?</h3>
+            <p class="text-cyan-100 mb-6">An extended session will add one hour to your service, allowing for a more thorough and relaxing experience.</p>
+            <div class="flex justify-end space-x-4">
+                <button @click="showModal = false; $refs.stepTwoForm.submit()" type="button" class="bg-white/20 font-bold py-2 px-6 rounded-full hover:bg-white/30 transition-all">
+                    No, Thanks
+                </button>
+                <button @click="$refs.extendedSessionInput.value = '1'; showModal = false; $refs.stepTwoForm.submit()" type="button" class="bg-white text-teal-600 font-bold py-2 px-6 rounded-full hover:bg-cyan-100 transition-all">
+                    Yes, Extend
+                </button>
+            </div>
+        </div>
+    </div>
 </div>
 @endsection
-
