@@ -1,4 +1,4 @@
-window.appointmentModal = function(todayForJs) {
+window.bookingModal = function(todayForJs) {
     return {
         // Data arrays
         branches: [],
