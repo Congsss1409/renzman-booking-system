@@ -20,54 +20,65 @@
         }
     </style>
 </head>
-<body class="bg-gradient-to-br from-gray-100 to-gray-200">
+<body class="min-h-screen bg-gradient-to-br from-indigo-50 via-slate-100 to-gray-200">
 
-    <div class="min-h-screen flex items-center justify-center p-4">
-        <div class="w-full max-w-4xl flex rounded-2xl shadow-2xl overflow-hidden bg-white">
-            
-            <!-- Left Panel: Image and Welcome Text -->
-            <div class="hidden md:flex flex-col justify-center items-center w-1/2 p-12 text-center bg-gradient-to-br from-teal-500 to-cyan-600">
-                <img src="{{ asset('images/logo_white.png') }}" alt="Renzman Logo" class="w-48 h-48">
-                <h1 class="text-4xl font-bold leading-tight mt-4 text-white">Renzman Booking</h1>
-                <p class="text-teal-100 mt-2">Management System</p>
-            </div>
-            
-            <!-- Right Panel: Login Form -->
-            <div class="w-full md:w-1/2 p-8 sm:p-12">
-                <h2 class="text-3xl font-bold text-gray-800">Login</h2>
-                <p class="text-gray-500 mt-2 mb-8">Enter your credentials to access the admin panel.</p>
-                
-                <!-- Login Form -->
-                <form action="{{ route('login.store') }}" method="POST" class="space-y-6">
-                    @csrf
-                    
-                    <!-- Email Input -->
-                    <div>
-                        <label for="email" class="block text-gray-600 font-semibold mb-2">Email</label>
-                        <input type="email" id="email" name="email" value="{{ old('email') }}" required autocomplete="email" autofocus 
-                               class="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500">
-                    </div>
-                    
-                    <!-- Password Input -->
-                    <div>
-                        <label for="password" class="block text-gray-600 font-semibold mb-2">Password</label>
-                        <input type="password" id="password" name="password" required autocomplete="current-password"
-                               class="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500">
-                    </div>
-                    
-                    <!-- Display Login Errors -->
-                    @error('email')
-                        <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-3 text-sm rounded-md" role="alert">
-                            <span>{{ $message }}</span>
-                        </div>
-                    @enderror
+    <div class="min-h-screen flex items-center justify-center p-6">
+        <div class="w-full max-w-4xl flex rounded-2xl overflow-hidden relative">
 
-                    <!-- Submit Button -->
-                    <button type="submit" 
-                            class="w-full bg-gradient-to-r from-teal-500 to-cyan-600 text-white font-bold p-3 rounded-lg hover:from-teal-600 hover:to-cyan-700 transition-all duration-300 transform hover:scale-105 shadow-lg">
-                        LOGIN
-                    </button>
-                </form>
+            <!-- Background glow / decorative (admin palette) -->
+            <div aria-hidden="true" class="absolute inset-0 bg-gradient-to-br from-teal-400 to-cyan-600 opacity-30 blur-3xl"></div>
+
+            <!-- Glass Card -->
+            <div class="relative z-10 w-full flex rounded-2xl shadow-2xl overflow-hidden">
+
+                <!-- Left Panel: Image and Welcome Text -->
+                <div class="hidden md:flex flex-col justify-center items-center w-1/2 p-12 text-center bg-gradient-to-br from-teal-500 to-cyan-600">
+                    <div class="inline-flex items-center justify-center p-2 bg-white/10 rounded-full shadow-2xl border border-white/30">
+                        <img src="{{ asset('images/logo_white.png') }}" alt="Renzman Logo" class="w-44 h-44 rounded-full">
+                    </div>
+                    <h1 class="text-4xl font-bold leading-tight mt-4 text-white/95">Renzman Booking</h1>
+                    <p class="text-white/80 mt-2">Management System</p>
+                </div>
+
+                <!-- Right Panel: Login Form (Glass - higher contrast) -->
+                <div class="w-full md:w-1/2 p-8 sm:p-12 bg-white/60 backdrop-blur-md border border-white/30 text-gray-900">
+                    <div class="max-w-md">
+                        <h2 class="text-3xl font-bold text-gray-900">Login</h2>
+                        <p class="text-gray-700 mt-2 mb-6">Enter your credentials to access the admin panel.</p>
+
+                        <!-- Login Form -->
+                        <form action="{{ route('login.store') }}" method="POST" class="space-y-6">
+                            @csrf
+
+                            <!-- Email Input -->
+                            <div>
+                                <label for="email" class="block text-sm font-semibold text-gray-700 mb-2">Email</label>
+                                <input type="email" id="email" name="email" value="{{ old('email') }}" required autocomplete="email" autofocus 
+                            class="w-full p-3 bg-white border border-gray-200 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-cyan-300 shadow-sm focus:shadow-md transition-shadow duration-150">
+                            </div>
+
+                            <!-- Password Input -->
+                            <div>
+                                <label for="password" class="block text-sm font-semibold text-gray-700 mb-2">Password</label>
+                                <input type="password" id="password" name="password" required autocomplete="current-password"
+                                       class="w-full p-3 bg-white border border-gray-200 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-cyan-300 shadow-sm focus:shadow-md transition-shadow duration-150">
+                            </div>
+
+                            <!-- Display Login Errors -->
+                            @error('email')
+                                <div class="bg-red-50 border-l-4 border-red-400 text-red-700 p-3 text-sm rounded-md" role="alert">
+                                    <span>{{ $message }}</span>
+                                </div>
+                            @enderror
+
+                            <!-- Submit Button -->
+                            <button type="submit" 
+                                    class="w-full inline-flex justify-center items-center bg-gradient-to-r from-teal-500 to-cyan-600 hover:from-teal-600 hover:to-cyan-700 text-white font-semibold p-3 rounded-lg transition-all duration-200 shadow-sm">
+                                LOGIN
+                            </button>
+                        </form>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

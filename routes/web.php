@@ -5,6 +5,7 @@ use App\Http\Controllers\BookingController;
 use App\Http\Controllers\FeedbackController;
 use App\Http\Controllers\LandingPageController;
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Auth\TwoFactorController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\ServiceController;
 use App\Http\Controllers\Admin\TherapistController;
@@ -44,6 +45,11 @@ Route::get('/feedback/{token}', [FeedbackController::class, 'create'])->name('fe
 Route::post('/feedback/{token}', [FeedbackController::class, 'store'])->name('feedback.store');
 Route::get('/api/therapists/{therapist}/availability/{date}/{service}', [BookingController::class, 'getAvailability'])->name('api.therapists.availability');
 
+// two-factor verification routes
+Route::get('/2fa', [TwoFactorController::class, 'index'])->name('2fa.index');
+Route::post('/2fa', [TwoFactorController::class, 'verify'])->name('2fa.verify');
+Route::post('/2fa/resend', [TwoFactorController::class, 'resend'])->name('2fa.resend');
+
 // --- Protected Admin Routes ---
 Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
     
@@ -82,5 +88,17 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
         Route::post('users/{user}', [\App\Http\Controllers\Admin\UserController::class, 'update'])->name('users.update');
         Route::post('users/{user}/delete', [\App\Http\Controllers\Admin\UserController::class, 'destroy'])->name('users.destroy');
     });
+
+    // Payroll Management
+    Route::get('payrolls', [\App\Http\Controllers\PayrollController::class, 'index'])->name('payrolls.index');
+    Route::get('payrolls/create', [\App\Http\Controllers\PayrollController::class, 'create'])->name('payrolls.create');
+    Route::post('payrolls', [\App\Http\Controllers\PayrollController::class, 'store'])->name('payrolls.store');
+    Route::get('payrolls/{payroll}', [\App\Http\Controllers\PayrollController::class, 'show'])->name('payrolls.show');
+    Route::get('payrolls-export', [\App\Http\Controllers\PayrollController::class, 'exportCsv'])->name('payrolls.export');
+    Route::get('payrolls/{payroll}/export-pdf', [\App\Http\Controllers\PayrollController::class, 'exportPdf'])->name('payrolls.export_pdf');
+    Route::post('payrolls/{payroll}/items', [\App\Http\Controllers\PayrollController::class, 'addItem'])->name('payrolls.items.add');
+    Route::post('payrolls/items/{item}/remove', [\App\Http\Controllers\PayrollController::class, 'removeItem'])->name('payrolls.items.remove');
+    Route::post('payrolls/{payroll}/payments', [\App\Http\Controllers\PayrollController::class, 'addPayment'])->name('payrolls.payments.add');
+    Route::post('payrolls/generate-from-bookings', [\App\Http\Controllers\PayrollController::class, 'generateFromBookings'])->name('payrolls.generate_from_bookings');
 });
 

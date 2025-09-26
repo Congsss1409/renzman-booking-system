@@ -39,4 +39,12 @@ class Therapist extends Model
         return $this->hasMany(Booking::class);
     }
 
+    /**
+     * Therapist payroll records
+     */
+    public function payrolls()
+    {
+        return $this->hasMany(Payroll::class);
+    }
+
 }

@@ -5,6 +5,11 @@
 @section('content')
 
 <div class="space-y-8">
+    {{-- Smooth scrolling for modal and overflow containers --}}
+    <style>
+        html, body { scroll-behavior: smooth; }
+        .smooth-scroll { scroll-behavior: smooth; -webkit-overflow-scrolling: touch; }
+    </style>
     <!-- Page Header -->
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
@@ -170,7 +175,7 @@
             </div>
         </div>
 
-        <div class="flex-grow overflow-y-auto pr-4 -mr-4">
+        <div class="flex-grow overflow-y-auto pr-4 -mr-4 smooth-scroll">
             <form id="appointmentForm" x-ref="appointmentForm" action="{{ route('admin.bookings.store') }}" method="POST">
                 @csrf
                 <!-- Hidden inputs to store selections -->
@@ -209,7 +214,7 @@
 
                 <!-- Step 2: Select Therapist -->
                 <div x-show="currentStep === 2" x-transition>
-                    <div class="space-y-3 max-h-[50vh] overflow-y-auto">
+                    <div class="space-y-3 max-h-[50vh] overflow-y-auto smooth-scroll">
                         <template x-if="loadingTherapists">
                             <p class="text-center text-gray-500">Loading therapists...</p>
                         </template>
@@ -257,7 +262,7 @@
                         </div>
                         <div class="min-w-[220px] xl:min-w-[260px]">
                             <label class="block text-lg font-semibold mb-2">Available Times for <span class="text-gray-800 font-bold" x-text="selectedDateFormatted"></span></label>
-                            <div class="bg-gray-50 rounded-lg p-6 h-[284px] overflow-y-auto flex flex-col gap-4">
+                            <div class="bg-gray-50 rounded-lg p-6 h-[284px] overflow-y-auto flex flex-col gap-4 smooth-scroll">
                                 <div x-show="loadingSlots" class="flex items-center justify-center h-full"><svg class="animate-spin h-8 w-8 text-teal-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg></div>
                                 <div x-show="!loadingSlots && availableSlots.length > 0" class="grid grid-cols-3 gap-2">
                                     <template x-for="slot in availableSlots" :key="slot">

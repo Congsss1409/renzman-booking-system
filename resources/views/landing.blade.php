@@ -4,11 +4,15 @@
 
 @section('content')
 <style>
+    /* Smooth scrolling for anchor navigation and overflow containers */
+    html, body { scroll-behavior: smooth; }
     /* Main container for the full-page scroll effect */
     .scroll-container {
         scroll-snap-type: y mandatory;
         overflow-y: scroll;
         height: 100vh;
+        scroll-behavior: smooth;
+        -webkit-overflow-scrolling: touch; /* momentum scrolling on iOS */
     }
     /* Each section is a snap point */
     .scroll-section {
@@ -227,5 +231,64 @@
         </div>
     </section>
 </div>
+
+<script>
+// Smooth programmatic scroll for the scroll-container with controllable duration/easing
+(function(){
+    const container = document.querySelector('.scroll-container');
+    if (!container) return;
+
+    const DURATION = 700; // ms
+    const easeInOutCubic = t => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+
+    function animateScrollTo(targetY, duration = DURATION) {
+        const startY = container.scrollTop;
+        const diff = targetY - startY;
+        const startTime = performance.now();
+
+        function step(now) {
+            const elapsed = now - startTime;
+            const t = Math.min(1, elapsed / duration);
+            container.scrollTop = Math.round(startY + diff * easeInOutCubic(t));
+            if (t < 1) requestAnimationFrame(step);
+        }
+
+        requestAnimationFrame(step);
+    }
+
+    // Intercept internal anchor clicks and animate the container instead of jumping
+    document.addEventListener('click', function(e){
+        const anchor = e.target.closest('a[href^="#"]');
+        if (!anchor) return;
+        const href = anchor.getAttribute('href');
+        if (!href || href === '#') return;
+        const id = href.slice(1);
+        const target = document.getElementById(id);
+        if (!target) return;
+
+        // Only handle targets that are inside the scroll container
+        if (!container.contains(target) && target !== container) return;
+
+        e.preventDefault();
+
+        // Compute target scrollTop relative to container
+        const containerRect = container.getBoundingClientRect();
+        const targetRect = target.getBoundingClientRect();
+        const targetY = targetRect.top - containerRect.top + container.scrollTop;
+
+        animateScrollTo(targetY, DURATION);
+
+        // Update the URL hash without jumping
+        try { history.replaceState(null, '', href); } catch (err) { /* ignore */ }
+
+        // Focus target after animation completes for accessibility
+        setTimeout(() => {
+            target.setAttribute('tabindex', '-1');
+            target.focus({ preventScroll: true });
+        }, DURATION + 20);
+    }, false);
+})();
+</script>
+
 @endsection
 
