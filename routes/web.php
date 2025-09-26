@@ -72,5 +72,15 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
     Route::get('branches/{branch}/edit', [BranchController::class, 'edit'])->name('branches.edit');
     Route::post('branches/{branch}', [BranchController::class, 'update'])->name('branches.update');
     Route::post('branches/{branch}/remove-image', [BranchController::class, 'removeImage'])->name('branches.remove-image');
+
+    // User Management (Admins only)
+    Route::middleware(\App\Http\Middleware\EnsureUserIsAdmin::class)->group(function () {
+        Route::get('users', [\App\Http\Controllers\Admin\UserController::class, 'index'])->name('users.index');
+        Route::get('users/create', [\App\Http\Controllers\Admin\UserController::class, 'create'])->name('users.create');
+        Route::post('users', [\App\Http\Controllers\Admin\UserController::class, 'store'])->name('users.store');
+        Route::get('users/{user}/edit', [\App\Http\Controllers\Admin\UserController::class, 'edit'])->name('users.edit');
+        Route::post('users/{user}', [\App\Http\Controllers\Admin\UserController::class, 'update'])->name('users.update');
+        Route::post('users/{user}/delete', [\App\Http\Controllers\Admin\UserController::class, 'destroy'])->name('users.destroy');
+    });
 });
 

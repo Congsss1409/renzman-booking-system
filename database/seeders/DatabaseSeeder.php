@@ -17,18 +17,12 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // 1. Create the Admin User (now the only user type)
-        User::create([
-            'name' => 'Admin',
-            'email' => 'admin@renzman.com',
-            'password' => Hash::make('password'),
-        ]);
-
-        // 2. Call other seeders
+        // Create admin user via dedicated seeder and call other seeders
         $this->call([
+            \Database\Seeders\AdminUserSeeder::class,
             BranchSeeder::class,
             ServiceSeeder::class,
-            TherapistSeeder::class, // This will now create therapists without logins
+            TherapistSeeder::class,
         ]);
     }
 }

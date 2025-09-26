@@ -68,6 +68,7 @@
                 <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
             @enderror
         </div>
+
         
         <!-- Form Actions -->
         <div class="flex justify-end gap-4 pt-4">
@@ -81,4 +82,10 @@
     </form>
 </div>
 @endsection
+
+@push('scripts')
+    <script>
+    // No account fields for therapists - removed per project policy
+    </script>
+@endpush
 

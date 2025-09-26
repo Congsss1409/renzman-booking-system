@@ -98,6 +98,7 @@ class TherapistController extends Controller
             'branch_id' => $request->branch_id,
             'image_url' => $imageUrl,
         ]);
+        
 
         return redirect()->route('admin.therapists.index')->with('success', 'Therapist updated successfully.');
     }

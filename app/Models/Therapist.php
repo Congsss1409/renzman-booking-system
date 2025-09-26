@@ -38,4 +38,5 @@ class Therapist extends Model
     {
         return $this->hasMany(Booking::class);
     }
+
 }

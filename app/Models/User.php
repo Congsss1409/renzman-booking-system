@@ -21,7 +21,8 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        // 'role' has been removed
+        // Role may or may not exist in the DB; keep it fillable if present
+        'role',
     ];
 
     /**
@@ -48,4 +49,18 @@ class User extends Authenticatable
     }
 
     // The therapist() relationship has been removed.
+
+    /**
+     * Convenience helper to check if the user is an admin.
+     * If a `role` column exists it checks for the string 'admin'.
+     * Otherwise returns false.
+     */
+    public function isAdmin(): bool
+    {
+        try {
+            return isset($this->role) && $this->role === 'admin';
+        } catch (\Exception $e) {
+            return false;
+        }
+    }
 }

@@ -78,3 +78,9 @@
     </form>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+// Account creation fields removed for therapists per project policy.
+</script>
+@endpush
