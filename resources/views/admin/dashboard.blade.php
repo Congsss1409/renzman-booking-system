@@ -3,6 +3,7 @@
 @section('title', 'Admin Dashboard')
 
 @section('content')
+
 <div class="space-y-8">
     <!-- Page Header -->
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -13,7 +14,7 @@
         <button 
             type="button"
             x-data 
-            @click.prevent="$dispatch('open-booking-modal')" 
+            @click.prevent="$dispatch('open-modal', 'appointment-modal')" 
             class="font-semibold bg-gradient-to-r from-teal-400 to-cyan-600 hover:from-teal-500 hover:to-cyan-700 text-white py-3 px-6 rounded-full shadow-lg transition-transform transform hover:scale-105 whitespace-nowrap">
             + NEW APPOINTMENT
         </button>
@@ -150,7 +151,7 @@
 <div x-data="appointmentModal({{ json_encode($todayForJs) }})"
      x-init="initCalendar()"
      x-show="show"
-     x-on:open-modal.window="if ($event.detail === 'appointment-modal') openModal()"
+     x-on:open-modal.window="if ($event.detail === 'appointment-modal') show = true"
      x-on:close-modal.window="closeModal()"
      x-on:keydown.escape.window="closeModal()"
      style="display: none;"
@@ -527,5 +528,4 @@ document.addEventListener('DOMContentLoaded', () => {
 </script>
 @endpush
 
-<!-- Include Booking Modal Component -->
-<x-admin-booking-modal />
+
