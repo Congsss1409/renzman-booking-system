@@ -24,18 +24,25 @@ class DashboardController extends Controller
      */
     public function dashboard(Request $request)
     {
-        // --- Dashboard Stats (can be cached for performance) ---
+        // --- Dashboard Stats (cached for performance) ---
         $stats = Cache::remember('admin_dashboard_stats', now()->addMinutes(5), function () {
+            $topServices = Service::withCount(['bookings' => function ($query) {
+                $query->where('status', '!=', 'Cancelled');
+            }])->orderBy('bookings_count', 'desc')->take(5)->get();
+
+            $topTherapists = Therapist::withCount(['bookings' => function ($query) {
+                $query->where('status', '!=', 'Cancelled');
+            }])->orderBy('bookings_count', 'desc')->with('branch')->take(5)->get();
+
             return [
                 'todaysBookings' => Booking::whereDate('start_time', Carbon::today())->count(),
                 'totalBookings' => Booking::count(),
                 'totalRevenue' => Booking::where('status', '!=', 'Cancelled')->sum('price'),
                 'averageRating' => Booking::whereNotNull('rating')->avg('rating'),
-                'sourceLabels' => Booking::select('payment_method', DB::raw('count(*) as count'))->whereNotNull('payment_method')->groupBy('payment_method')->get()->pluck('payment_method'),
-                'sourceData' => Booking::select('payment_method', DB::raw('count(*) as count'))->whereNotNull('payment_method')->groupBy('payment_method')->get()->pluck('count'),
-                'topTherapists' => Therapist::withCount(['bookings' => function ($query) {
-                    $query->where('status', '!=', 'Cancelled');
-                }])->orderBy('bookings_count', 'desc')->with('branch')->take(5)->get(),
+                'topServices' => $topServices,
+                'topServicesLabels' => $topServices->pluck('name'),
+                'topServicesData' => $topServices->pluck('bookings_count'),
+                'topTherapists' => $topTherapists,
             ];
         });
 
@@ -61,15 +68,24 @@ class DashboardController extends Controller
             $query->orderBy($sortBy, $sortOrder);
         }
 
-        $bookings = $query->paginate(10)->withQueryString();
+        $bookings = $query->paginate(15)->withQueryString();
 
         $branches = Branch::orderBy('name')->get();
         $services = Service::orderBy('name')->get();
+
+        // Data for the date picker in the modal
+        $manilaTime = Carbon::now('Asia/Manila');
+        $todayForJs = [
+            'year' => $manilaTime->year,
+            'month' => $manilaTime->month - 1, // JS months are 0-indexed
+            'day' => $manilaTime->day
+        ];
 
         $viewData = array_merge($stats, [
             'bookings' => $bookings,
             'branches' => $branches,
             'services' => $services,
+            'todayForJs' => $todayForJs,
         ]);
 
         return view('admin.dashboard', $viewData);
@@ -87,25 +103,9 @@ class DashboardController extends Controller
             'branch_id' => 'required|exists:branches,id',
             'service_id' => 'required|exists:services,id',
             'therapist_id' => 'required|exists:therapists,id',
-            'start_time' => ['required', 'date', function ($attribute, $value, $fail) {
-                $now = Carbon::now('Asia/Manila');
-                $bookingTime = Carbon::parse($value, 'Asia/Manila');
-                $mallOpen = $bookingTime->copy()->setTime(8, 0); // 8:00 AM
-                $mallClose = $bookingTime->copy()->setTime(21, 0); // 9:00 PM
-
-                if ($bookingTime->isPast()) {
-                    $fail('Booking time must be in the future.');
-                    return;
-                }
-                if ($bookingTime->lt($mallOpen) || $bookingTime->gt($mallClose)) {
-                    $fail('Booking must be within mall hours (8:00 AM - 9:00 PM).');
-                    return;
-                }
-                if ($bookingTime->isToday() && $bookingTime->diffInMinutes($now) < 30) {
-                     $fail('Bookings for today must be made at least 30 minutes in advance.');
-                }
-            }],
-            'payment_method' => 'required|string|in:On-Site,GCash,Maya',
+            'booking_date' => 'required|date',
+            'booking_time' => 'required|string',
+            'extended_session' => 'nullable|boolean',
         ]);
 
         if ($validator->fails()) {
@@ -115,8 +115,14 @@ class DashboardController extends Controller
         }
 
         $service = Service::find($request->service_id);
-        $startTime = Carbon::parse($request->start_time);
-        $endTime = $startTime->copy()->addMinutes($service->duration);
+        $startTime = Carbon::parse($request->booking_date . ' ' . $request->booking_time, 'Asia/Manila');
+        
+        $isExtended = $request->boolean('extended_session');
+        $durationInMinutes = $service->duration + ($isExtended ? 60 : 0);
+        $endTime = $startTime->copy()->addMinutes($durationInMinutes);
+
+        $extensionPrice = 500;
+        $finalPrice = $service->price + ($isExtended ? $extensionPrice : 0);
 
         $booking = Booking::create([
             'client_name' => $request->client_name,
@@ -127,12 +133,8 @@ class DashboardController extends Controller
             'therapist_id' => $request->therapist_id,
             'start_time' => $startTime,
             'end_time' => $endTime,
-            'price' => $service->price,
+            'price' => $finalPrice,
             'status' => 'Confirmed',
-            'payment_method' => $request->payment_method,
-            'payment_status' => 'Pending',
-            'downpayment_amount' => 0,
-            'remaining_balance' => $service->price,
         ]);
 
         // Send confirmation email if an email address is provided
@@ -173,7 +175,14 @@ class DashboardController extends Controller
      */
     public function getTherapistsByBranch(Branch $branch)
     {
-        return response()->json($branch->therapists()->orderBy('name')->get());
+        $therapists = $branch->therapists()->orderBy('name')->get()->map(function ($therapist) {
+            if ($therapist->image_url) {
+                // Prepend the full URL for the image for easy use in Alpine.js
+                $therapist->image_url = asset('storage/' . $therapist->image_url);
+            }
+            return $therapist;
+        });
+        return response()->json($therapists);
     }
 
     /**

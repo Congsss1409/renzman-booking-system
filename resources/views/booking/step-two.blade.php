@@ -3,7 +3,7 @@
 @section('title', 'Step 2: Choose Your Therapist')
 
 @section('content')
-<div x-data="{ showModal: false }" class="glass-panel rounded-3xl max-w-6xl mx-auto overflow-hidden shadow-2xl">
+<div x-data="{ showModal: false, selectedTherapist: '{{ old('therapist_id', $bookingData->therapist_id ?? '') }}' }" class="glass-panel rounded-3xl max-w-6xl mx-auto overflow-hidden shadow-2xl">
     <div class="grid md:grid-cols-2">
         
         <!-- Left Column: Image & Branding -->
@@ -57,7 +57,7 @@
                 <div class="space-y-4 max-h-[40vh] overflow-y-auto pr-4">
                     @forelse($therapists as $therapist)
                         <label class="block">
-                            <input type="radio" name="therapist_id" value="{{ $therapist->id }}" class="hidden peer" required {{ old('therapist_id', $bookingData->therapist_id ?? '') == $therapist->id ? 'checked' : '' }}>
+                            <input type="radio" name="therapist_id" value="{{ $therapist->id }}" @change="selectedTherapist = $event.target.value" class="hidden peer" required {{ old('therapist_id', $bookingData->therapist_id ?? '') == $therapist->id ? 'checked' : '' }}>
                             <div class="p-4 rounded-lg border border-white/30 cursor-pointer peer-checked:bg-white peer-checked:text-teal-600 peer-checked:ring-2 peer-checked:ring-white hover:bg-white/20 transition-all">
                                 <div class="flex items-center justify-between">
                                     <div class="flex items-center gap-4">
@@ -91,7 +91,7 @@
                     <a href="{{ route('booking.create.step-one') }}" class="bg-white/20 text-white font-bold py-3 px-10 rounded-full shadow-md hover:bg-white/30 transition-all transform hover:scale-105">
                         &larr; Back
                     </a>
-                    <button type="button" @click.prevent="showModal = true" class="bg-white text-teal-600 font-bold py-3 px-10 rounded-full shadow-md hover:bg-cyan-100 transition-all transform hover:scale-105">
+                    <button type="button" @click.prevent="if (selectedTherapist) showModal = true" :disabled="!selectedTherapist" :class="{ 'opacity-50 cursor-not-allowed': !selectedTherapist }" class="bg-white text-teal-600 font-bold py-3 px-10 rounded-full shadow-md hover:bg-cyan-100 transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed">
                         Next Step &rarr;
                     </button>
                 </div>
@@ -103,7 +103,7 @@
     <div x-show="showModal" @keydown.escape.window="showModal = false" class="fixed inset-0 z-50 flex items-center justify-center bg-black/70" style="display: none;">
         <div x-show="showModal" x-transition class="bg-teal-700 text-white rounded-2xl shadow-2xl max-w-sm mx-auto p-8" @click.away="showModal = false">
             <h3 class="text-2xl font-bold mb-2">Extend Your Session?</h3>
-            <p class="text-cyan-100 mb-6">An extended session will add one hour to your service, allowing for a more thorough and relaxing experience.</p>
+            <p class="text-cyan-100 mb-6">An extended session will add one hour to your service. The available time slots in the next step will be adjusted for the longer duration.</p>
             <div class="flex justify-end space-x-4">
                 <button @click="showModal = false; $refs.stepTwoForm.submit()" type="button" class="bg-white/20 font-bold py-2 px-6 rounded-full hover:bg-white/30 transition-all">
                     No, Thanks
@@ -116,3 +116,4 @@
     </div>
 </div>
 @endsection
+

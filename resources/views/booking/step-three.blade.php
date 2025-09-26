@@ -15,7 +15,7 @@
             </div>
         </div>
 
-        <div class="p-8 md:p-12" x-data="dateTimePicker('{{ $now }}', {{ json_encode($todayForJs) }})">
+        <div class="p-8 md:p-12" x-data="dateTimePicker('{{ $now }}', {{ json_encode($todayForJs) }}, {{ $extendedSession ? 'true' : 'false' }})">
             <div class="mb-8">
                 <div class="flex justify-between items-center text-sm font-semibold text-cyan-100 mb-2"><span>Step 3/5: Date & Time</span><span>60%</span></div>
                 <div class="w-full bg-white/20 rounded-full h-2.5"><div class="bg-white h-2.5 rounded-full" style="width: 60%"></div></div>
@@ -61,7 +61,7 @@
                             <div x-show="loading" class="flex items-center justify-center h-full"><svg class="animate-spin h-8 w-8 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg></div>
                             <div x-show="!loading && availableSlots.length > 0" class="grid grid-cols-3 gap-2">
                                 <template x-for="slot in availableSlots" :key="slot">
-                                     <button type="button" @click="selectTime(slot)" :class="selectedTime === slot ? 'bg-white text-teal-600 font-semibold' : 'bg-white/10 text-white hover:bg-white/20'" class="p-2 rounded-lg text-sm text-center transition-all duration-200"><span x-text="formatTime(slot)"></span></button>
+                                        <button type="button" @click="selectTime(slot)" :class="selectedTime === slot ? 'bg-white text-teal-600 font-semibold' : 'bg-white/10 text-white hover:bg-white/20'" class="p-2 rounded-lg text-sm text-center transition-all duration-200"><span x-text="formatTime(slot)"></span></button>
                                 </template>
                             </div>
                             <div x-show="!loading && availableSlots.length === 0" class="flex items-center justify-center h-full text-center"><p class="text-cyan-100">No available time slots for this day.<br>Please select another date.</p></div>
@@ -77,10 +77,10 @@
     </div>
 </div>
 @endsection
- <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
 @push('scripts')
 <script>
-function dateTimePicker(serverTime, todayForJs) {
+function dateTimePicker(serverTime, todayForJs, isExtended) { // Accept the new isExtended parameter
     return {
         month: '', year: '', dayCount: [], blankDays: [],
         days: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
@@ -89,6 +89,7 @@ function dateTimePicker(serverTime, todayForJs) {
         availableSlots: [], loading: false,
         serverTime: serverTime,
         todayForJs: todayForJs,
+        isExtended: isExtended, // Store the value in the component's state
 
         init() {
             // Use the server's definition of today for all initial calendar state
@@ -128,7 +129,8 @@ function dateTimePicker(serverTime, todayForJs) {
             this.availableSlots = [];
             this.selectedDateFormatted = new Date(this.selectedDate + 'T00:00:00').toLocaleDateString('en-US', { month: 'long', day: 'numeric' });
             
-            const extendedParam = '{{ $extendedSession ? '1' : '0' }}';
+            // Use the isExtended state variable to build the correct API URL
+            const extendedParam = this.isExtended ? '1' : '0';
             const apiUrl = `/api/therapists/{{ $therapist->id }}/availability/${this.selectedDate}/{{ $service->id }}?extended=${extendedParam}`;
 
             fetch(apiUrl)

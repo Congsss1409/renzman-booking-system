@@ -142,6 +142,13 @@ class BookingController extends Controller
         $durationInMinutes = $service->duration + ($isExtended ? 60 : 0);
         $endTime = $startTime->copy()->addMinutes($durationInMinutes);
 
+        // --- START: MODIFIED PRICE LOGIC ---
+        // A fixed price of 500 is added for the one-hour extension.
+        // This can be changed or moved to the database in the future.
+        $extensionPrice = 500;
+        $finalPrice = $service->price + ($isExtended ? $extensionPrice : 0);
+        // --- END: MODIFIED PRICE LOGIC ---
+
         $booking = Booking::create([
             'client_name' => $bookingData->client_name,
             'client_email' => $bookingData->client_email,
@@ -151,7 +158,7 @@ class BookingController extends Controller
             'therapist_id' => $bookingData->therapist_id,
             'start_time' => $startTime,
             'end_time' => $endTime,
-            'price' => $service->price, // Note: Price is not updated for extended session
+            'price' => $finalPrice, // Use the calculated final price
             'status' => 'Pending Verification',
             'verification_code' => rand(100000, 999999),
             'verification_expires_at' => Carbon::now()->addMinutes(10),
@@ -216,41 +223,75 @@ class BookingController extends Controller
     {
         $isExtended = $request->query('extended') === '1';
         $durationInMinutes = $service->duration + ($isExtended ? 60 : 0);
-
+    
         $selectedDate = Carbon::parse($date, 'Asia/Manila')->startOfDay();
-        $dayStart = $selectedDate->copy()->hour(8); // Shop opens at 8 AM
-        $dayEnd = $selectedDate->copy()->hour(21); // Shop closes at 9 PM
-
+        
+        // --- START: MODIFIED LOGIC ---
+        
+        // Define default working hours
+        $dayStart = $selectedDate->copy()->hour(10); // Default open time: 10 AM
+        $dayEnd = $selectedDate->copy()->hour(21);   // Shop closes at 9 PM
+    
+        $now = Carbon::now('Asia/Manila');
+    
+        // Apply special logic if the selected date is today
+        if ($selectedDate->isToday()) {
+            // Define the special 4:00 PM start time for today
+            $specialStartTime = $selectedDate->copy()->setTime(16, 0); // 4:00 PM
+    
+            // The earliest booking can start is the later of the current time or 4:00 PM.
+            $effectiveStartTime = $now->gt($specialStartTime) ? $now : $specialStartTime;
+    
+            // If this effective start time is later than the normal opening time, use it.
+            if ($effectiveStartTime->gt($dayStart)) {
+                $dayStart = $effectiveStartTime;
+            }
+    
+            // Round up the start time to the next full hour to maintain clean 1-hour intervals.
+            if ($dayStart->minute > 0 || $dayStart->second > 0) {
+                $dayStart->addHour()->startOfHour();
+            }
+        } else if ($selectedDate->isPast()) {
+            // If a past date is somehow selected, return no slots.
+            return response()->json([]);
+        }
+    
+        // --- END: MODIFIED LOGIC ---
+    
         $existingBookings = Booking::where('therapist_id', $therapist->id)
             ->whereDate('start_time', $selectedDate->toDateString())
             ->whereIn('status', ['Confirmed', 'In Progress', 'Pending Verification'])
             ->orderBy('start_time')
             ->get(['start_time', 'end_time']);
-
+    
         $availableSlots = [];
-        $potentialSlotStart = $dayStart;
-
+        $potentialSlotStart = $dayStart->copy();
+    
+        // Loop through potential slots until the end of the working day
         while ($potentialSlotStart->copy()->addMinutes($durationInMinutes) <= $dayEnd) {
             $potentialSlotEnd = $potentialSlotStart->copy()->addMinutes($durationInMinutes);
-
+    
             $isConflict = false;
             foreach ($existingBookings as $booking) {
                 $bookingStart = Carbon::parse($booking->start_time);
                 $bookingEnd = Carbon::parse($booking->end_time);
-
+    
                 if ($potentialSlotStart < $bookingEnd && $potentialSlotEnd > $bookingStart) {
                     $isConflict = true;
-                    break; 
+                    break;
                 }
             }
-
+    
             if (!$isConflict) {
                 $availableSlots[] = $potentialSlotStart->format('H:i');
             }
             
-            $potentialSlotStart->addMinutes(30);
+            // --- INTERVAL CHANGE ---
+            // Move to the next potential slot, 1 hour later
+            $potentialSlotStart->addHour();
         }
-
+    
         return response()->json($availableSlots);
     }
 }
+
