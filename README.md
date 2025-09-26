@@ -166,9 +166,7 @@ php artisan serve
 
 ---
 
-## Want me to prepare a ready-to-run zip?
 
-I can prepare a zip file containing the project with `vendor/` and `public/build` already added so you can drop it into `C:\xampp\htdocs` and run immediately. Reply "please prepare zip" and I'll create it.
 
 ---
 
