@@ -80,9 +80,11 @@ class ServiceController extends Controller
 
         $imageUrl = $service->image_url;
         if ($request->hasFile('image')) {
-            // Delete the old image from storage if it exists
+            // Delete the old image from storage if it exists and is a relative storage path
             if ($service->image_url) {
-                Storage::disk('public')->delete(str_replace('/storage/', '', $service->image_url));
+                if (!preg_match('/^https?:\/\//', $service->image_url)) {
+                    Storage::disk('public')->delete(ltrim(str_replace('/storage/', '', $service->image_url), '/'));
+                }
             }
             // Store the new image
             $path = $request->file('image')->store('services', 'public');
@@ -108,7 +110,9 @@ class ServiceController extends Controller
         try {
             // Delete the associated image from storage if it exists
             if ($service->image_url) {
-                Storage::disk('public')->delete(str_replace('/storage/', '', $service->image_url));
+                if (!preg_match('/^https?:\/\//', $service->image_url)) {
+                    Storage::disk('public')->delete(ltrim(str_replace('/storage/', '', $service->image_url), '/'));
+                }
             }
             $service->delete();
             return redirect()->route('admin.services.index')->with('success', 'Service deleted successfully.');

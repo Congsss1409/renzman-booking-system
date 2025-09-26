@@ -36,7 +36,7 @@
         <!-- Sidebar -->
         <aside :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'" class="fixed inset-y-0 left-0 w-64 flex-shrink-0 bg-gradient-to-b from-teal-600 to-cyan-700 text-teal-100 flex flex-col transform transition-transform duration-300 ease-in-out z-30 lg:relative lg:translate-x-0">
             <div class="h-20 flex items-center justify-center text-2xl font-bold text-white">
-                <img src="{{ asset('images/logo_white.png') }}" alt="Logo" class="h-13 w-auto">
+                <img src="{{ asset('images/logo_white.png') }}" alt="Logo" class="h-16 w-auto">
             </div>
             <nav class="flex-grow px-4">
                 <a href="{{ route('admin.dashboard') }}" class="sidebar-link flex items-center gap-4 px-4 py-3 rounded-lg transition-colors hover:bg-teal-700 @if(request()->routeIs('admin.dashboard')) active @endif">
@@ -54,6 +54,11 @@
                 <a href="{{ route('admin.feedback') }}" class="sidebar-link flex items-center gap-4 px-4 py-3 rounded-lg transition-colors hover:bg-teal-700 @if(request()->routeIs('admin.feedback')) active @endif">
                     <svg class="w-6 h-6 text-teal-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path></svg>
                     <span>Feedback</span>
+                </a>
+                <!-- New Branches link -->
+                <a href="{{ route('admin.branches.index') }}" class="sidebar-link flex items-center gap-4 px-4 py-3 rounded-lg transition-colors hover:bg-teal-700 @if(request()->routeIs('admin.branches.*')) active @endif">
+                    <svg class="w-6 h-6 text-teal-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+                    <span>Branches</span>
                 </a>
             </nav>
             <div class="p-4">

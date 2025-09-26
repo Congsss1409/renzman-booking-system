@@ -177,8 +177,13 @@ class DashboardController extends Controller
     {
         $therapists = $branch->therapists()->orderBy('name')->get()->map(function ($therapist) {
             if ($therapist->image_url) {
-                // Prepend the full URL for the image for easy use in Alpine.js
-                $therapist->image_url = asset('storage/' . $therapist->image_url);
+                // If the image_url looks like an absolute URL, leave it as-is; otherwise prefix with storage asset
+                if (preg_match('/^https?:\/\//', $therapist->image_url)) {
+                    // absolute URL already
+                    $therapist->image_url = $therapist->image_url;
+                } else {
+                    $therapist->image_url = asset('storage/' . ltrim($therapist->image_url, '/'));
+                }
             }
             return $therapist;
         });

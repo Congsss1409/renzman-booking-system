@@ -8,6 +8,7 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\ServiceController;
 use App\Http\Controllers\Admin\TherapistController;
+use App\Http\Controllers\Admin\BranchController;
 
 /*
 |--------------------------------------------------------------------------
@@ -63,5 +64,13 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
     // Feedback Management
     Route::get('/feedback', [DashboardController::class, 'feedback'])->name('feedback');
     Route::post('/feedback/{booking}/toggle', [DashboardController::class, 'toggleFeedbackDisplay'])->name('feedback.toggle');
+
+    // Branch Management
+    Route::get('branches', [BranchController::class, 'index'])->name('branches.index');
+    Route::get('branches/create', [BranchController::class, 'create'])->name('branches.create');
+    Route::post('branches', [BranchController::class, 'store'])->name('branches.store');
+    Route::get('branches/{branch}/edit', [BranchController::class, 'edit'])->name('branches.edit');
+    Route::post('branches/{branch}', [BranchController::class, 'update'])->name('branches.update');
+    Route::post('branches/{branch}/remove-image', [BranchController::class, 'removeImage'])->name('branches.remove-image');
 });
 

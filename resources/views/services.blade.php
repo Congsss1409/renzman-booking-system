@@ -17,6 +17,11 @@
         -webkit-backdrop-filter: blur(12px);
         border: 1px solid rgba(255, 255, 255, 0.1);
     }
+    .mobile-nav {
+        background: rgba(0, 0, 0, 0.4);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+    }
     .animate-blob { animation: blob 7s infinite; }
     .animation-delay-2000 { animation-delay: 2s; }
     .animation-delay-4000 { animation-delay: 4s; }
@@ -28,7 +33,7 @@
     }
 </style>
 
-<div class="relative min-h-screen w-full bg-gradient-to-br from-cyan-500 via-teal-500 to-emerald-600 text-white">
+<div class="relative min-h-screen w-full bg-gradient-to-br from-cyan-500 via-teal-500 to-emerald-600 text-white overflow-x-hidden">
     
     <!-- Floating decorative blobs -->
     <div class="absolute top-0 -left-20 w-72 h-72 bg-teal-400 rounded-full mix-blend-soft-light filter blur-xl opacity-70 animate-blob"></div>
@@ -37,36 +42,48 @@
 
     <div class="relative z-10">
         <!-- Header Section -->
-        <header class="p-4 sticky top-0 z-50">
-            <div class="container mx-auto flex justify-between items-center header-glass rounded-full p-2 px-6 shadow-lg">
-                <a href="{{ route('landing') }}"><img src="{{ asset('images/logo trans.png') }}" alt="Renzman Logo" class="h-10"></a>
+        <header x-data="{ open: false }" class="fixed top-0 left-0 right-0 z-50 p-2 sm:p-4">
+            <div class="container mx-auto flex justify-between items-center header-glass rounded-full p-2 px-4 sm:px-6 shadow-lg">
+                <a href="{{ route('landing') }}"><img src="{{ asset('images/logo_white.png') }}" alt="Renzman Logo" class="h-10 sm:h-12"></a>
                 <nav class="hidden md:flex items-center space-x-8 text-gray-200">
                     <a href="{{ route('landing') }}" class="hover:text-white transition-colors">Home</a>
                     <a href="{{ route('services') }}" class="font-bold text-white">Services</a>
                     <a href="{{ route('about') }}" class="hover:text-white transition-colors">About Us</a>
                 </nav>
-                <a href="{{ route('booking.create.step-one') }}" class="bg-white text-teal-600 font-bold py-3 px-8 rounded-full shadow-md hover:bg-cyan-100 transition-all transform hover:scale-105">
+                <a href="{{ route('booking.create.step-one') }}" class="hidden sm:inline-block bg-white text-teal-600 font-bold py-2 px-6 text-sm sm:py-3 sm:px-8 sm:text-base rounded-full shadow-md hover:bg-cyan-100 transition-all transform hover:scale-105">
                     Book Now
                 </a>
+                <div class="md:hidden">
+                    <button @click="open = !open" class="text-white focus:outline-none">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                    </button>
+                </div>
+            </div>
+            <!-- Mobile Menu -->
+            <div x-show="open" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 -translate-y-2" x-transition:enter-end="opacity-100 translate-y-0" x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100 translate-y-0" x-transition:leave-end="opacity-0 -translate-y-2" @click.away="open = false" class="md:hidden mt-3 mobile-nav rounded-2xl shadow-lg">
+                <a href="{{ route('landing') }}" @click="open = false" class="block text-center py-3 px-4 text-white hover:bg-white/10 rounded-t-2xl">Home</a>
+                <a href="{{ route('services') }}" @click="open = false" class="block text-center py-3 px-4 text-white bg-white/10 font-bold">Services</a>
+                <a href="{{ route('about') }}" @click="open = false" class="block text-center py-3 px-4 text-white hover:bg-white/10">About Us</a>
+                <a href="{{ route('booking.create.step-one') }}" class="block text-center bg-white/20 hover:bg-white/30 text-white font-bold py-4 px-4 rounded-b-2xl">Book Now</a>
             </div>
         </header>
 
         <!-- Main Content -->
-        <main class="container mx-auto px-6 py-16">
-            <div class="glass-panel rounded-3xl p-8 md:p-12">
+        <main class="container mx-auto px-4 sm:px-6 pt-28 pb-16">
+            <div class="glass-panel rounded-3xl p-6 sm:p-8 md:p-12">
                 <div class="text-center">
-                    <h1 class="text-4xl md:text-5xl font-bold">Our Signature Services</h1>
-                    <p class="mt-4 text-lg text-cyan-100">Discover the perfect treatment to rejuvenate your body and mind.</p>
+                    <h1 class="text-3xl sm:text-4xl md:text-5xl font-bold">Our Signature Services</h1>
+                    <p class="mt-4 text-base sm:text-lg text-cyan-100">Discover the perfect treatment to rejuvenate your body and mind.</p>
                 </div>
 
-                <div class="mt-16 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="mt-12 sm:mt-16 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
                     @forelse($services as $service)
-                        <div class="glass-panel rounded-2xl p-8 text-center shadow-lg transform hover:-translate-y-2 transition-transform duration-300">
-                            <img src="{{ $service->image_url ?? 'https://placehold.co/400x250/FFFFFF/333333?text=' . urlencode($service->name) }}" alt="{{ $service->name }}" class="w-full h-48 object-cover rounded-lg mb-4">
-                            <h3 class="text-2xl font-bold">{{ $service->name }}</h3>
+                        <div class="glass-panel rounded-2xl p-6 sm:p-8 text-center shadow-lg transform hover:-translate-y-2 transition-transform duration-300">
+                            <img src="{{ $service->image_url ?? 'https://placehold.co/400x250/FFFFFF/333333?text=' . urlencode($service->name) }}" alt="{{ $service->name }}" class="w-full h-40 sm:h-48 object-cover rounded-lg mb-4">
+                            <h3 class="text-xl sm:text-2xl font-bold">{{ $service->name }}</h3>
                             <p class="text-cyan-200 mt-2 text-sm h-16">{{ $service->description }}</p>
-                            <div class="my-6"><span class="text-4xl font-bold">₱{{ number_format($service->price, 2) }}</span><span class="text-cyan-100">/ {{ $service->duration }} mins</span></div>
-                            <a href="{{ route('booking.create.step-one') }}" class="mt-4 inline-block bg-white/20 hover:bg-white/30 font-semibold py-3 px-8 rounded-full transition border border-white/30">
+                            <div class="my-4 sm:my-6"><span class="text-3xl sm:text-4xl font-bold">₱{{ number_format($service->price, 2) }}</span><span class="text-cyan-100">/ {{ $service->duration }} mins</span></div>
+                            <a href="{{ route('booking.create.step-one') }}" class="mt-4 inline-block bg-white/20 hover:bg-white/30 font-semibold py-3 px-6 sm:px-8 rounded-full transition border border-white/30">
                                 Book This Service
                             </a>
                         </div>
@@ -78,8 +95,8 @@
         </main>
         
         <!-- Footer -->
-        <footer class="container mx-auto text-center py-12 px-6">
-             <div class="glass-panel rounded-2xl p-8">
+        <footer class="container mx-auto text-center pb-12 px-4 sm:px-6">
+             <div class="glass-panel rounded-2xl p-6 sm:p-8">
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center md:text-left">
                     <div>
                         <h3 class="font-bold text-lg">About Renzman</h3>
@@ -105,7 +122,7 @@
                     <p>&copy; {{ date('Y') }} Renzman. All rights reserved.</p>
                 </div>
             </div>
-        </footer>
+            </footer>
     </div>
 </div>
 @endsection

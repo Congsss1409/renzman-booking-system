@@ -15,9 +15,25 @@ class BranchSeeder extends Seeder
     public function run(): void
     {
         // Data extracted from the flyer provided
-        Branch::create(['name' => 'Metro Plaza Malaria', 'address' => 'Malaria, Caloocan, Metro Manila']);
-        Branch::create(['name' => 'Metro Plaza Bagong Silang', 'address' => 'Bagong Silang, Caloocan, Metro Manila']);
-        Branch::create(['name' => 'Zabarte Town Center', 'address' => 'Zabarte Rd, Novaliches, Quezon City']);
-        Branch::create(['name' => 'Metro Plaza Gen Luis', 'address' => 'Gen. Luis St, Novaliches, Quezon City']);
+        Branch::create([
+            'name' => 'Metro Plaza Malaria',
+            'address' => 'Malaria, Caloocan, Metro Manila',
+            'image_url' => '/images/branch-placeholder.svg',
+        ]);
+        Branch::create([
+            'name' => 'Metro Plaza Bagong Silang',
+            'address' => 'Bagong Silang, Caloocan, Metro Manila',
+            'image_url' => '/images/branch-placeholder.svg',
+        ]);
+        Branch::create([
+            'name' => 'Zabarte Town Center',
+            'address' => 'Zabarte Rd, Novaliches, Quezon City',
+            'image_url' => '/images/branch-placeholder.svg',
+        ]);
+        Branch::create([
+            'name' => 'Metro Plaza Gen Luis',
+            'address' => 'Gen. Luis St, Novaliches, Quezon City',
+            'image_url' => '/images/branch-placeholder.svg',
+        ]);
     }
 }

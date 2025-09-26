@@ -81,9 +81,12 @@ class TherapistController extends Controller
 
         $imageUrl = $therapist->image_url;
         if ($request->hasFile('image')) {
-            // Delete old image if it exists and is not a UI Avatar
+            // Delete old image if it exists and appears to be a relative storage path
             if ($therapist->image_url && !str_contains($therapist->image_url, 'ui-avatars.com')) {
-                Storage::disk('public')->delete(str_replace('/storage/', '', $therapist->image_url));
+                // If the URL starts with http(s) it's an absolute URL — don't attempt to delete via storage disk
+                if (!preg_match('/^https?:\/\//', $therapist->image_url)) {
+                    Storage::disk('public')->delete(ltrim(str_replace('/storage/', '', $therapist->image_url), '/'));
+                }
             }
             // Corrected: Explicitly use the 'public' disk.
             $path = $request->file('image')->store('therapists', 'public');
@@ -106,7 +109,9 @@ class TherapistController extends Controller
     {
         try {
             if ($therapist->image_url && !str_contains($therapist->image_url, 'ui-avatars.com')) {
-                Storage::disk('public')->delete(str_replace('/storage/', '', $therapist->image_url));
+                if (!preg_match('/^https?:\/\//', $therapist->image_url)) {
+                    Storage::disk('public')->delete(ltrim(str_replace('/storage/', '', $therapist->image_url), '/'));
+                }
             }
             $therapist->delete();
             return redirect()->route('admin.therapists.index')->with('success', 'Therapist deleted successfully.');

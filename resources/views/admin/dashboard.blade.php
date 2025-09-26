@@ -171,25 +171,24 @@
         </div>
 
         <div class="flex-grow overflow-y-auto pr-4 -mr-4">
-            <form id="appointmentForm" action="{{ route('admin.bookings.store') }}" method="POST" @submit.prevent="submitForm">
+            <form id="appointmentForm" x-ref="appointmentForm" action="{{ route('admin.bookings.store') }}" method="POST">
                 @csrf
                 <!-- Hidden inputs to store selections -->
-                <input type="hidden" name="branch_id" x-model="formData.branch_id">
-                <input type="hidden" name="service_id" x-model="formData.service_id">
-                <input type="hidden" name="therapist_id" x-model="formData.therapist_id">
-                <input type="hidden" name="extended_session" x-model="formData.extended_session">
-                <input type="hidden" name="booking_date" x-model="formData.booking_date">
-                <input type="hidden" name="booking_time" x-model="formData.booking_time">
-                <input type="hidden" name="client_name" x-model="formData.client_name">
-                <input type="hidden" name="client_phone" x-model="formData.client_phone">
-                <input type="hidden" name="client_email" x-model="formData.client_email">
+                <input type="hidden" name="branch_id" :value="formData.branch_id">
+                <input type="hidden" name="service_id" :value="formData.service_id">
+                <input type="hidden" name="therapist_id" :value="formData.therapist_id">
+                <input type="hidden" name="booking_date" :value="formData.booking_date">
+                <input type="hidden" name="booking_time" :value="formData.booking_time">
+                <input type="hidden" name="client_name" :value="formData.client_name">
+                <input type="hidden" name="client_phone" :value="formData.client_phone">
+                <input type="hidden" name="client_email" :value="formData.client_email">
 
                 <!-- Step 1: Select Branch & Service -->
                 <div x-show="currentStep === 1" x-transition>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
                             <label class="font-semibold text-gray-700">Branch</label>
-                            <select x-model="formData.branch_id" @change="fetchTherapists()" class="w-full mt-2 bg-stone-100 p-4 rounded-full border-none focus:ring-2 focus:ring-teal-400 outline-none">
+                            <select name="branch_select" x-model="formData.branch_id" @change="fetchTherapists()" class="w-full mt-2 bg-stone-100 p-4 rounded-full border-none focus:ring-2 focus:ring-teal-400 outline-none">
                                 <option value="">Select Branch</option>
                                 @foreach($branches as $branch)
                                 <option value="{{ $branch->id }}">{{ $branch->name }}</option>
@@ -198,7 +197,7 @@
                         </div>
                         <div>
                             <label class="font-semibold text-gray-700">Service</label>
-                            <select x-model="formData.service_id" class="w-full mt-2 bg-stone-100 p-4 rounded-full border-none focus:ring-2 focus:ring-teal-400 outline-none">
+                            <select name="service_select" x-model="formData.service_id" class="w-full mt-2 bg-stone-100 p-4 rounded-full border-none focus:ring-2 focus:ring-teal-400 outline-none">
                                 <option value="">Select Service</option>
                                 @foreach($services as $service)
                                 <option value="{{ $service->id }}">{{ $service->name }} ({{ $service->duration }} mins)</option>
@@ -214,13 +213,13 @@
                         <template x-if="loadingTherapists">
                             <p class="text-center text-gray-500">Loading therapists...</p>
                         </template>
-                        <template x-for="therapist in availableTherapists" :key="therapist.id">
+                            <template x-for="therapist in availableTherapists" :key="therapist.id">
                             <label class="block">
-                                <input type="radio" x-model="formData.therapist_id" :value="therapist.id" class="hidden peer">
+                                <input type="radio" name="therapist_id" x-model="formData.therapist_id" :value="therapist.id" class="hidden peer">
                                 <div class="p-4 rounded-lg border border-gray-300 cursor-pointer peer-checked:bg-teal-500 peer-checked:text-white peer-checked:border-teal-500 hover:border-teal-400 transition-all">
                                     <div class="flex items-center justify-between">
                                         <div class="flex items-center gap-4">
-                                            <img :src="therapist.image_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(therapist.name)}&color=FFFFFF&background=059669&size=128`" :alt="therapist.name" class="w-12 h-12 rounded-full object-cover">
+                                            <img :src="getImageUrl(therapist.image_url, therapist.name)" :alt="therapist.name" class="w-12 h-12 rounded-full object-cover">
                                             <div><p class="font-bold text-lg" x-text="therapist.name"></p></div>
                                         </div>
                                     </div>
@@ -236,15 +235,15 @@
                 <!-- Step 3: Date & Time -->
                 <div x-show="currentStep === 3" x-transition>
                     <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
-                        <div class="bg-gray-50 p-4 rounded-lg">
+                        <div class="bg-gray-50 p-6 rounded-lg min-w-[320px] xl:min-w-[380px]">
                             <div class="flex items-center justify-between mb-4">
                                 <button type="button" @click="prevMonth()" class="p-2 rounded-full hover:bg-gray-200 focus:outline-none"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg></button>
                                 <div class="text-lg font-semibold" x-text="`${months[month]} ${year}`"></div>
                                 <button type="button" @click="nextMonth()" class="p-2 rounded-full hover:bg-gray-200 focus:outline-none"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></button>
                             </div>
                             <div class="grid grid-cols-7 gap-1 text-center text-sm">
-                                <template x-for="day in days" :key="day"><div class="font-medium text-gray-600" x-text="day"></div></template>
-                                <template x-for="blank in blankDays"><div class="border-none"></div></template>
+                                <template x-for="(day, idx) in days" :key="idx"><div class="font-medium text-gray-600" x-text="day"></div></template>
+                                <template x-for="(_, idx) in blankDays" :key="`blank-${idx}`"><div class="border-none"></div></template>
                                 <template x-for="day in dayCount" :key="day">
                                     <div @click="selectDate(day)"
                                          :class="{
@@ -256,9 +255,9 @@
                                 </template>
                             </div>
                         </div>
-                        <div>
+                        <div class="min-w-[220px] xl:min-w-[260px]">
                             <label class="block text-lg font-semibold mb-2">Available Times for <span class="text-gray-800 font-bold" x-text="selectedDateFormatted"></span></label>
-                            <div class="bg-gray-50 rounded-lg p-4 h-[284px] overflow-y-auto">
+                            <div class="bg-gray-50 rounded-lg p-6 h-[284px] overflow-y-auto flex flex-col gap-4">
                                 <div x-show="loadingSlots" class="flex items-center justify-center h-full"><svg class="animate-spin h-8 w-8 text-teal-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg></div>
                                 <div x-show="!loadingSlots && availableSlots.length > 0" class="grid grid-cols-3 gap-2">
                                     <template x-for="slot in availableSlots" :key="slot">
@@ -299,7 +298,7 @@
                                 <div class="flex justify-between"><span class="font-semibold">Therapist:</span> <span x-text="getTherapistName()"></span></div>
                                 <div class="flex justify-between"><span class="font-semibold">Date:</span> <span x-text="selectedDateFormatted"></span></div>
                                 <div class="flex justify-between"><span class="font-semibold">Time:</span> <span x-text="formatTime(formData.booking_time)"></span></div>
-                                <div class="flex justify-between"><span class="font-semibold">Extended:</span> <span x-text="formData.extended_session ? 'Yes (+1 hr)' : 'No'"></span></div>
+                                <!-- Extended session not applicable for admin modal bookings -->
                                 <hr class="my-2">
                                 <div class="flex justify-between font-bold text-gray-800 text-lg"><span class="">Total Price:</span> <span x-text="`₱${getFinalPrice()}`"></span></div>
                             </div>
@@ -317,21 +316,10 @@
             </div>
             <button type="button" @click="nextStep()" x-show="currentStep === 2" :disabled="!isStep2Valid()" class="font-semibold bg-gradient-to-r from-teal-400 to-cyan-600 hover:from-teal-500 hover:to-cyan-700 text-white py-3 px-8 rounded-full shadow-lg transition-transform transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed">Next</button>
             <button type="button" @click="nextStep()" x-show="currentStep === 3" :disabled="!isStep3Valid()" class="font-semibold bg-gradient-to-r from-teal-400 to-cyan-600 hover:from-teal-500 hover:to-cyan-700 text-white py-3 px-8 rounded-full shadow-lg transition-transform transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed">Next</button>
-            <button type="button" @click="$refs.appointmentForm.submit()" x-show="currentStep === 4" :disabled="!isStep4Valid()" class="font-semibold bg-gradient-to-r from-teal-400 to-cyan-600 hover:from-teal-500 hover:to-cyan-700 text-white py-3 px-8 rounded-full shadow-lg transition-transform transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed">CONFIRM APPOINTMENT</button>
+            <button type="submit" form="appointmentForm" x-show="currentStep === 4" :disabled="!isStep4Valid()" class="font-semibold bg-gradient-to-r from-teal-400 to-cyan-600 hover:from-teal-500 hover:to-cyan-700 text-white py-3 px-8 rounded-full shadow-lg transition-transform transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed">CONFIRM APPOINTMENT</button>
         </div>
     </div>
 
-    <!-- Extension Modal -->
-    <div x-show="showExtensionModal" @keydown.escape.window="showExtensionModal = false" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50" style="display: none;">
-        <div x-show="showExtensionModal" x-transition class="bg-white rounded-2xl shadow-2xl max-w-sm mx-auto p-8" @click.away="showExtensionModal = false">
-            <h3 class="text-2xl font-bold mb-2 text-gray-800">Extend Your Session?</h3>
-            <p class="text-gray-600 mb-6">An extended session adds 1 hour. This will adjust the available time slots for the next step.</p>
-            <div class="flex justify-end space-x-4">
-                <button @click="handleExtension(false)" type="button" class="bg-gray-200 font-bold py-2 px-6 rounded-full hover:bg-gray-300 transition-all">No, Thanks</button>
-                <button @click="handleExtension(true)" type="button" class="bg-teal-500 text-white font-bold py-2 px-6 rounded-full hover:bg-teal-600 transition-all">Yes, Extend</button>
-            </div>
-        </div>
-    </div>
 </div>
 @endsection
 
@@ -345,14 +333,12 @@ document.addEventListener('alpine:init', () => {
 
         return {
             show: {{ $errors->bookingCreation->any() ? 'true' : 'false' }},
-            showExtensionModal: false,
             currentStep: 1,
             
             formData: {
                 branch_id: '{{ old('branch_id') }}',
                 service_id: '{{ old('service_id') }}',
                 therapist_id: '{{ old('therapist_id') }}',
-                extended_session: '{{ old('extended_session', '0') }}' === '1',
                 booking_date: '{{ old('booking_date') }}',
                 booking_time: '{{ old('booking_time') }}',
                 client_name: '{{ old('client_name') }}',
@@ -387,27 +373,23 @@ document.addEventListener('alpine:init', () => {
             closeModal() { this.show = false; this.resetModal(); },
             resetModal() {
                 this.currentStep = 1;
-                this.formData = { branch_id: '', service_id: '', therapist_id: '', extended_session: false, booking_date: '', booking_time: '', client_name: '', client_phone: '', client_email: '' };
+                this.formData = { branch_id: '', service_id: '', therapist_id: '', booking_date: '', booking_time: '', client_name: '', client_phone: '', client_email: '' };
                 this.availableTherapists = [];
                 this.availableSlots = [];
                 this.initCalendar();
             },
             nextStep() {
-                if (this.currentStep === 2) {
-                    this.showExtensionModal = true;
-                } else if (this.currentStep < 4) {
+                if (this.currentStep < 4) {
                     this.currentStep++;
+                    // If entering the Date & Time step, refresh availability
+                    if (this.currentStep === 3) {
+                        this.fetchAvailability();
+                    }
                 }
             },
             prevStep() { if (this.currentStep > 1) this.currentStep--; },
             
-            handleExtension(extended) {
-                this.formData.extended_session = extended;
-                this.showExtensionModal = false;
-                this.currentStep = 3;
-                // We need to fetch availability again as the duration has changed
-                this.fetchAvailability();
-            },
+            // extension handling removed for modal (walk-in only)
 
             // Step validation
             isStep1Valid() { return this.formData.branch_id && this.formData.service_id; },
@@ -428,8 +410,8 @@ document.addEventListener('alpine:init', () => {
             fetchAvailability() {
                 if (!this.selectedDate || !this.formData.therapist_id || !this.formData.service_id) return;
                 this.loadingSlots = true; this.availableSlots = []; this.formData.booking_time = '';
-                const extendedParam = this.formData.extended_session ? '1' : '0';
-                const url = `/api/therapists/${this.formData.therapist_id}/availability/${this.selectedDate}/${this.formData.service_id}?extended=${extendedParam}`;
+                // Modal bookings do not support extension; always request availability with extended=0
+                const url = `/api/therapists/${this.formData.therapist_id}/availability/${this.selectedDate}/${this.formData.service_id}?extended=0`;
                 fetch(url, { headers: { 'Cache-Control': 'no-cache' }})
                     .then(res => res.json())
                     .then(data => { this.availableSlots = data; })
@@ -470,8 +452,25 @@ document.addEventListener('alpine:init', () => {
             getBranchName() { return branches[this.formData.branch_id] || 'N/A'; },
             getTherapistName() { return this.availableTherapists.find(t => t.id == this.formData.therapist_id)?.name || 'N/A'; },
             getFinalPrice() {
-                const servicePrice = services[this.formData.service_id]?.price || 0;
-                return (servicePrice + (this.formData.extended_session ? extensionPrice : 0)).toFixed(2);
+                // Coerce to Number to ensure toFixed exists
+                const servicePrice = Number(services[this.formData.service_id]?.price || 0);
+                const total = servicePrice; // Admin modal bookings don't include extension
+                return Number.isFinite(total) ? total.toFixed(2) : '0.00';
+            },
+            getImageUrl(imageUrl, name) {
+                // If imageUrl is falsy, return ui-avatars direct URL.
+                // If imageUrl contains an absolute URL (starts with http), return it directly.
+                if (!imageUrl) return `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&color=FFFFFF&background=059669&size=128`;
+                try {
+                    const url = new URL(imageUrl, window.location.origin);
+                    // If url is absolute (has protocol), return as-is
+                    if (url.protocol === 'http:' || url.protocol === 'https:') return imageUrl;
+                } catch (e) {
+                    // If new URL failed, fall back to raw imageUrl
+                    return imageUrl;
+                }
+                // For relative paths stored in 'imageUrl', prefix with storage path and trim leading slashes
+                return `/storage/${String(imageUrl).replace(/^\/+/, '')}`;
             },
             formatTime(time) {
                 if (!time) return 'N/A';
@@ -481,10 +480,7 @@ document.addEventListener('alpine:init', () => {
                 const adjustedHour = hour % 12 === 0 ? 12 : hour % 12;
                 return `${adjustedHour}:${m} ${period}`;
             },
-            submitForm() {
-                // A little trick to submit the form from outside
-                this.$refs.appointmentForm.submit();
-            }
+            // submitForm removed to use native form submission
         }
     });
 });

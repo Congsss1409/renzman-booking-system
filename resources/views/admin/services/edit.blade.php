@@ -48,7 +48,17 @@
         <!-- Image Upload -->
         <div>
             <label for="image" class="block text-sm font-semibold text-gray-600 mb-2">Change Service Photo (Optional)</label>
-            <div x-data="{ imagePreview: '{{ $service->image_url ? asset($service->image_url) : null }}' }" class="flex items-center gap-4">
+            @php
+                $servicePreview = '';
+                if ($service->image_url) {
+                    if (preg_match('/^https?:\/\//', $service->image_url)) {
+                        $servicePreview = $service->image_url;
+                    } else {
+                        $servicePreview = asset('storage/' . ltrim($service->image_url, '/'));
+                    }
+                }
+            @endphp
+            <div x-data="{ imagePreview: '{{ $servicePreview }}' }" class="flex items-center gap-4">
                 <img x-show="imagePreview" :src="imagePreview" alt="Current or new image preview" class="w-48 h-28 rounded-lg object-cover border-2 border-gray-300">
                  <div x-show="!imagePreview" class="w-48 h-28 rounded-lg bg-gray-100 flex items-center justify-center text-gray-400">
                     <svg class="w-10 h-10" fill="currentColor" viewBox="0 0 24 24"><path d="M19 3H5c-1.103 0-2 .897-2 2v14c0 1.103.897 2 2 2h14c1.103 0 2-.897 2-2V5c0-1.103-.897-2-2-2zM5 19V5h14l.002 14H5z"/><path d="m10 14-1-1-3 4h12l-5-7z"/></svg>
