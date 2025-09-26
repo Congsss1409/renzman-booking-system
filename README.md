@@ -1,61 +1,181 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Renzman Booking System
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+<p align="center"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="320" alt="Laravel Logo"></p>
 
-## About Laravel
+## 🚀 What this project is
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+Renzman Booking System is a small spa & massage booking application built with Laravel. It includes an admin dashboard, therapist management, booking flows, email notifications, payroll generation, CSV export, and PDF export for payroll reports.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+This README focuses on how to run the app on a desktop/PC that does NOT have Composer or Node installed.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+---
 
-## Learning Laravel
+## ✨ Key features
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+- Multi-branch booking management
+- Therapist availability and status tracking
+- Multi-step booking flow (Alpine.js + Blade) and email confirmations
+- Payments and downpayment handling
+- Automatic payroll generation from completed bookings (per-therapist, per-day)
+- Payroll itemization and payments tracking
+- 60/40 split by default (therapist / owner) for payrolls
+- CSV export for reports
+- Per-payroll PDF export (server-side using dompdf)
+- Real-time event broadcasting for updates (Pusher / Echo)
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+---
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## 💡 Run on a PC without Composer or Node
 
-## Laravel Sponsors
+You have two practical options when your desktop doesn't have Composer or Node: use XAMPP (recommended for Windows) or use Docker. The key requirement for both is that the project must contain the `vendor/` directory and built frontend assets (`public/build` or `public/js` + `public/css`). If those folders are missing, see "Bring built assets/vendor from another machine" below.
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+### Option A — Use XAMPP (Windows)
 
-### Premium Partners
+1. Install XAMPP (https://www.apachefriends.org) and start Apache + MySQL.
+2. Place the project in XAMPP's htdocs, e.g. `C:\xampp\htdocs\renzman-booking-system`.
+3. Ensure `vendor/` and `public/build` exist in the project. If they're not present, follow the section below about copying them from another machine.
+4. Copy the env file and edit DB settings:
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+```powershell
+cd C:\xampp\htdocs\renzman-booking-system
+copy .env.example .env
+```
 
-## Contributing
+Edit `.env` and set:
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+- APP_URL=http://localhost/renzman-booking-system
+- DB_CONNECTION=mysql
+- DB_HOST=127.0.0.1
+- DB_PORT=3306
+- DB_DATABASE=renzman
+- DB_USERNAME=root
+- DB_PASSWORD=
 
-## Code of Conduct
+5. Create the `renzman` database using phpMyAdmin (http://localhost/phpmyadmin) or the MySQL CLI.
+6. Use XAMPP's PHP binary to run artisan commands (requires `vendor/` to exist):
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+```powershell
+C:\xampp\php\php.exe artisan key:generate
+C:\xampp\php\php.exe artisan migrate --force
+```
 
-## Security Vulnerabilities
+7. Open the app in your browser:
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+http://localhost/renzman-booking-system/public
+
+(Optional: create an Apache virtual host pointing to the `public` folder.)
+
+### Option B — Use Docker (no Composer/Node on host)
+
+If Docker Desktop is available, mount the project into a PHP + Apache container and run a MySQL container.
+
+Example quick commands (PowerShell):
+
+```powershell
+# network
+docker network create renzman-net
+
+# mysql
+docker run -d --name renzman-mysql --network renzman-net -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=renzman -p 3306:3306 mysql:8
+
+# php/apache container
+docker run -d --name renzman-php --network renzman-net -v C:/xampp/htdocs/renzman-booking-system:/var/www/html -p 8080:80 php:8.1-apache
+
+# access at http://localhost:8080
+```
+
+Note: the container approach still requires `vendor/` and built assets in the project directory. See next section.
+
+---
+
+## 📦 Bring built assets / vendor from another machine
+
+If you have another machine with Composer and Node installed (or if you can provision a temporary environment), do the following there and copy the results to the target PC.
+
+On the machine with Composer & Node:
+
+```bash
+# install server deps
+composer install --no-dev --optimize-autoloader
+
+# frontend build
+npm install
+npm run build
+```
+
+Copy the following folders to the target PC's project root:
+
+- `vendor/` (complete)
+- `public/build/` (or `public/js`, `public/css` if used by the project)
+
+After copying, follow the XAMPP or Docker steps above and run `artisan migrate` using the available PHP binary.
+
+---
+
+## ✅ Quick checklist
+
+- PHP 8+ available (XAMPP includes PHP)
+- Apache (XAMPP) or Docker container serving `public/`
+- `vendor/` exists and is complete
+- `public/build` or built assets exist
+- Writable `storage/` and `bootstrap/cache`
+
+---
+
+## 🧾 Payroll & PDF export notes
+
+- The app uses `barryvdh/laravel-dompdf` for server-side PDF generation. The Export PDF button will generate a PDF if `vendor/` includes this package.
+- Payrolls are generated from completed bookings and split 60% to the therapist and 40% to the owner by default. Payrolls include itemization and payments.
+
+---
+
+## 🛠 Troubleshooting
+
+- "Missing vendor" — either run Composer on another machine and copy `vendor/`, or install Composer locally.
+- "Missing public/build" — build assets on another machine and copy `public/build`.
+- Permissions on Windows — ensure Apache/PHP user can write to `storage/` and `bootstrap/cache`.
+- Database connection — double-check `.env` and that MySQL is running.
+
+---
+
+## 🎯 When you have Composer & Node later (developer flow)
+
+```powershell
+# server deps
+composer install
+
+# frontend build (dev)
+npm install
+npm run dev
+
+# migrations + seeds
+php artisan migrate --seed
+
+# serve for development
+php artisan serve
+```
+
+---
+
+## Project structure highlights
+
+- `app/Models` — Booking, Branch, Therapist, Payroll
+- `app/Http/Controllers/PayrollController.php` — payroll generation, items, payments, CSV/PDF
+- `resources/views/payrolls` — admin UI and PDF blade
+- `database/migrations` — schema
+
+---
+
+## Want me to prepare a ready-to-run zip?
+
+I can prepare a zip file containing the project with `vendor/` and `public/build` already added so you can drop it into `C:\xampp\htdocs` and run immediately. Reply "please prepare zip" and I'll create it.
+
+---
 
 ## License
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+MIT
+
+---
+
+Made with ❤️ — enjoy managing bookings and payrolls!
