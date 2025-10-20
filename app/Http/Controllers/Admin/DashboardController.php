@@ -20,31 +20,255 @@ use Illuminate\Support\Facades\Log;
 class DashboardController extends Controller
 {
     /**
+     * Get today's booking statistics
+     */
+    private function getTodaysStats()
+    {
+        $today = Carbon::today();
+        
+        return [
+            'bookings' => Booking::whereDate('start_time', $today)->count(),
+            'revenue' => Booking::whereDate('start_time', $today)->where('status', 'Completed')->sum('price'),
+            'completed' => Booking::whereDate('start_time', $today)->where('status', 'Completed')->count(),
+            'cancelled' => Booking::whereDate('start_time', $today)->where('status', 'Cancelled')->count(),
+            'confirmed' => Booking::whereDate('start_time', $today)->where('status', 'Confirmed')->count(),
+            'pending' => Booking::whereDate('start_time', $today)->where('status', 'Pending')->count(),
+        ];
+    }
+    
+    /**
+     * Get total booking statistics
+     */
+    private function getTotalStats()
+    {        
+        return [
+            'bookings' => Booking::count(),
+            'revenue' => Booking::where('status', 'Completed')->sum('price'),
+            'completed' => Booking::where('status', 'Completed')->count(),
+            'cancelled' => Booking::where('status', 'Cancelled')->count(),
+            'confirmed' => Booking::where('status', 'Confirmed')->count(),
+            'pending' => Booking::where('status', 'Pending')->count(),
+            'in_progress' => Booking::where('status', 'In Progress')->count(),
+        ];
+    }
+    
+    /**
+     * Get booking statistics for a specific period
+     */
+    private function getPeriodStats($startDate, $endDate)
+    {        
+        return [
+            'bookings' => Booking::whereBetween('start_time', [$startDate, $endDate])->count(),
+            'revenue' => Booking::whereBetween('start_time', [$startDate, $endDate])->where('status', 'Completed')->sum('price'),
+            'completed' => Booking::whereBetween('start_time', [$startDate, $endDate])->where('status', 'Completed')->count(),
+            'cancelled' => Booking::whereBetween('start_time', [$startDate, $endDate])->where('status', 'Cancelled')->count(),
+        ];
+    }
+
+    /**
+     * Get booking status breakdown with percentages
+     */
+    private function getStatusBreakdown()
+    {
+        $totalBookings = Booking::count();
+        
+        if ($totalBookings == 0) {
+            return [
+                'pending' => ['count' => 0, 'percentage' => 0],
+                'confirmed' => ['count' => 0, 'percentage' => 0],
+                'in_progress' => ['count' => 0, 'percentage' => 0],
+                'completed' => ['count' => 0, 'percentage' => 0],
+                'cancelled' => ['count' => 0, 'percentage' => 0],
+            ];
+        }
+        
+        $statuses = ['Pending', 'Confirmed', 'In Progress', 'Completed', 'Cancelled'];
+        $breakdown = [];
+        
+        foreach ($statuses as $status) {
+            $count = Booking::where('status', $status)->count();
+            $breakdown[strtolower(str_replace(' ', '_', $status))] = [
+                'count' => $count,
+                'percentage' => round(($count / $totalBookings) * 100, 1)
+            ];
+        }
+        
+        return $breakdown;
+    }
+    
+    /**
+     * Get hourly booking distribution for today
+     */
+    private function getTodayBookingDistribution()
+    {
+        $today = Carbon::today();
+        $hours = [];
+        
+        for ($hour = 8; $hour <= 20; $hour++) {
+            $startHour = $today->copy()->setHour($hour);
+            $endHour = $today->copy()->setHour($hour + 1);
+            
+            $bookingCount = Booking::whereBetween('start_time', [$startHour, $endHour])->count();
+            $hours[] = [
+                'hour' => $hour . ':00',
+                'bookings' => $bookingCount
+            ];
+        }
+        
+        return $hours;
+    }
+    
+    /**
+     * Get booking trends comparison
+     */
+    private function getBookingTrends()
+    {
+        $today = Carbon::today();
+        $yesterday = Carbon::yesterday();
+        $lastWeek = Carbon::today()->subWeek();
+        $lastMonth = Carbon::today()->subMonth();
+        
+        return [
+            'today_vs_yesterday' => [
+                'today' => Booking::whereDate('start_time', $today)->count(),
+                'yesterday' => Booking::whereDate('start_time', $yesterday)->count(),
+            ],
+            'this_week_vs_last_week' => [
+                'this_week' => Booking::whereBetween('start_time', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()])->count(),
+                'last_week' => Booking::whereBetween('start_time', [$lastWeek->startOfWeek(), $lastWeek->endOfWeek()])->count(),
+            ],
+            'this_month_vs_last_month' => [
+                'this_month' => Booking::whereBetween('start_time', [Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()])->count(),
+                'last_month' => Booking::whereBetween('start_time', [$lastMonth->startOfMonth(), $lastMonth->endOfMonth()])->count(),
+            ]
+        ];
+    }
+
+    /**
      * Display the admin dashboard with statistics and booking management.
      */
     public function dashboard(Request $request)
     {
-        // --- Dashboard Stats (cached for performance) ---
-        $stats = Cache::remember('admin_dashboard_stats', now()->addMinutes(5), function () {
-            $topServices = Service::withCount(['bookings' => function ($query) {
-                $query->where('status', '!=', 'Cancelled');
-            }])->orderBy('bookings_count', 'desc')->take(5)->get();
+        // --- Dashboard Stats (always fresh) ---
+        $topServices = Service::withCount(['bookings' => function ($query) {
+            $query->where('status', '!=', 'Cancelled');
+        }])->orderBy('bookings_count', 'desc')->take(5)->get();
 
-            $topTherapists = Therapist::withCount(['bookings' => function ($query) {
-                $query->where('status', '!=', 'Cancelled');
-            }])->orderBy('bookings_count', 'desc')->with('branch')->take(5)->get();
+        $topTherapists = Therapist::withCount(['bookings' => function ($query) {
+            $query->where('status', '!=', 'Cancelled');
+        }])->orderBy('bookings_count', 'desc')->with('branch')->take(5)->get();
 
-            return [
-                'todaysBookings' => Booking::whereDate('start_time', Carbon::today())->count(),
-                'totalBookings' => Booking::count(),
-                'totalRevenue' => Booking::where('status', '!=', 'Cancelled')->sum('price'),
-                'averageRating' => Booking::whereNotNull('rating')->avg('rating'),
-                'topServices' => $topServices,
-                'topServicesLabels' => $topServices->pluck('name'),
-                'topServicesData' => $topServices->pluck('bookings_count'),
-                'topTherapists' => $topTherapists,
-            ];
-        });
+            // Monthly revenue filter
+
+        $month = $request->input('month', Carbon::now()->month);
+        $year = $request->input('year', Carbon::now()->year);
+        $monthlyRevenue = Booking::where('status', 'Completed')
+            ->whereMonth('start_time', $month)
+            ->whereYear('start_time', $year)
+            ->sum('price');
+
+        // Previous month/year calculation
+        $prevMonth = $month - 1;
+        $prevYear = $year;
+        if ($prevMonth < 1) {
+            $prevMonth = 12;
+            $prevYear = $year - 1;
+        }
+        $prevMonthlyRevenue = Booking::where('status', 'Completed')
+            ->whereMonth('start_time', $prevMonth)
+            ->whereYear('start_time', $prevYear)
+            ->sum('price');
+
+        $totalRevenue = Booking::where('status', 'Completed')->sum('price');
+        $totalProfit = Booking::where('status', 'Completed')->sum(DB::raw('price - COALESCE(cost,0)'));
+        $totalCancellations = Booking::where('status', 'Cancelled')->count();
+        $totalCompleted = Booking::where('status', 'Completed')->count();
+        
+        // Enhanced booking statistics
+        $todaysBookings = Booking::whereDate('start_time', Carbon::today())->count();
+        $todaysRevenue = Booking::whereDate('start_time', Carbon::today())
+            ->where('status', 'Completed')
+            ->sum('price');
+        $todaysCancellations = Booking::whereDate('start_time', Carbon::today())
+            ->where('status', 'Cancelled')
+            ->count();
+        $todaysCompleted = Booking::whereDate('start_time', Carbon::today())
+            ->where('status', 'Completed')
+            ->count();
+            
+        // Weekly statistics
+        $weekStart = Carbon::now()->startOfWeek();
+        $weekEnd = Carbon::now()->endOfWeek();
+        $weeklyBookings = Booking::whereBetween('start_time', [$weekStart, $weekEnd])->count();
+        $weeklyRevenue = Booking::whereBetween('start_time', [$weekStart, $weekEnd])
+            ->where('status', 'Completed')
+            ->sum('price');
+            
+        // Monthly statistics for current month
+        $monthStart = Carbon::now()->startOfMonth();
+        $monthEnd = Carbon::now()->endOfMonth();
+        $currentMonthBookings = Booking::whereBetween('start_time', [$monthStart, $monthEnd])->count();
+        $currentMonthRevenue = Booking::whereBetween('start_time', [$monthStart, $monthEnd])
+            ->where('status', 'Completed')
+            ->sum('price');
+            
+        // Status breakdown
+        $statusCounts = [
+            'pending' => Booking::where('status', 'Pending')->count(),
+            'confirmed' => Booking::where('status', 'Confirmed')->count(),
+            'in_progress' => Booking::where('status', 'In Progress')->count(),
+            'completed' => Booking::where('status', 'Completed')->count(),
+            'cancelled' => Booking::where('status', 'Cancelled')->count(),
+        ];
+
+        $stats = [
+            'selectedMonth' => $month,
+            'selectedYear' => $year,
+            'monthlyRevenue' => $monthlyRevenue,
+            'prevMonth' => $prevMonth,
+            'prevYear' => $prevYear,
+            'prevMonthlyRevenue' => $prevMonthlyRevenue,
+            
+            // Today's Statistics
+            'todaysBookings' => $todaysBookings,
+            'todaysRevenue' => $todaysRevenue,
+            'todaysCancellations' => $todaysCancellations,
+            'todaysCompleted' => $todaysCompleted,
+            
+            // Weekly Statistics
+            'weeklyBookings' => $weeklyBookings,
+            'weeklyRevenue' => $weeklyRevenue,
+            
+            // Monthly Statistics (current month)
+            'currentMonthBookings' => $currentMonthBookings,
+            'currentMonthRevenue' => $currentMonthRevenue,
+            
+            // Total Statistics
+            'totalBookings' => Booking::count(),
+            'totalRevenue' => $totalRevenue,
+            'totalProfit' => $totalProfit,
+            'totalCancellations' => $totalCancellations,
+            'totalCompleted' => $totalCompleted,
+            
+            // Status Breakdown
+            'statusCounts' => $statusCounts,
+            'pendingBookings' => $statusCounts['pending'],
+            'confirmedBookings' => $statusCounts['confirmed'],
+            'inProgressBookings' => $statusCounts['in_progress'],
+            'completedBookings' => $statusCounts['completed'],
+            'cancelledBookings' => $statusCounts['cancelled'],
+            
+            // Additional Metrics
+            'averageRating' => Booking::whereNotNull('rating')->avg('rating'),
+            'completionRate' => $totalCompleted > 0 ? round(($totalCompleted / Booking::count()) * 100, 1) : 0,
+            'cancellationRate' => $totalCancellations > 0 ? round(($totalCancellations / Booking::count()) * 100, 1) : 0,
+            
+            // Charts Data
+            'topServices' => $topServices,
+            'topServicesLabels' => $topServices->pluck('name'),
+            'topServicesData' => $topServices->pluck('bookings_count'),
+            'topTherapists' => $topTherapists,
+        ];
 
         // --- All Bookings Query (this part is dynamic and not cached) ---
         $query = Booking::with(['service', 'therapist', 'branch']);
@@ -61,11 +285,14 @@ class DashboardController extends Controller
         }
 
         // Sorting functionality
-        $sortBy = $request->input('sort_by', 'start_time');
-        $sortOrder = $request->input('sort_order', 'desc');
+    $sortBy = $request->input('sort_by', 'start_time');
+    $sortOrder = $request->input('sort_order', 'desc');
         $validSortColumns = ['client_name', 'start_time', 'status', 'created_at', 'updated_at'];
         if (in_array($sortBy, $validSortColumns)) {
             $query->orderBy($sortBy, $sortOrder);
+        } else {
+            // Default: newest to oldest by start_time
+            $query->orderBy('start_time', 'desc');
         }
 
         $bookings = $query->paginate(15)->withQueryString();
@@ -98,7 +325,7 @@ class DashboardController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'client_name' => 'required|string|max:255',
-            'client_phone' => 'required|string|max:20',
+            'client_phone' => 'required|digits:11',
             'client_email' => 'nullable|email|max:255',
             'branch_id' => 'required|exists:branches,id',
             'service_id' => 'required|exists:services,id',
@@ -106,6 +333,9 @@ class DashboardController extends Controller
             'booking_date' => 'required|date',
             'booking_time' => 'required|string',
             'extended_session' => 'nullable|boolean',
+        ], [
+            'client_phone.required' => 'Phone number is required.',
+            'client_phone.digits' => 'Phone number must be exactly 11 digits.',
         ]);
 
         if ($validator->fails()) {

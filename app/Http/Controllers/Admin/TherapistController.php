@@ -35,9 +35,19 @@ class TherapistController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required|string|max:255',
+            'name' => [
+                'required',
+                'string',
+                'max:255',
+                // Unique name within the same branch
+                \Illuminate\Validation\Rule::unique('therapists')->where(function ($query) use ($request) {
+                    return $query->where('branch_id', $request->branch_id);
+                }),
+            ],
             'branch_id' => 'required|exists:branches,id',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:10240',
+        ], [
+            'name.unique' => 'A therapist with this name already exists in the selected branch.'
         ]);
 
         $imageUrl = null;
@@ -74,9 +84,19 @@ class TherapistController extends Controller
     public function update(Request $request, Therapist $therapist)
     {
         $request->validate([
-            'name' => 'required|string|max:255',
+            'name' => [
+                'required',
+                'string',
+                'max:255',
+                // Unique name within the same branch, ignore current therapist
+                \Illuminate\Validation\Rule::unique('therapists')->ignore($therapist->id)->where(function ($query) use ($request) {
+                    return $query->where('branch_id', $request->branch_id);
+                }),
+            ],
             'branch_id' => 'required|exists:branches,id',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:10240',
+        ], [
+            'name.unique' => 'A therapist with this name already exists in the selected branch.'
         ]);
 
         $imageUrl = $therapist->image_url;

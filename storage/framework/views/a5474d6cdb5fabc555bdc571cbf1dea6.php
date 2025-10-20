@@ -1,8 +1,6 @@
-@extends('layouts.Booking')
+<?php $__env->startSection('title', 'Step 5: Verify Your Booking'); ?>
 
-@section('title', 'Step 5: Verify Your Booking')
-
-@section('content')
+<?php $__env->startSection('content'); ?>
 <div class="glass-panel rounded-3xl max-w-6xl mx-auto overflow-hidden shadow-2xl">
     <div class="grid md:grid-cols-2">
         
@@ -33,22 +31,29 @@
 
             <div class="text-left mb-8">
                 <h1 class="text-3xl md:text-4xl font-bold text-black">Enter Verification Code</h1>
-                <p class="mt-2 text-lg text-black">A code has been sent to {{ $booking->client_email }}.</p>
+                <p class="mt-2 text-lg text-black">A code has been sent to <?php echo e($booking->client_email); ?>.</p>
             </div>
 
-            @if (session('error'))
+            <?php if(session('error')): ?>
                 <div class="mb-4 bg-red-500/30 border border-red-400 text-black px-4 py-3 rounded-lg relative" role="alert">
-                    <span class="block sm:inline">{{ session('error') }}</span>
+                    <span class="block sm:inline"><?php echo e(session('error')); ?></span>
                 </div>
-            @endif
-             @error('verification_code')
+            <?php endif; ?>
+             <?php $__errorArgs = ['verification_code'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
                 <div class="mb-4 bg-red-500/30 border border-red-400 text-black px-4 py-3 rounded-lg relative" role="alert">
-                    <span class="block sm:inline">{{ $message }}</span>
+                    <span class="block sm:inline"><?php echo e($message); ?></span>
                 </div>
-            @enderror
+            <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
 
-            <form action="{{ route('booking.store.step-five') }}" method="POST">
-                @csrf
+            <form action="<?php echo e(route('booking.store.step-five')); ?>" method="POST">
+                <?php echo csrf_field(); ?>
                 <div class="space-y-6 text-black">
                     <div>
                         <label for="verification_code" class="block text-lg font-semibold mb-2 text-black">6-Digit Code</label>
@@ -59,7 +64,7 @@
                 </div>
 
                 <div class="mt-10 flex justify-between">
-                    <a href="{{ route('booking.create.step-four') }}" class="bg-white/20 text-white font-bold py-3 px-10 rounded-full shadow-md hover:bg-white/30 transition-all transform hover:scale-105">
+                    <a href="<?php echo e(route('booking.create.step-four')); ?>" class="bg-white/20 text-white font-bold py-3 px-10 rounded-full shadow-md hover:bg-white/30 transition-all transform hover:scale-105">
                         &larr; Back
                     </a>
                     <button type="submit" class="bg-white text-teal-600 font-bold py-3 px-10 rounded-full shadow-md hover:bg-cyan-100 transition-all transform hover:scale-105">
@@ -70,4 +75,5 @@
         </div>
     </div>
 </div>
-@endsection
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('layouts.Booking', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\Desktop\renzman-booking-system\resources\views/booking/step-five.blade.php ENDPATH**/ ?>

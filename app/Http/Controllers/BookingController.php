@@ -127,7 +127,10 @@ class BookingController extends Controller
         $validated = $request->validate([
             'client_name' => 'required|string|max:255',
             'client_email' => 'required|email|max:255',
-            'client_phone' => 'required|string|max:20',
+            'client_phone' => 'required|digits:11',
+        ], [
+            'client_phone.required' => 'Phone number is required.',
+            'client_phone.digits' => 'Phone number must be exactly 11 digits.',
         ]);
         
         $bookingData = $request->session()->get('booking', new \stdClass());
@@ -148,6 +151,24 @@ class BookingController extends Controller
         $extensionPrice = 500;
         $finalPrice = $service->price + ($isExtended ? $extensionPrice : 0);
         // --- END: MODIFIED PRICE LOGIC ---
+
+
+        // Prevent double booking for the same therapist
+        $conflictingBooking = Booking::where('therapist_id', $bookingData->therapist_id)
+            ->where(function($query) use ($startTime, $endTime) {
+                $query->where(function($q) use ($startTime) {
+                    $q->where('start_time', '<=', $startTime)
+                      ->where('end_time', '>', $startTime);
+                })->orWhere(function($q) use ($endTime) {
+                    $q->where('start_time', '<', $endTime)
+                      ->where('end_time', '>=', $endTime);
+                });
+            })
+            ->exists();
+
+        if ($conflictingBooking) {
+            return redirect()->route('booking.create.step-four')->with('error', 'The selected therapist is already booked for this time slot. Please choose another time or therapist.');
+        }
 
         $booking = Booking::create([
             'client_name' => $bookingData->client_name,

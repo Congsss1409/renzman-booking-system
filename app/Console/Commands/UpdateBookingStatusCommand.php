@@ -38,9 +38,15 @@ class UpdateBookingStatusCommand extends Command
             ->update(['status' => 'In Progress']);
 
         // 2. Update 'Confirmed' or 'In Progress' bookings to 'Completed' if the session end time is in the past
-        Booking::whereIn('status', ['Confirmed', 'In Progress'])
+        $bookingsToComplete = Booking::whereIn('status', ['Confirmed', 'In Progress'])
             ->where('end_time', '<=', $now)
-            ->update(['status' => 'Completed']);
+            ->get();
+            
+        foreach ($bookingsToComplete as $booking) {
+            $booking->update(['status' => 'Completed']);
+            // Dispatch event to send feedback email
+            \App\Events\BookingCompleted::dispatch($booking);
+        }
 
         $this->info('Booking statuses have been updated successfully.');
         return 0;

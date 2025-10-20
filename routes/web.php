@@ -52,10 +52,14 @@ Route::post('/2fa/resend', [TwoFactorController::class, 'resend'])->name('2fa.re
 
 // --- Protected Admin Routes ---
 Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
+    // Revenue Export
+    Route::get('/revenue/export/pdf', [\App\Http\Controllers\Admin\RevenueReportController::class, 'monthlyPdf'])->name('revenue.export.pdf');
+    Route::get('/revenue/export/excel', [\App\Http\Controllers\Admin\RevenueExcelExportController::class, 'monthlyExcel'])->name('revenue.export.excel');
     
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'dashboard'])->name('dashboard');
-    
+
+
     // Manual Booking Management
     Route::post('/bookings', [DashboardController::class, 'storeBooking'])->name('bookings.store');
     Route::post('/bookings/{booking}/cancel', [DashboardController::class, 'cancelBooking'])->name('bookings.cancel');

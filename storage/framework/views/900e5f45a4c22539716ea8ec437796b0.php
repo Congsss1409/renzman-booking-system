@@ -1,14 +1,12 @@
-@extends('layouts.Booking')
+<?php $__env->startSection('title', 'Step 1: Select Your Service'); ?>
 
-@section('title', 'Step 1: Select Your Service')
-
-@section('content')
+<?php $__env->startSection('content'); ?>
 <div class="glass-panel rounded-3xl max-w-6xl mx-auto overflow-hidden shadow-2xl">
     <div class="grid md:grid-cols-2">
         
         <!-- Left Column: Image & Branding -->
         <div class="hidden md:block relative">
-            <img src="{{ asset('images/services-showcase.jpg') }}" class="absolute h-full w-full object-cover" alt="Woman receiving a relaxing massage">
+            <img src="<?php echo e(asset('images/services-showcase.jpg')); ?>" class="absolute h-full w-full object-cover" alt="Woman receiving a relaxing massage">
             <div class="absolute inset-0 bg-teal-800/50"></div>
             <div class="relative z-10 p-12 text-white flex flex-col h-full">
                 <div>
@@ -40,30 +38,31 @@
                 <p class="mt-2 text-lg text-black">Choose from our range of professional treatments.</p>
             </div>
 
-            @if ($errors->any())
+            <?php if($errors->any()): ?>
                 <div class="mb-4 bg-red-500/30 border border-red-400 text-black px-4 py-3 rounded-lg relative" role="alert">
                     <ul>
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
+                        <?php $__currentLoopData = $errors->all(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $error): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                            <li><?php echo e($error); ?></li>
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                     </ul>
                 </div>
-            @endif
+            <?php endif; ?>
 
             <!-- Form Content -->
-            <form action="{{ route('booking.store.step-one') }}" method="POST">
-                @csrf
+            <form action="<?php echo e(route('booking.store.step-one')); ?>" method="POST">
+                <?php echo csrf_field(); ?>
                 <div class="space-y-6">
                     <!-- Branch Selection -->
                     <div>
                         <label for="branch_id" class="block text-lg font-semibold mb-2 text-black">1. Choose a Branch</label>
                         <select name="branch_id" id="branch_id" required class="w-full p-4 bg-white/10 rounded-lg border border-white/30 focus:outline-none focus:ring-2 focus:ring-white appearance-none text-black">
                             <option value="" disabled selected class="text-black">Select a branch location</option>
-                            @foreach($branches as $branch)
-                                <option value="{{ $branch->id }}" {{ old('branch_id', $booking->branch_id ?? '') == $branch->id ? 'selected' : '' }} class="text-black">
-                                    {{ $branch->name }}
+                            <?php $__currentLoopData = $branches; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $branch): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                <option value="<?php echo e($branch->id); ?>" <?php echo e(old('branch_id', $booking->branch_id ?? '') == $branch->id ? 'selected' : ''); ?> class="text-black">
+                                    <?php echo e($branch->name); ?>
+
                                 </option>
-                            @endforeach
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                         </select>
                     </div>
 
@@ -72,11 +71,12 @@
                         <label for="service_id" class="block text-lg font-semibold mb-2 text-black">2. Choose a Service</label>
                         <select name="service_id" id="service_id" required class="w-full p-4 bg-white/10 rounded-lg border border-white/30 focus:outline-none focus:ring-2 focus:ring-white appearance-none text-black">
                             <option value="" disabled selected class="text-black">Select a service</option>
-                            @foreach($services as $service)
-                                <option value="{{ $service->id }}" {{ old('service_id', $booking->service_id ?? '') == $service->id ? 'selected' : '' }} class="text-black">
-                                    {{ $service->name }} ({{ $service->duration }} mins) - ₱{{ number_format($service->price, 2) }}
+                            <?php $__currentLoopData = $services; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $service): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                <option value="<?php echo e($service->id); ?>" <?php echo e(old('service_id', $booking->service_id ?? '') == $service->id ? 'selected' : ''); ?> class="text-black">
+                                    <?php echo e($service->name); ?> (<?php echo e($service->duration); ?> mins) - ₱<?php echo e(number_format($service->price, 2)); ?>
+
                                 </option>
-                            @endforeach
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                         </select>
                     </div>
                 </div>
@@ -91,5 +91,7 @@
         </div>
     </div>
 </div>
-@endsection
+<?php $__env->stopSection(); ?>
 
+
+<?php echo $__env->make('layouts.Booking', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\Desktop\renzman-booking-system\resources\views/booking/step-one.blade.php ENDPATH**/ ?>

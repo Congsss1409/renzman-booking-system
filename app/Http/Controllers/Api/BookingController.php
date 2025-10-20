@@ -24,8 +24,11 @@ class BookingController extends Controller
             'booking_time' => 'required|date_format:H:i',
             'client_name' => 'required|string|max:255',
             'client_email' => 'nullable|email|max:255',
-            'client_phone' => 'required|string|max:20',
+            'client_phone' => 'required|digits:11',
             'extended_session' => 'boolean'
+        ], [
+            'client_phone.required' => 'Phone number is required.',
+            'client_phone.digits' => 'Phone number must be exactly 11 digits.',
         ]);
 
         try {

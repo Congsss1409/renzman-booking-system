@@ -1,9 +1,7 @@
-@extends('layouts.Booking')
+<?php $__env->startSection('title', 'Step 2: Choose Your Therapist'); ?>
 
-@section('title', 'Step 2: Choose Your Therapist')
-
-@section('content')
-<div x-data="{ showModal: false, selectedTherapist: '{{ old('therapist_id', $bookingData->therapist_id ?? '') }}' }" class="glass-panel rounded-3xl max-w-6xl mx-auto overflow-hidden shadow-2xl">
+<?php $__env->startSection('content'); ?>
+<div x-data="{ showModal: false, selectedTherapist: '<?php echo e(old('therapist_id', $bookingData->therapist_id ?? '')); ?>' }" class="glass-panel rounded-3xl max-w-6xl mx-auto overflow-hidden shadow-2xl">
     <div class="grid md:grid-cols-2">
         
         <!-- Left Column: Image & Branding -->
@@ -40,55 +38,55 @@
                 <p class="mt-2 text-lg text-black">Choose your preferred wellness expert.</p>
             </div>
 
-            @if ($errors->any())
+            <?php if($errors->any()): ?>
                 <div class="mb-4 bg-red-500/30 border border-red-400 text-black px-4 py-3 rounded-lg relative" role="alert">
                     <ul>
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
+                        <?php $__currentLoopData = $errors->all(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $error): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                            <li><?php echo e($error); ?></li>
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                     </ul>
                 </div>
-            @endif
+            <?php endif; ?>
 
             <!-- Form Content -->
-            <form x-ref="stepTwoForm" action="{{ route('booking.store.step-two') }}" method="POST">
-                @csrf
+            <form x-ref="stepTwoForm" action="<?php echo e(route('booking.store.step-two')); ?>" method="POST">
+                <?php echo csrf_field(); ?>
                 <input type="hidden" name="extended_session" x-ref="extendedSessionInput" value="0">
                 <div class="space-y-4 max-h-[40vh] overflow-y-auto pr-4 text-black">
-                    @forelse($therapists as $therapist)
+                    <?php $__empty_1 = true; $__currentLoopData = $therapists; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $therapist): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                         <label class="block text-black">
-                            <input type="radio" name="therapist_id" value="{{ $therapist->id }}" @change="selectedTherapist = $event.target.value" class="hidden peer" required {{ old('therapist_id', $bookingData->therapist_id ?? '') == $therapist->id ? 'checked' : '' }}>
+                            <input type="radio" name="therapist_id" value="<?php echo e($therapist->id); ?>" @change="selectedTherapist = $event.target.value" class="hidden peer" required <?php echo e(old('therapist_id', $bookingData->therapist_id ?? '') == $therapist->id ? 'checked' : ''); ?>>
                             <div class="p-4 rounded-lg border border-white/30 cursor-pointer peer-checked:bg-white peer-checked:text-teal-600 peer-checked:ring-2 peer-checked:ring-white hover:bg-white/20 transition-all text-black">
                                 <div class="flex items-center justify-between">
                                     <div class="flex items-center gap-4">
-                                        <img src="{{ $therapist->image_url ?? 'https://ui-avatars.com/api/?name=' . urlencode($therapist->name) . '&color=FFFFFF&background=059669&size=128' }}" alt="{{ $therapist->name }}" class="w-12 h-12 rounded-full object-cover">
+                                        <img src="<?php echo e($therapist->image_url ?? 'https://ui-avatars.com/api/?name=' . urlencode($therapist->name) . '&color=FFFFFF&background=059669&size=128'); ?>" alt="<?php echo e($therapist->name); ?>" class="w-12 h-12 rounded-full object-cover">
                                         <div>
-                                            <p class="font-bold text-lg text-black">{{ $therapist->name }}</p>
+                                            <p class="font-bold text-lg text-black"><?php echo e($therapist->name); ?></p>
                                         </div>
                                     </div>
-                                    @if($therapist->current_status == 'Available')
+                                    <?php if($therapist->current_status == 'Available'): ?>
                                         <div class="text-right">
                                             <span class="px-3 py-1 text-xs font-semibold text-green-800 bg-green-200 rounded-full">Available Now</span>
                                         </div>
-                                    @else
+                                    <?php else: ?>
                                         <div class="text-right">
                                             <span class="px-3 py-1 text-xs font-semibold text-yellow-800 bg-yellow-200 rounded-full">Currently Busy</span>
-                                            <p class="text-xs opacity-80 mt-1 text-black">Available after {{ $therapist->available_at }}</p>
+                                            <p class="text-xs opacity-80 mt-1 text-black">Available after <?php echo e($therapist->available_at); ?></p>
                                         </div>
-                                    @endif
+                                    <?php endif; ?>
                                 </div>
                             </div>
                         </label>
-                    @empty
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                         <div class="p-8 text-center bg-white/10 rounded-lg">
                             <p>No therapists are currently available for this branch. Please check back later or select a different branch.</p>
                         </div>
-                    @endforelse
+                    <?php endif; ?>
                 </div>
 
                 <!-- Navigation Buttons -->
                 <div class="mt-10 flex justify-between">
-                    <a href="{{ route('booking.create.step-one') }}" class="bg-white/20 text-white font-bold py-3 px-10 rounded-full shadow-md hover:bg-white/30 transition-all transform hover:scale-105">
+                    <a href="<?php echo e(route('booking.create.step-one')); ?>" class="bg-white/20 text-white font-bold py-3 px-10 rounded-full shadow-md hover:bg-white/30 transition-all transform hover:scale-105">
                         &larr; Back
                     </a>
                     <button type="button" @click.prevent="if (selectedTherapist) showModal = true" :disabled="!selectedTherapist" :class="{ 'opacity-50 cursor-not-allowed': !selectedTherapist }" class="bg-white text-teal-600 font-bold py-3 px-10 rounded-full shadow-md hover:bg-cyan-100 transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed">
@@ -115,5 +113,7 @@
         </div>
     </div>
 </div>
-@endsection
+<?php $__env->stopSection(); ?>
 
+
+<?php echo $__env->make('layouts.Booking', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\Desktop\renzman-booking-system\resources\views/booking/step-two.blade.php ENDPATH**/ ?>
