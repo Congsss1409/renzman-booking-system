@@ -63,8 +63,7 @@
     <header x-data="{ open: false }" class="fixed top-0 left-0 right-0 z-50 p-2 sm:p-4">
         <div class="container mx-auto flex justify-between items-center header-glass rounded-full p-2 px-4 sm:px-6 shadow-lg">
             <a href="<?php echo e(route('landing')); ?>">
-                <img src="<?php echo e(asset('images/logo_white.png')); ?>" alt="Renzman Logo" class="h-10 sm:h-12">
-            </a>
+                
             <nav class="hidden md:flex items-center space-x-8 text-gray-200">
                 <a href="#services" class="hover:text-white transition-colors">Services</a>
                 <a href="#branches" class="hover:text-white transition-colors">Branches</a>
@@ -111,8 +110,10 @@
     </section>
 
     <!-- Page 2: Services Section -->
-    <section id="services" class="scroll-section">
+    <section id="services" class="scroll-section" style="background-image: url('<?php echo e(asset('images/store2.jpg')); ?>'); background-size: cover; background-position: center;">
         <div class="container mx-auto h-full flex flex-col justify-center">
+            <div class="absolute inset-0 bg-black/40"></div>
+            <div class="relative z-10 flex flex-col">
             <div class="text-center mb-4 sm:mb-8">
                 <h2 class="text-3xl sm:text-4xl font-bold">Our Signature Services</h2>
                 <p class="mt-2 text-cyan-100 px-4">Tailored treatments designed for your ultimate comfort.</p>
@@ -143,13 +144,16 @@
                         <a href="<?php echo e(route('services')); ?>" class="font-semibold bg-white/20 hover:bg-white/30 py-2 px-4 rounded-full">View All Services &rarr;</a>
                     </div>
                  <?php endif; ?>
+                </div>
             </div>
         </div>
     </section>
 
     <!-- Page 3: Our Branches Section -->
-    <section id="branches" class="scroll-section">
+    <section id="branches" class="scroll-section" style="background-image: url('<?php echo e(asset('images/store3.jpg')); ?>'); background-size: cover; background-position: center;">
         <div class="container mx-auto h-full flex flex-col justify-center">
+            <div class="absolute inset-0 bg-black/30"></div>
+            <div class="relative z-10 flex flex-col">
             <div class="text-center mb-4 sm:mb-8">
                 <h2 class="text-3xl sm:text-4xl font-bold">Visit Our Branches</h2>
                 <p class="mt-2 text-cyan-100 px-4">Find a sanctuary near you.</p>
@@ -170,13 +174,16 @@
                         <p class="col-span-full text-center">Our branches will be listed here soon.</p>
                     <?php endif; ?>
                 </div>
+                </div>
             </div>
         </div>
     </section>
 
     <!-- Page 4: Testimonials & Footer Section -->
-    <section id="testimonials" class="scroll-section">
+    <section id="testimonials" class="scroll-section" style="background-image: url('<?php echo e(asset('images/store4.jpg')); ?>'); background-size: cover; background-position: center;">
         <div class="container mx-auto h-full flex flex-col justify-center">
+            <div class="absolute inset-0 bg-black/35"></div>
+            <div class="relative z-10 flex flex-col">
              <?php if($feedbacks->isNotEmpty()): ?>
                 <div class="text-center mb-4 sm:mb-8">
                     <h2 class="text-3xl sm:text-4xl font-bold">What Our Clients Say</h2>
