@@ -60,7 +60,7 @@
                     <a href="<?php echo e(route('about')); ?>" class="hover:text-white transition-colors">About Us</a>
                 </nav>
                  <a href="<?php echo e(route('landing')); ?>" class="bg-white text-teal-600 font-bold py-3 px-8 rounded-full shadow-md hover:bg-cyan-100 transition-all transform hover:scale-105">
-                    Cancel Booking
+                    Home
                 </a>
             </div>
         </header>

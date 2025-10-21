@@ -39,6 +39,7 @@ Route::prefix('booking')->name('booking.')->group(function () {
     Route::post('/step-four', [BookingController::class, 'storeStepFour'])->name('store.step-four');
     Route::get('/step-five', [BookingController::class, 'createStepFive'])->name('create.step-five');
     Route::post('/step-five', [BookingController::class, 'storeStepFive'])->name('store.step-five');
+    Route::post('/resend-code', [BookingController::class, 'resendCode'])->name('resend-code');
     Route::get('/success', [BookingController::class, 'success'])->name('success');
 });
 Route::get('/feedback/{token}', [FeedbackController::class, 'create'])->name('feedback.create');

@@ -5,120 +5,53 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Feedback Request - Renzman Spa</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            line-height: 1.6;
-            color: #333;
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #f4f4f4;
-        }
-        .container {
-            background: white;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-        }
-        .header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-        .logo {
-            font-size: 28px;
-            font-weight: bold;
-            color: #2dd4bf;
-            margin-bottom: 10px;
-        }
-        .subtitle {
-            color: #666;
-            font-size: 16px;
-        }
-        .booking-info {
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 8px;
-            margin: 20px 0;
-            border-left: 4px solid #2dd4bf;
-        }
-        .feedback-button {
-            text-align: center;
-            margin: 30px 0;
-        }
-        .btn {
-            display: inline-block;
-            background: #2dd4bf;
-            color: white;
-            padding: 15px 30px;
-            text-decoration: none;
-            border-radius: 8px;
-            font-weight: bold;
-            font-size: 16px;
-        }
-        .btn:hover {
-            background: #26a69a;
-        }
-        .stars {
-            text-align: center;
-            margin: 20px 0;
-        }
-        .star {
-            font-size: 30px;
-            color: #ddd;
-            margin: 0 5px;
-        }
-        .footer {
-            text-align: center;
-            margin-top: 30px;
-            padding-top: 20px;
-            border-top: 1px solid #eee;
-            color: #666;
-            font-size: 14px;
-        }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial; background:#f8fafc; margin:0; padding:20px; }
+        .email-wrapper { max-width:600px; margin:0 auto; }
+        .card { background:#ffffff; border-radius:10px; padding:28px; box-shadow:0 6px 18px rgba(15,23,42,0.06); }
+        .brand { text-align:center; margin-bottom:18px; }
+        .brand .logo { font-size:22px; font-weight:700; color:#0f766e; }
+        .brand .subtitle { color:#475569; font-size:13px; }
+        h2.title { color:#059669; text-align:center; margin:6px 0 18px; }
+        .meta { color:#374151; font-size:14px; }
+        .booking-info { background:#f8fafc; padding:16px; border-radius:8px; margin:18px 0; border-left:4px solid #34d399; }
+        .btn { display:inline-block; background:#10b981; color:white; padding:12px 22px; border-radius:8px; text-decoration:none; font-weight:600; }
+        .footer { text-align:center; color:#6b7280; font-size:13px; margin-top:20px; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <div class="logo">RENZMAN SPA</div>
-            <div class="subtitle">Premium Spa Services</div>
-        </div>
+    <div class="email-wrapper">
+        <div class="card">
+            <div class="brand">
+                <div class="logo">RENZMAN SPA</div>
+                <div class="subtitle">Premium Spa Services</div>
+            </div>
 
-        <h2 style="color: #2dd4bf; text-align: center;">How was your experience?</h2>
-        
-        <p>Hi {{ $booking->client_name }},</p>
-        
-        <p>Thank you for choosing Renzman Spa! We hope you enjoyed your recent {{ $booking->service->name ?? 'spa service' }} with {{ $booking->therapist->name ?? 'our therapist' }}.</p>
+            <h2 class="title">How was your experience?</h2>
 
-        <div class="booking-info">
-            <h4 style="margin-top: 0; color: #333;">Your Service Details:</h4>
-            <p><strong>Service:</strong> {{ $booking->service->name ?? 'N/A' }}</p>
-            <p><strong>Therapist:</strong> {{ $booking->therapist->name ?? 'N/A' }}</p>
-            <p><strong>Date:</strong> {{ $booking->start_time ? $booking->start_time->format('F d, Y \a\t h:i A') : 'N/A' }}</p>
-            <p><strong>Location:</strong> {{ $booking->branch->name ?? 'N/A' }}</p>
-        </div>
+            <p class="meta">Hi {{ $booking->client_name }},</p>
 
-        <p>We would love to hear about your experience! Your feedback helps us continue to provide the best possible service to all our valued clients.</p>
+            <p class="meta">Thank you for choosing Renzman Spa! We hope you enjoyed your recent {{ $booking->service->name ?? 'spa service' }} with {{ $booking->therapist->name ?? 'our therapist' }}.</p>
 
-        <div class="stars">
-            <span class="star">★</span>
-            <span class="star">★</span>
-            <span class="star">★</span>
-            <span class="star">★</span>
-            <span class="star">★</span>
-        </div>
+            <div class="booking-info">
+                <h4 style="margin-top:0; color:#0f172a;">Your Service Details:</h4>
+                <p><strong>Service:</strong> {{ $booking->service->name ?? 'N/A' }}</p>
+                <p><strong>Therapist:</strong> {{ $booking->therapist->name ?? 'N/A' }}</p>
+                <p><strong>Date:</strong> {{ $booking->start_time ? $booking->start_time->format('F d, Y \a\t h:i A') : 'N/A' }}</p>
+                <p><strong>Location:</strong> {{ $booking->branch->name ?? 'N/A' }}</p>
+            </div>
 
-        <div class="feedback-button">
-            <a href="{{ $feedbackUrl }}" class="btn">Share Your Feedback</a>
-        </div>
+            <p class="meta">We would love to hear about your experience! Your feedback helps us continue to provide the best possible service to all our valued clients.</p>
 
-        <p>It only takes a minute, and your honest review means the world to us!</p>
+            <div style="text-align:center; margin:20px 0;">
+                <a href="{{ $feedbackUrl }}" class="btn">Share Your Feedback</a>
+            </div>
 
-        <div class="footer">
-            <p>If you have any concerns or need to contact us directly, please reply to this email or call us.</p>
-            <p><strong>Renzman Spa</strong><br>
-            Premium Spa Services<br>
-            Thank you for being our valued client!</p>
+            <p class="meta">It only takes a minute, and your honest review means the world to us!</p>
+
+            <div class="footer">
+                <p>If you have any concerns or need to contact us directly, please reply to this email or call us.</p>
+                <p><strong>Renzman Spa</strong><br>Premium Spa Services</p>
+            </div>
         </div>
     </div>
 </body>

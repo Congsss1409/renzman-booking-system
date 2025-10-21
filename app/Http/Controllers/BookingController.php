@@ -182,15 +182,18 @@ class BookingController extends Controller
             'price' => $finalPrice, // Use the calculated final price
             'status' => 'Pending Verification',
             'verification_code' => rand(100000, 999999),
-            'verification_expires_at' => Carbon::now()->addMinutes(10),
+            // Set verification code TTL to 2 minutes to match UI/email
+            'verification_expires_at' => Carbon::now()->addMinutes(2),
         ]);
 
         try {
             Mail::to($booking->client_email)->send(new BookingVerificationMail($booking));
         } catch (\Exception $e) {
             Log::error("Verification email failed for booking ID {$booking->id}: " . $e->getMessage());
-            $booking->delete();
-            return redirect()->route('booking.create.step-four')->with('error', 'Could not send verification email. Please check the address and try again.');
+            // Do NOT delete the booking on email failure; allow the user to proceed to verification
+            // and attempt resend from the next page. Store booking id in session and proceed.
+            $request->session()->put('booking_id_for_verification', $booking->id);
+            return redirect()->route('booking.create.step-five')->with('error', 'Could not send verification email. You can still proceed to verification and request a new code.');
         }
         
         $request->session()->forget('booking');
@@ -212,13 +215,25 @@ class BookingController extends Controller
     public function storeStepFive(Request $request)
     {
         $validated = $request->validate([ 'verification_code' => 'required|string|digits:6', ]);
-        $bookingId = $request->session()->get('booking_id_for_verification');
+
+        // Prefer session-stored booking id but allow a hidden input fallback (helps when redirects clear session)
+        $bookingId = $request->session()->get('booking_id_for_verification') ?? $request->input('booking_id');
         if (!$bookingId) {
             return redirect()->route('booking.create.step-one')->with('error', 'Your session has expired. Please start again.');
         }
-        $booking = Booking::findOrFail($bookingId);
-        if ($booking->verification_code !== $validated['verification_code'] || Carbon::now()->gt($booking->verification_expires_at)) {
-            return back()->with('error', 'Invalid or expired verification code. Please try again.');
+
+        $booking = Booking::find($bookingId);
+        if (!$booking) {
+            return redirect()->route('booking.create.step-one')->with('error', 'Booking not found. Please start again.');
+        }
+
+        // Check code and expiry
+        if ($booking->verification_code !== $validated['verification_code']) {
+            return back()->withErrors(['verification_code' => 'Invalid verification code.'])->withInput();
+        }
+
+        if (Carbon::now()->gt($booking->verification_expires_at)) {
+            return back()->withErrors(['verification_code' => 'Expired verification code. Please request a new one.'])->withInput();
         }
         $booking->update([
             'status' => 'Confirmed', 'verification_code' => null, 'verification_expires_at' => null,
@@ -229,7 +244,50 @@ class BookingController extends Controller
             Log::error("Confirmation email failed for booking ID {$booking->id}: " . $e->getMessage());
         }
         $request->session()->forget('booking_id_for_verification');
-        return redirect()->route('booking.success')->with('booking_id', $booking->id);
+        // store booking_id for success page
+        $request->session()->put('booking_id', $booking->id);
+        return redirect()->route('booking.success');
+    }
+
+    /**
+     * Resend verification code for a pending booking.
+     */
+    public function resendCode(Request $request)
+    {
+        // allow booking_id via session or hidden input
+        $bookingId = $request->session()->get('booking_id_for_verification') ?? $request->input('booking_id');
+        if (!$bookingId) {
+            return redirect()->route('booking.create.step-one')->with('error', 'Your session has expired. Please start again.');
+        }
+
+        $booking = Booking::find($bookingId);
+        if (!$booking) {
+            return redirect()->route('booking.create.step-one')->with('error', 'Booking not found.');
+        }
+
+        // Only allow resending if booking is still pending verification
+        if ($booking->status !== 'Pending Verification') {
+            return redirect()->route('booking.create.step-five')->with('error', 'Booking is not pending verification.');
+        }
+
+        // Generate new code and expiry
+        $booking->verification_code = rand(100000, 999999);
+        $booking->verification_expires_at = Carbon::now()->addMinutes(2);
+        $booking->save();
+
+        try {
+            Mail::to($booking->client_email)->send(new BookingVerificationMail($booking));
+            if ($request->wantsJson() || $request->ajax()) {
+                return response()->json(['success' => true, 'expires_at' => $booking->verification_expires_at->toIso8601String()]);
+            }
+            return redirect()->route('booking.create.step-five')->with('success', 'A new verification code has been sent.');
+        } catch (\Exception $e) {
+            Log::error("Failed to resend verification email for booking {$booking->id}: " . $e->getMessage());
+            if ($request->wantsJson() || $request->ajax()) {
+                return response()->json(['success' => false, 'message' => 'Failed to resend verification email. Please try again later.'], 500);
+            }
+            return redirect()->route('booking.create.step-five')->with('error', 'Failed to resend verification email. Please try again later.');
+        }
     }
 
     public function success(Request $request)
@@ -237,6 +295,12 @@ class BookingController extends Controller
         $bookingId = $request->session()->get('booking_id');
         if(!$bookingId) return redirect()->route('landing');
         $booking = Booking::findOrFail($bookingId);
+        // Ensure confirmation email is sent (idempotent if already sent)
+        try {
+            Mail::to($booking->client_email)->send(new BookingConfirmed($booking));
+        } catch (\Exception $e) {
+            Log::error("Failed to send booking confirmation for booking {$booking->id}: " . $e->getMessage());
+        }
         return view('booking.success', compact('booking'));
     }
 

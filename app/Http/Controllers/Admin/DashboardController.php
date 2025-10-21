@@ -326,7 +326,7 @@ class DashboardController extends Controller
         $validator = Validator::make($request->all(), [
             'client_name' => 'required|string|max:255',
             'client_phone' => 'required|digits:11',
-            'client_email' => 'nullable|email|max:255',
+            'client_email' => 'required|email|max:255',
             'branch_id' => 'required|exists:branches,id',
             'service_id' => 'required|exists:services,id',
             'therapist_id' => 'required|exists:therapists,id',

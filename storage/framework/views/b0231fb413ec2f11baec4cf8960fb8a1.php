@@ -1,8 +1,6 @@
-@extends('layouts.Booking')
+<?php $__env->startSection('title', 'Step 5: Verify Your Booking'); ?>
 
-@section('title', 'Step 5: Verify Your Booking')
-
-@section('content')
+<?php $__env->startSection('content'); ?>
 <div class="glass-panel rounded-3xl max-w-6xl mx-auto overflow-hidden shadow-2xl">
     <div class="grid md:grid-cols-2">
         
@@ -33,33 +31,40 @@
 
             <div class="text-left mb-8">
                 <h1 class="text-3xl md:text-4xl font-bold text-black">Enter Verification Code</h1>
-                @php
+                <?php
                     $expiresAt = $booking->verification_expires_at ?? \Carbon\Carbon::now()->addMinutes(2);
-                @endphp
-                <p class="mt-2 text-lg text-black">A code has been sent to {{ $booking->client_email }}. <span id="countdown" class="text-sm text-gray-800 ml-2">(02:00)</span></p>
-                <input type="hidden" id="expiresAt" value="{{ \Carbon\Carbon::parse($expiresAt)->toIso8601String() }}">
+                ?>
+                <p class="mt-2 text-lg text-black">A code has been sent to <?php echo e($booking->client_email); ?>. <span id="countdown" class="text-sm text-gray-800 ml-2">(02:00)</span></p>
+                <input type="hidden" id="expiresAt" value="<?php echo e(\Carbon\Carbon::parse($expiresAt)->toIso8601String()); ?>">
                 <div id="resendStatus" class="mt-2"></div>
             </div>
 
-            @if (session('error'))
+            <?php if(session('error')): ?>
                 <div class="mb-4 bg-red-500/30 border border-red-400 text-black px-4 py-3 rounded-lg relative" role="alert">
-                    <span class="block sm:inline">{{ session('error') }}</span>
+                    <span class="block sm:inline"><?php echo e(session('error')); ?></span>
                 </div>
-            @endif
-            @if (session('success'))
+            <?php endif; ?>
+            <?php if(session('success')): ?>
                 <div class="mb-4 bg-green-200 border border-green-300 text-black px-4 py-3 rounded-lg relative" role="alert">
-                    <span class="block sm:inline">{{ session('success') }}</span>
+                    <span class="block sm:inline"><?php echo e(session('success')); ?></span>
                 </div>
-            @endif
-             @error('verification_code')
+            <?php endif; ?>
+             <?php $__errorArgs = ['verification_code'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
                 <div class="mb-4 bg-red-500/30 border border-red-400 text-black px-4 py-3 rounded-lg relative" role="alert">
-                    <span class="block sm:inline">{{ $message }}</span>
+                    <span class="block sm:inline"><?php echo e($message); ?></span>
                 </div>
-            @enderror
+            <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
 
-            <form action="{{ route('booking.store.step-five') }}" method="POST">
-                @csrf
-                <input type="hidden" name="booking_id" value="{{ $booking->id }}">
+            <form action="<?php echo e(route('booking.store.step-five')); ?>" method="POST">
+                <?php echo csrf_field(); ?>
+                <input type="hidden" name="booking_id" value="<?php echo e($booking->id); ?>">
                 <div class="space-y-6 text-black">
                     <div>
                         <label for="verification_code" class="block text-lg font-semibold mb-2 text-black">6-Digit Code</label>
@@ -70,7 +75,7 @@
                 </div>
 
                 <div class="mt-10 flex justify-between">
-                    <a href="{{ route('booking.create.step-four') }}" class="bg-white/20 text-white font-bold py-3 px-10 rounded-full shadow-md hover:bg-white/30 transition-all transform hover:scale-105">
+                    <a href="<?php echo e(route('booking.create.step-four')); ?>" class="bg-white/20 text-white font-bold py-3 px-10 rounded-full shadow-md hover:bg-white/30 transition-all transform hover:scale-105">
                         &larr; Back
                     </a>
                     <div class="flex items-center gap-4">
@@ -101,14 +106,14 @@
             resendButton.addEventListener('click', function(){
                 resendButton.disabled = true;
                 showStatus('Sending new code...', 'info');
-                fetch("{{ route('booking.resend-code') }}", {
+                fetch("<?php echo e(route('booking.resend-code')); ?>", {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'X-CSRF-TOKEN': '<?php echo e(csrf_token()); ?>',
                         'Accept': 'application/json'
                     },
-                    body: JSON.stringify({ booking_id: '{{ $booking->id }}' })
+                    body: JSON.stringify({ booking_id: '<?php echo e($booking->id); ?>' })
                 }).then(res => res.json()).then(data => {
                     if (data.success) {
                         // update expiry and reset timer
@@ -150,7 +155,7 @@
         update();
         const timer = setInterval(update, 1000);
         // Prevent form submission if expired (extra guard)
-        const form = document.querySelector('form[action="{{ route('booking.store.step-five') }}"]');
+        const form = document.querySelector('form[action="<?php echo e(route('booking.store.step-five')); ?>"]');
         if (form) {
             form.addEventListener('submit', function(e){
                 const now = new Date();
@@ -162,4 +167,5 @@
         }
     })();
 </script>
-@endsection
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('layouts.Booking', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\Users\Vincen Basa\Desktop\renzman-booking-system\resources\views/booking/step-five.blade.php ENDPATH**/ ?>

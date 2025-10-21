@@ -54,8 +54,9 @@ class TwoFactorController extends Controller
         $user = \App\Models\User::find($userId);
         if (!$user) return redirect()->route('login')->withErrors(['email' => 'User not found.']);
 
-        $code = random_int(100000, 999999);
-        Cache::put('2fa_code_' . $userId, $code, now()->addMinutes(10));
+    $code = random_int(100000, 999999);
+    // Set 2FA code TTL to 2 minutes to match UI/email
+    Cache::put('2fa_code_' . $userId, $code, now()->addMinutes(2));
 
         try {
             Mail::to($user->email)->send(new TwoFactorCodeMail($code));

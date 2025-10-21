@@ -59,23 +59,24 @@
 <body>
     <div class="container">
         <div class="header">
-            <img src="{{ $message->embed(public_path('images/logo trans.png')) }}" alt="Renzman Logo">
+            <img src="<?php echo e($message->embed(public_path('images/logo trans.png'))); ?>" alt="Renzman Logo">
             <h1>Confirm Your Booking</h1>
         </div>
         <div class="content">
-            <p>Hello {{ $booking->client_name }},</p>
+            <p>Hello <?php echo e($booking->client_name); ?>,</p>
             <p>Thank you for choosing Renzman! To secure your appointment, please use the following verification code. This code is valid for 2 minutes.</p>
             
             <div class="code-container">
-                <span class="code">{{ $booking->verification_code }}</span>
+                <span class="code"><?php echo e($booking->verification_code); ?></span>
             </div>
 
             <p>If you did not request this booking, you can safely ignore this email.</p>
             <p>Thank you,<br>The Renzman Team</p>
         </div>
         <div class="footer">
-            <p>&copy; {{ date('Y') }} Renzman. All rights reserved.</p>
+            <p>&copy; <?php echo e(date('Y')); ?> Renzman. All rights reserved.</p>
         </div>
     </div>
 </body>
 </html>
+<?php /**PATH C:\Users\Vincen Basa\Desktop\renzman-booking-system\resources\views/emails/booking-verification.blade.php ENDPATH**/ ?>

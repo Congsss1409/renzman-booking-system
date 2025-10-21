@@ -106,7 +106,7 @@
                         <div class="flex justify-end space-x-3">
                             <button type="button" @click="showPrivacyModal = false" class="px-4 py-2 rounded-full bg-gray-200 hover:bg-gray-300">Cancel</button>
                             <button type="button" :disabled="!agreed" @click="$refs.bookingForm.submit()" :class="agreed ? 'bg-teal-600 text-white hover:bg-teal-700' : 'bg-gray-300 text-gray-600 cursor-not-allowed'" class="px-4 py-2 rounded-full font-bold">
-                                I Agree
+                                Continue
                             </button>
                         </div>
                     </div>

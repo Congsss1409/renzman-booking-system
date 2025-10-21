@@ -1,6 +1,4 @@
-@extends('layouts.app')
-
-@section('content')
+<?php $__env->startSection('content'); ?>
 <div class="min-h-screen flex items-center justify-center p-8 bg-gray-100">
     <div class="w-full max-w-xl">
         <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
@@ -19,25 +17,25 @@
                     </div>
                 </div>
 
-                @if(session('status'))
-                    <div class="mt-4 rounded-md bg-green-50 border border-green-100 p-3 text-green-700">{{ session('status') }}</div>
-                @endif
+                <?php if(session('status')): ?>
+                    <div class="mt-4 rounded-md bg-green-50 border border-green-100 p-3 text-green-700"><?php echo e(session('status')); ?></div>
+                <?php endif; ?>
 
-                @if($errors->any())
+                <?php if($errors->any()): ?>
                     <div class="mt-4 rounded-md bg-red-50 border border-red-100 p-3 text-red-700">
                         <ul class="list-disc pl-5 text-sm">
-                            @foreach($errors->all() as $error)
-                                <li>{{ $error }}</li>
-                            @endforeach
+                            <?php $__currentLoopData = $errors->all(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $error): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                <li><?php echo e($error); ?></li>
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                         </ul>
                     </div>
-                @endif
+                <?php endif; ?>
 
-                <form method="POST" action="{{ route('2fa.verify') }}" class="mt-6 grid gap-4" id="verify-form">
-                    @csrf
+                <form method="POST" action="<?php echo e(route('2fa.verify')); ?>" class="mt-6 grid gap-4" id="verify-form">
+                    <?php echo csrf_field(); ?>
                     <div>
                         <label for="code" class="block text-sm font-medium text-gray-700">Verification code</label>
-                        <input id="code" name="code" inputmode="numeric" pattern="[0-9]*" maxlength="6" value="{{ old('code') }}" required autofocus
+                        <input id="code" name="code" inputmode="numeric" pattern="[0-9]*" maxlength="6" value="<?php echo e(old('code')); ?>" required autofocus
                             class="mt-1 block w-full px-4 py-3 border border-gray-200 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-300 shadow-sm focus:shadow-md transition-shadow duration-150" placeholder="123456">
                     </div>
 
@@ -50,10 +48,10 @@
                     </div>
                 </form>
 
-                <form id="resend-form" method="POST" action="{{ route('2fa.resend') }}" style="display:none;">@csrf</form>
+                <form id="resend-form" method="POST" action="<?php echo e(route('2fa.resend')); ?>" style="display:none;"><?php echo csrf_field(); ?></form>
 
                 <div class="mt-6 text-sm text-gray-600 text-center">
-                    <a href="{{ route('login') }}" class="text-teal-600 hover:underline">Back to login</a>
+                    <a href="<?php echo e(route('login')); ?>" class="text-teal-600 hover:underline">Back to login</a>
                 </div>
             </div>
         </div>
@@ -139,4 +137,6 @@
     </script>
 </div>
 
-@endsection
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\Users\Vincen Basa\Desktop\renzman-booking-system\resources\views/auth/2fa.blade.php ENDPATH**/ ?>

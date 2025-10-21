@@ -1,11 +1,9 @@
-@extends('layouts.admin')
+<?php $__env->startSection('title', 'Admin Dashboard'); ?>
 
-@section('title', 'Admin Dashboard')
-
-@section('content')
+<?php $__env->startSection('content'); ?>
 
 <div class="space-y-8">
-    {{-- Smooth scrolling for modal and overflow containers --}}
+    
     <style>
         html, body { scroll-behavior: smooth; }
         .smooth-scroll { scroll-behavior: smooth; -webkit-overflow-scrolling: touch; }
@@ -30,31 +28,31 @@
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-6">
         <div class="bg-gradient-to-br from-teal-400 to-cyan-600 text-white p-6 rounded-2xl shadow-xl transform hover:-translate-y-1 transition-all duration-300">
             <div class="flex justify-between items-start"><h4 class="text-lg font-semibold">Today's Bookings</h4><svg class="w-8 h-8 opacity-80" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg></div>
-            <p class="text-6xl font-bold mt-4">{{ $todaysBookings }}</p>
+            <p class="text-6xl font-bold mt-4"><?php echo e($todaysBookings); ?></p>
         </div>
         <div class="bg-gradient-to-br from-teal-400 to-cyan-600 text-white p-6 rounded-2xl shadow-xl transform hover:-translate-y-1 transition-all duration-300">
             <div class="flex justify-between items-start"><h4 class="text-lg font-semibold">Total Bookings</h4><svg class="w-8 h-8 opacity-80" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg></div>
-            <p class="text-6xl font-bold mt-4">{{ $totalBookings }}</p>
+            <p class="text-6xl font-bold mt-4"><?php echo e($totalBookings); ?></p>
         </div>
         <div 
             class="bg-gradient-to-br from-teal-400 to-cyan-600 text-white p-6 rounded-2xl shadow-xl transform hover:-translate-y-1 transition-all duration-300 cursor-pointer hover:shadow-2xl"
             x-data 
             @click="$dispatch('open-modal', 'revenue-modal')">
             <div class="flex justify-between items-start"><h4 class="text-lg font-semibold">Total Revenue</h4><svg class="w-8 h-8 opacity-80" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v.01M12 6v-1m0-1V4m0 2.01M12 18v-1m0-1v-1m0 2v1m0 1v1M4 6h16M4 10h16M4 14h16M4 18h16"></path></svg></div>
-            <p class="text-5xl font-bold mt-4">₱{{ number_format($totalRevenue, 2) }}</p>
+            <p class="text-5xl font-bold mt-4">₱<?php echo e(number_format($totalRevenue, 2)); ?></p>
             <div class="mt-2 text-sm opacity-75">Click to view details</div>
         </div>
         <div class="bg-gradient-to-br from-teal-400 to-cyan-600 text-white p-6 rounded-2xl shadow-xl transform hover:-translate-y-1 transition-all duration-300">
             <div class="flex justify-between items-start"><h4 class="text-lg font-semibold">Average Rating</h4><svg class="w-8 h-8 opacity-80" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg></div>
-            <p class="text-5xl font-bold mt-4">{{ number_format($averageRating, 2) }} <span class="text-yellow-300">★</span></p>
+            <p class="text-5xl font-bold mt-4"><?php echo e(number_format($averageRating, 2)); ?> <span class="text-yellow-300">★</span></p>
         </div>
         <div class="bg-gradient-to-br from-green-200 to-green-400 text-green-900 p-6 rounded-2xl shadow-xl transform hover:-translate-y-1 transition-all duration-300">
             <div class="flex justify-between items-start"><h4 class="text-lg font-semibold">Completed Bookings</h4><svg class="w-8 h-8 opacity-80" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg></div>
-            <p class="text-5xl font-bold mt-4">{{ $totalCompleted }}</p>
+            <p class="text-5xl font-bold mt-4"><?php echo e($totalCompleted); ?></p>
         </div>
         <div class="bg-gradient-to-br from-red-200 to-red-400 text-red-900 p-6 rounded-2xl shadow-xl transform hover:-translate-y-1 transition-all duration-300">
             <div class="flex justify-between items-start"><h4 class="text-lg font-semibold">Cancellations</h4><svg class="w-8 h-8 opacity-80" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></div>
-            <p class="text-5xl font-bold mt-4">{{ $totalCancellations }}</p>
+            <p class="text-5xl font-bold mt-4"><?php echo e($totalCancellations); ?></p>
         </div>
     </div>
 
@@ -66,8 +64,8 @@
         <div class="lg:col-span-2 bg-white p-6 rounded-2xl shadow-lg">
             <div class="flex flex-col sm:flex-row justify-between items-center mb-4 gap-4">
                 <h2 class="text-2xl font-bold text-gray-800">All Bookings</h2>
-                <form action="{{ route('admin.dashboard') }}" method="GET" class="flex items-center">
-                    <input type="text" name="search" placeholder="Search bookings..." value="{{ request('search') }}" class="w-full sm:w-64 p-2 border border-gray-300 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-teal-500">
+                <form action="<?php echo e(route('admin.dashboard')); ?>" method="GET" class="flex items-center">
+                    <input type="text" name="search" placeholder="Search bookings..." value="<?php echo e(request('search')); ?>" class="w-full sm:w-64 p-2 border border-gray-300 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-teal-500">
                     <button type="submit" class="bg-teal-500 text-white p-2 rounded-r-lg hover:bg-teal-600"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg></button>
                 </form>
             </div>
@@ -76,50 +74,50 @@
                 <table class="w-full text-sm text-left text-gray-500">
                     <thead class="text-xs text-gray-700 uppercase bg-gray-50">
                         <tr>
-                            @php $sort_by = request('sort_by', 'start_time'); $sort_order = request('sort_order', 'desc'); @endphp
-                            <th scope="col" class="px-4 py-3"><a href="{{ route('admin.dashboard', ['sort_by' => 'client_name', 'sort_order' => ($sort_by == 'client_name' && $sort_order == 'asc') ? 'desc' : 'asc', 'search' => request('search')]) }}" class="flex items-center gap-1">Client @if($sort_by == 'client_name')<span class="text-teal-500">{{ $sort_order == 'asc' ? '▲' : '▼' }}</span>@endif</a></th>
+                            <?php $sort_by = request('sort_by', 'start_time'); $sort_order = request('sort_order', 'desc'); ?>
+                            <th scope="col" class="px-4 py-3"><a href="<?php echo e(route('admin.dashboard', ['sort_by' => 'client_name', 'sort_order' => ($sort_by == 'client_name' && $sort_order == 'asc') ? 'desc' : 'asc', 'search' => request('search')])); ?>" class="flex items-center gap-1">Client <?php if($sort_by == 'client_name'): ?><span class="text-teal-500"><?php echo e($sort_order == 'asc' ? '▲' : '▼'); ?></span><?php endif; ?></a></th>
                             <th scope="col" class="px-4 py-3">Details</th>
-                            <th scope="col" class="px-4 py-3"><a href="{{ route('admin.dashboard', ['sort_by' => 'start_time', 'sort_order' => ($sort_by == 'start_time' && $sort_order == 'asc') ? 'desc' : 'asc', 'search' => request('search')]) }}" class="flex items-center gap-1">Schedule @if($sort_by == 'start_time')<span class="text-teal-500">{{ $sort_order == 'asc' ? '▲' : '▼' }}</span>@endif</a></th>
-                            <th scope="col" class="px-4 py-3"><a href="{{ route('admin.dashboard', ['sort_by' => 'created_at', 'sort_order' => ($sort_by == 'created_at' && $sort_order == 'asc') ? 'desc' : 'asc', 'search' => request('search')]) }}" class="flex items-center gap-1">Created @if($sort_by == 'created_at')<span class="text-teal-500">{{ $sort_order == 'asc' ? '▲' : '▼' }}</span>@endif</a></th>
-                            <th scope="col" class="px-4 py-3"><a href="{{ route('admin.dashboard', ['sort_by' => 'status', 'sort_order' => ($sort_by == 'status' && $sort_order == 'asc') ? 'desc' : 'asc', 'search' => request('search')]) }}" class="flex items-center gap-1">Status @if($sort_by == 'status')<span class="text-teal-500">{{ $sort_order == 'asc' ? '▲' : '▼' }}</span>@endif</a></th>
+                            <th scope="col" class="px-4 py-3"><a href="<?php echo e(route('admin.dashboard', ['sort_by' => 'start_time', 'sort_order' => ($sort_by == 'start_time' && $sort_order == 'asc') ? 'desc' : 'asc', 'search' => request('search')])); ?>" class="flex items-center gap-1">Schedule <?php if($sort_by == 'start_time'): ?><span class="text-teal-500"><?php echo e($sort_order == 'asc' ? '▲' : '▼'); ?></span><?php endif; ?></a></th>
+                            <th scope="col" class="px-4 py-3"><a href="<?php echo e(route('admin.dashboard', ['sort_by' => 'created_at', 'sort_order' => ($sort_by == 'created_at' && $sort_order == 'asc') ? 'desc' : 'asc', 'search' => request('search')])); ?>" class="flex items-center gap-1">Created <?php if($sort_by == 'created_at'): ?><span class="text-teal-500"><?php echo e($sort_order == 'asc' ? '▲' : '▼'); ?></span><?php endif; ?></a></th>
+                            <th scope="col" class="px-4 py-3"><a href="<?php echo e(route('admin.dashboard', ['sort_by' => 'status', 'sort_order' => ($sort_by == 'status' && $sort_order == 'asc') ? 'desc' : 'asc', 'search' => request('search')])); ?>" class="flex items-center gap-1">Status <?php if($sort_by == 'status'): ?><span class="text-teal-500"><?php echo e($sort_order == 'asc' ? '▲' : '▼'); ?></span><?php endif; ?></a></th>
                             <th scope="col" class="px-4 py-3">Action</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @forelse($bookings as $booking)
+                        <?php $__empty_1 = true; $__currentLoopData = $bookings; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $booking): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                             <tr class="bg-white border-b hover:bg-gray-50">
                                 <td class="px-4 py-4">
-                                    <p class="font-medium text-gray-900">{{ $booking->client_name }}</p>
-                                    <p class="text-xs text-gray-500">{{ $booking->client_phone }}</p>
+                                    <p class="font-medium text-gray-900"><?php echo e($booking->client_name); ?></p>
+                                    <p class="text-xs text-gray-500"><?php echo e($booking->client_phone); ?></p>
                                 </td>
                                 <td class="px-4 py-4">
-                                    <p class="font-semibold text-xs">{{ $booking->service->name ?? 'N/A' }}</p>
-                                    <p class="text-xs text-gray-500">{{ $booking->therapist->name ?? 'N/A' }} at {{ $booking->branch->name ?? 'N/A' }}</p>
-                                    <p class="font-bold text-xs text-teal-600">₱{{ number_format($booking->price, 2) }}</p>
+                                    <p class="font-semibold text-xs"><?php echo e($booking->service->name ?? 'N/A'); ?></p>
+                                    <p class="text-xs text-gray-500"><?php echo e($booking->therapist->name ?? 'N/A'); ?> at <?php echo e($booking->branch->name ?? 'N/A'); ?></p>
+                                    <p class="font-bold text-xs text-teal-600">₱<?php echo e(number_format($booking->price, 2)); ?></p>
                                 </td>
-                                <td class="px-4 py-4"><p class="text-xs">{{ $booking->start_time->format('M d, Y') }}</p><p class="text-xs text-gray-500">{{ $booking->start_time->format('g:i A') }}</p></td>
+                                <td class="px-4 py-4"><p class="text-xs"><?php echo e($booking->start_time->format('M d, Y')); ?></p><p class="text-xs text-gray-500"><?php echo e($booking->start_time->format('g:i A')); ?></p></td>
                                 <td class="px-4 py-4 text-xs text-gray-500">
-                                    <p>{{ $booking->created_at->format('M d, Y') }}</p>
-                                    <p class="text-gray-400">{{ $booking->created_at->format('g:i A') }}</p>
+                                    <p><?php echo e($booking->created_at->format('M d, Y')); ?></p>
+                                    <p class="text-gray-400"><?php echo e($booking->created_at->format('g:i A')); ?></p>
                                 </td>
-                                <td class="px-4 py-4"><span class="font-semibold text-xs px-3 py-1 rounded-full {{ $booking->status == 'Confirmed' ? 'bg-green-100 text-green-800' : ($booking->status == 'Cancelled' ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800') }}">{{ $booking->status }}</span></td>
+                                <td class="px-4 py-4"><span class="font-semibold text-xs px-3 py-1 rounded-full <?php echo e($booking->status == 'Confirmed' ? 'bg-green-100 text-green-800' : ($booking->status == 'Cancelled' ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800')); ?>"><?php echo e($booking->status); ?></span></td>
                                 <td class="px-4 py-4">
-                                    @if($booking->status !== 'Cancelled' && $booking->status !== 'Completed')
-                                    <form action="{{ route('admin.bookings.cancel', $booking) }}" method="POST" class="cancel-form">
-                                        @csrf
+                                    <?php if($booking->status !== 'Cancelled' && $booking->status !== 'Completed'): ?>
+                                    <form action="<?php echo e(route('admin.bookings.cancel', $booking)); ?>" method="POST" class="cancel-form">
+                                        <?php echo csrf_field(); ?>
                                         <button type="button" class="font-medium text-red-600 hover:underline text-xs cancel-button">Cancel</button>
                                     </form>
-                                    @endif
+                                    <?php endif; ?>
                                 </td>
                             </tr>
-                        @empty
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                             <tr><td colspan="6" class="text-center py-12 text-gray-500"><p class="font-bold text-lg">No bookings found.</p><p>Try adjusting your search or filter.</p></td></tr>
-                        @endforelse
+                        <?php endif; ?>
                     </tbody>
                 </table>
             </div>
 
-            <div class="mt-6">{{ $bookings->links() }}</div>
+            <div class="mt-6"><?php echo e($bookings->links()); ?></div>
 
         </div>
 
@@ -128,17 +126,17 @@
             <div class="bg-white p-6 rounded-2xl shadow-lg">
                 <h3 class="text-xl font-bold text-gray-800 mb-4">Top Services</h3>
                 <div class="space-y-4">
-                    @forelse($topServices as $service)
+                    <?php $__empty_1 = true; $__currentLoopData = $topServices; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $service): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                         <div class="flex items-center justify-between">
                             <div class="flex items-center gap-4">
-                                <img src="{{ $service->image_url ?? 'https://placehold.co/128x128/059669/FFFFFF?text=' . substr($service->name, 0, 1) }}" alt="{{ $service->name }}" class="w-12 h-12 rounded-full object-cover">
-                                <div><p class="font-bold text-gray-800">{{ $service->name }}</p></div>
+                                <img src="<?php echo e($service->image_url ?? 'https://placehold.co/128x128/059669/FFFFFF?text=' . substr($service->name, 0, 1)); ?>" alt="<?php echo e($service->name); ?>" class="w-12 h-12 rounded-full object-cover">
+                                <div><p class="font-bold text-gray-800"><?php echo e($service->name); ?></p></div>
                             </div>
-                            <div class="text-right"><p class="font-bold text-lg text-teal-500">{{ $service->bookings_count }}</p><p class="text-sm text-gray-500">Bookings</p></div>
+                            <div class="text-right"><p class="font-bold text-lg text-teal-500"><?php echo e($service->bookings_count); ?></p><p class="text-sm text-gray-500">Bookings</p></div>
                         </div>
-                    @empty
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                         <p class="text-center text-gray-500 py-4">No service data available.</p>
-                    @endforelse
+                    <?php endif; ?>
                 </div>
             </div>
             <div class="bg-white p-6 rounded-2xl shadow-lg flex justify-center items-center"><div class="w-full max-w-xs"><canvas id="topServicesChart"></canvas></div></div>
@@ -154,40 +152,40 @@
             <input type="text" id="therapist-search" placeholder="Search therapist or branch..." class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500" onkeyup="filterTherapists()">
         </div>
         <div class="space-y-8 max-h-[400px] overflow-y-auto pr-2" id="therapist-history-list">
-            @php $allTherapists = \App\Models\Therapist::with('branch')->orderBy('name')->get(); @endphp
-            @forelse($allTherapists as $therapist)
+            <?php $allTherapists = \App\Models\Therapist::with('branch')->orderBy('name')->get(); ?>
+            <?php $__empty_1 = true; $__currentLoopData = $allTherapists; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $therapist): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                 <div class="border-b pb-4 mb-4">
                     <div class="flex items-center gap-4 mb-2">
-                        <img src="{{ $therapist->image_url ?? 'https://ui-avatars.com/api/?name=' . urlencode($therapist->name) . '&color=FFFFFF&background=059669&size=128' }}" alt="{{ $therapist->name }}" class="w-10 h-10 rounded-full object-cover">
+                        <img src="<?php echo e($therapist->image_url ?? 'https://ui-avatars.com/api/?name=' . urlencode($therapist->name) . '&color=FFFFFF&background=059669&size=128'); ?>" alt="<?php echo e($therapist->name); ?>" class="w-10 h-10 rounded-full object-cover">
                         <div>
-                            <p class="font-bold text-gray-800 mb-0">{{ $therapist->name }}</p>
-                            <p class="text-xs text-gray-500 mb-0">{{ $therapist->branch->name ?? 'N/A' }}</p>
+                            <p class="font-bold text-gray-800 mb-0"><?php echo e($therapist->name); ?></p>
+                            <p class="text-xs text-gray-500 mb-0"><?php echo e($therapist->branch->name ?? 'N/A'); ?></p>
                         </div>
                     </div>
                     <div>
                         <p class="text-xs font-semibold text-gray-700 mb-1">Recent Bookings:</p>
-                        @php
+                        <?php
                             $recentBookings = \App\Models\Booking::where('therapist_id', $therapist->id)
                                 ->orderBy('start_time', 'desc')
                                 ->take(5)
                                 ->get();
-                        @endphp
-                        @if($recentBookings->count())
+                        ?>
+                        <?php if($recentBookings->count()): ?>
                             <ul class="text-xs text-gray-600">
-                                @foreach($recentBookings as $booking)
+                                <?php $__currentLoopData = $recentBookings; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $booking): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                     <li>
-                                        {{ $booking->start_time->format('M d, Y') }} - {{ $booking->client_name }} ({{ $booking->status }})
+                                        <?php echo e($booking->start_time->format('M d, Y')); ?> - <?php echo e($booking->client_name); ?> (<?php echo e($booking->status); ?>)
                                     </li>
-                                @endforeach
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                             </ul>
-                        @else
+                        <?php else: ?>
                             <span class="text-xs text-gray-400">No booking history</span>
-                        @endif
+                        <?php endif; ?>
                     </div>
                 </div>
-            @empty
+            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                 <p class="text-center text-gray-500 py-4">No therapist data available.</p>
-            @endforelse
+            <?php endif; ?>
         </div>
     </div>
     <script>
@@ -211,7 +209,7 @@
 </div>
 
 <!-- New Appointment Modal -->
-<div x-data="appointmentModal({{ json_encode($todayForJs) }})"
+<div x-data="appointmentModal(<?php echo e(json_encode($todayForJs)); ?>)"
     x-init="initCalendar()"
     x-show="show"
     x-on:open-modal.window="if ($event.detail === 'appointment-modal') show = true"
@@ -234,8 +232,8 @@
         </div>
 
     <div class="flex-grow overflow-y-auto pr-2 smooth-scroll">
-            <form id="appointmentForm" x-ref="appointmentForm" action="{{ route('admin.bookings.store') }}" method="POST">
-                @csrf
+            <form id="appointmentForm" x-ref="appointmentForm" action="<?php echo e(route('admin.bookings.store')); ?>" method="POST">
+                <?php echo csrf_field(); ?>
                 <!-- Hidden inputs to store selections -->
                 <input type="hidden" name="branch_id" :value="formData.branch_id">
                 <input type="hidden" name="service_id" :value="formData.service_id">
@@ -253,18 +251,18 @@
                             <label class="font-semibold text-gray-700">Branch</label>
                             <select name="branch_select" x-model="formData.branch_id" @change="fetchTherapists()" class="w-full mt-2 bg-stone-100 p-4 rounded-full border-none focus:ring-2 focus:ring-teal-400 outline-none">
                                 <option value="">Select Branch</option>
-                                @foreach($branches as $branch)
-                                <option value="{{ $branch->id }}">{{ $branch->name }}</option>
-                                @endforeach
+                                <?php $__currentLoopData = $branches; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $branch): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                <option value="<?php echo e($branch->id); ?>"><?php echo e($branch->name); ?></option>
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                             </select>
                         </div>
                         <div>
                             <label class="font-semibold text-gray-700">Service</label>
                             <select name="service_select" x-model="formData.service_id" class="w-full mt-2 bg-stone-100 p-4 rounded-full border-none focus:ring-2 focus:ring-teal-400 outline-none">
                                 <option value="">Select Service</option>
-                                @foreach($services as $service)
-                                <option value="{{ $service->id }}">{{ $service->name }} ({{ $service->duration }} mins)</option>
-                                @endforeach
+                                <?php $__currentLoopData = $services; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $service): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                <option value="<?php echo e($service->id); ?>"><?php echo e($service->name); ?> (<?php echo e($service->duration); ?> mins)</option>
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                             </select>
                         </div>
                     </div>
@@ -414,20 +412,20 @@
             <!-- Total Revenue Card -->
             <div class="bg-gradient-to-br from-teal-400 to-cyan-600 text-white p-6 rounded-2xl">
                 <h4 class="text-lg font-semibold mb-2">All Time Revenue</h4>
-                <p class="text-3xl font-bold">₱{{ number_format($totalRevenue, 2) }}</p>
+                <p class="text-3xl font-bold">₱<?php echo e(number_format($totalRevenue, 2)); ?></p>
             </div>
             
             <!-- Monthly Revenue Card -->
             <div class="bg-gradient-to-br from-blue-400 to-blue-600 text-white p-6 rounded-2xl">
                 <h4 class="text-lg font-semibold mb-2">Monthly Revenue</h4>
-                <p class="text-3xl font-bold">₱{{ number_format($monthlyRevenue, 2) }}</p>
-                <p class="text-sm opacity-80">{{ DateTime::createFromFormat('!m', $selectedMonth)->format('F') }} {{ $selectedYear }}</p>
+                <p class="text-3xl font-bold">₱<?php echo e(number_format($monthlyRevenue, 2)); ?></p>
+                <p class="text-sm opacity-80"><?php echo e(DateTime::createFromFormat('!m', $selectedMonth)->format('F')); ?> <?php echo e($selectedYear); ?></p>
             </div>
             
             <!-- Average per Booking -->
             <div class="bg-gradient-to-br from-green-400 to-green-600 text-white p-6 rounded-2xl">
                 <h4 class="text-lg font-semibold mb-2">Average per Booking</h4>
-                <p class="text-3xl font-bold">₱{{ number_format($totalRevenue > 0 && $totalBookings > 0 ? $totalRevenue / $totalBookings : 0, 2) }}</p>
+                <p class="text-3xl font-bold">₱<?php echo e(number_format($totalRevenue > 0 && $totalBookings > 0 ? $totalRevenue / $totalBookings : 0, 2)); ?></p>
                 <p class="text-sm opacity-80">Based on all bookings</p>
             </div>
         </div>
@@ -439,18 +437,18 @@
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">Month</label>
                     <select x-model="selectedMonth" class="border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-teal-500 focus:border-teal-500">
-                        @for ($m = 1; $m <= 12; $m++)
-                            <option value="{{ $m }}">{{ DateTime::createFromFormat('!m', $m)->format('F') }}</option>
-                        @endfor
+                        <?php for($m = 1; $m <= 12; $m++): ?>
+                            <option value="<?php echo e($m); ?>"><?php echo e(DateTime::createFromFormat('!m', $m)->format('F')); ?></option>
+                        <?php endfor; ?>
                     </select>
                 </div>
                 
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">Year</label>
                     <select x-model="selectedYear" class="border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-teal-500 focus:border-teal-500">
-                        @for ($y = now()->year; $y >= 2020; $y--)
-                            <option value="{{ $y }}">{{ $y }}</option>
-                        @endfor
+                        <?php for($y = now()->year; $y >= 2020; $y--): ?>
+                            <option value="<?php echo e($y); ?>"><?php echo e($y); ?></option>
+                        <?php endfor; ?>
                     </select>
                 </div>
                 
@@ -494,29 +492,29 @@
     </div>
 </div>
 
-@endsection
+<?php $__env->stopSection(); ?>
 
-@push('scripts')
+<?php $__env->startPush('scripts'); ?>
 <script>
 document.addEventListener('alpine:init', () => {
     Alpine.data('appointmentModal', (todayForJs) => {
-        const services = @json($services->mapWithKeys(fn($s) => [$s->id => ['name' => $s->name, 'price' => $s->price, 'duration' => $s->duration]]));
-        const branches = @json($branches->pluck('name', 'id'));
+        const services = <?php echo json_encode($services->mapWithKeys(fn($s) => [$s->id => ['name' => $s->name, 'price' => $s->price, 'duration' => $s->duration]])) ?>;
+        const branches = <?php echo json_encode($branches->pluck('name', 'id'), 512) ?>;
         const extensionPrice = 500;
 
         return {
-            show: {{ $errors->bookingCreation->any() ? 'true' : 'false' }},
+            show: <?php echo e($errors->bookingCreation->any() ? 'true' : 'false'); ?>,
             currentStep: 1,
             
             formData: {
-                branch_id: '{{ old('branch_id') }}',
-                service_id: '{{ old('service_id') }}',
-                therapist_id: '{{ old('therapist_id') }}',
-                booking_date: '{{ old('booking_date') }}',
-                booking_time: '{{ old('booking_time') }}',
-                client_name: '{{ old('client_name') }}',
-                client_phone: '{{ old('client_phone') }}',
-                client_email: '{{ old('client_email') }}',
+                branch_id: '<?php echo e(old('branch_id')); ?>',
+                service_id: '<?php echo e(old('service_id')); ?>',
+                therapist_id: '<?php echo e(old('therapist_id')); ?>',
+                booking_date: '<?php echo e(old('booking_date')); ?>',
+                booking_time: '<?php echo e(old('booking_time')); ?>',
+                client_name: '<?php echo e(old('client_name')); ?>',
+                client_phone: '<?php echo e(old('client_phone')); ?>',
+                client_email: '<?php echo e(old('client_email')); ?>',
             },
 
             availableTherapists: [], availableSlots: [],
@@ -661,8 +659,8 @@ document.addEventListener('alpine:init', () => {
     Alpine.data('revenueModal', () => {
         return {
             show: false,
-            selectedMonth: {{ $selectedMonth }},
-            selectedYear: {{ $selectedYear }},
+            selectedMonth: <?php echo e($selectedMonth); ?>,
+            selectedYear: <?php echo e($selectedYear); ?>,
             isLoading: false,
             
             openModal() { 
@@ -679,11 +677,11 @@ document.addEventListener('alpine:init', () => {
             },
             
             exportPDF() {
-                window.open(`{{ route('admin.revenue.export.pdf') }}?month=${this.selectedMonth}&year=${this.selectedYear}`, '_blank');
+                window.open(`<?php echo e(route('admin.revenue.export.pdf')); ?>?month=${this.selectedMonth}&year=${this.selectedYear}`, '_blank');
             },
             
             exportExcel() {
-                window.open(`{{ route('admin.revenue.export.excel') }}?month=${this.selectedMonth}&year=${this.selectedYear}`, '_blank');
+                window.open(`<?php echo e(route('admin.revenue.export.excel')); ?>?month=${this.selectedMonth}&year=${this.selectedYear}`, '_blank');
             }
         }
     });
@@ -692,7 +690,7 @@ document.addEventListener('alpine:init', () => {
 document.addEventListener('DOMContentLoaded', () => {
     Chart.defaults.font.family = "'Poppins', sans-serif"; Chart.defaults.color = '#64748b';
     const topServicesCtx = document.getElementById('topServicesChart')?.getContext('2d');
-    if (topServicesCtx) { new Chart(topServicesCtx, { type: 'doughnut', data: { labels: @json($topServicesLabels), datasets: [{ label: 'Bookings', data: @json($topServicesData), backgroundColor: ['#2dd4bf', '#22d3ee', '#60a5fa', '#a78bfa', '#f87171'], borderColor: '#FFFFFF', borderWidth: 4, }] }, options: { responsive: true, cutout: '70%', plugins: { legend: { position: 'bottom' }, title: { display: true, text: 'Top Services by Bookings', font: { size: 18, weight: '600' }, padding: { bottom: 20 } } } } }); }
+    if (topServicesCtx) { new Chart(topServicesCtx, { type: 'doughnut', data: { labels: <?php echo json_encode($topServicesLabels, 15, 512) ?>, datasets: [{ label: 'Bookings', data: <?php echo json_encode($topServicesData, 15, 512) ?>, backgroundColor: ['#2dd4bf', '#22d3ee', '#60a5fa', '#a78bfa', '#f87171'], borderColor: '#FFFFFF', borderWidth: 4, }] }, options: { responsive: true, cutout: '70%', plugins: { legend: { position: 'bottom' }, title: { display: true, text: 'Top Services by Bookings', font: { size: 18, weight: '600' }, padding: { bottom: 20 } } } } }); }
     
     const cancelButtons = document.querySelectorAll('.cancel-button');
     cancelButtons.forEach(button => {
@@ -726,7 +724,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 </script>
-@endpush
+<?php $__env->stopPush(); ?>
 
 
 
+
+<?php echo $__env->make('layouts.admin', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\Users\Vincen Basa\Desktop\renzman-booking-system\resources\views/admin/dashboard.blade.php ENDPATH**/ ?>

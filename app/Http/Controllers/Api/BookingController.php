@@ -23,7 +23,7 @@ class BookingController extends Controller
             'booking_date' => 'required|date_format:Y-m-d',
             'booking_time' => 'required|date_format:H:i',
             'client_name' => 'required|string|max:255',
-            'client_email' => 'nullable|email|max:255',
+            'client_email' => 'required|email|max:255',
             'client_phone' => 'required|digits:11',
             'extended_session' => 'boolean'
         ], [
