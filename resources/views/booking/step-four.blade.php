@@ -46,7 +46,7 @@
                 </div>
             @endif
 
-            <form action="{{ route('booking.store.step-four') }}" method="POST">
+            <form x-data="{ showPrivacyModal: false, agreed: false }" x-ref="bookingForm" action="{{ route('booking.store.step-four') }}" method="POST">
                 @csrf
                 <div class="space-y-6 text-black">
                     <div>
@@ -68,13 +68,50 @@
                     </div>
                 </div>
 
-                <div class="mt-10 flex justify-between">
+                    <div class="mt-10 flex justify-between">
                     <a href="{{ route('booking.create.step-three') }}" class="bg-white/20 text-white font-bold py-3 px-10 rounded-full shadow-md hover:bg-white/30 transition-all transform hover:scale-105">
                         &larr; Back
                     </a>
-                    <button type="submit" class="bg-white text-teal-600 font-bold py-3 px-10 rounded-full shadow-md hover:bg-cyan-100 transition-all transform hover:scale-105">
+                    <!-- Open privacy modal before submitting -->
+                    <button type="button" @click="showPrivacyModal = true" class="bg-white text-teal-600 font-bold py-3 px-10 rounded-full shadow-md hover:bg-cyan-100 transition-all transform hover:scale-105">
                         Next Step &rarr;
                     </button>
+                </div>
+
+                <!-- Privacy Policy Modal -->
+                <div x-cloak x-show="showPrivacyModal" x-transition class="fixed inset-0 z-50 flex items-center justify-center">
+                    <div class="absolute inset-0 bg-black/60" @click="showPrivacyModal = false"></div>
+                    <div class="relative bg-white text-black rounded-2xl max-w-3xl w-full mx-4 p-6 shadow-xl">
+                        <h3 class="text-2xl font-semibold mb-3">Privacy Policy</h3>
+                        <div class="max-h-72 overflow-y-auto text-sm leading-relaxed mb-4">
+                            <p class="mb-3 font-semibold">Your privacy is important to us.</p>
+                            <p class="mb-3">At Renzman Blind Massage, we are committed to protecting your personal information in accordance with the Data Privacy Act of 2012 (Republic Act No. 10173).</p>
+                            <p class="mb-3">As part of our booking process, we may collect certain personal details such as your full name, contact number, preferred schedule, and service request. This information helps us confirm your appointment, send reminders, and provide better service to you.</p>
+
+                            <p class="mb-2 font-semibold">We assure you that:</p>
+                            <ul class="list-disc list-inside mb-3">
+                                <li>The information you provide will be used only for scheduling, confirming, and managing your appointment.</li>
+                                <li>All personal data collected will be treated with strict confidentiality.</li>
+                                <li>Your data will not be shared, sold, or disclosed to any other individual, company, or third party without your consent.</li>
+                                <li>We store your information securely and take necessary measures to protect it from unauthorized access or misuse.</li>
+                                <li>You have the right to access, correct, or request deletion of your data at any time by contacting us through our official channels.</li>
+                            </ul>
+
+                            <p class="mb-3">By clicking “I Agree,” you are giving your voluntary consent for Renzman Blind Massage to collect, store, and process your personal information for legitimate business purposes only, specifically for handling your appointment and customer records.</p>
+                        </div>
+
+                        <div class="flex items-center space-x-3 mb-4">
+                            <input type="checkbox" id="agree" x-model="agreed" class="w-4 h-4" />
+                            <label for="agree" class="text-sm">I Agree</label>
+                        </div>
+
+                        <div class="flex justify-end space-x-3">
+                            <button type="button" @click="showPrivacyModal = false" class="px-4 py-2 rounded-full bg-gray-200 hover:bg-gray-300">Cancel</button>
+                            <button type="button" :disabled="!agreed" @click="$refs.bookingForm.submit()" :class="agreed ? 'bg-teal-600 text-white hover:bg-teal-700' : 'bg-gray-300 text-gray-600 cursor-not-allowed'" class="px-4 py-2 rounded-full font-bold">
+                                I Agree
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </form>
         </div>
