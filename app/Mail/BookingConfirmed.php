@@ -47,6 +47,9 @@ class BookingConfirmed extends Mailable
     {
         return new Content(
             view: 'emails.booking-confirmed',
+            with: [
+                'feedbackUrl' => route('feedback.create', $this->booking->feedback_token),
+            ],
         );
     }
 

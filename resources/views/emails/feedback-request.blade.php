@@ -5,29 +5,28 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Feedback Request - Renzman Spa</title>
     <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial; background:#f8fafc; margin:0; padding:20px; }
-        .email-wrapper { max-width:600px; margin:0 auto; }
-        .card { background:#ffffff; border-radius:10px; padding:28px; box-shadow:0 6px 18px rgba(15,23,42,0.06); }
-        .brand { text-align:center; margin-bottom:18px; }
-        .brand .logo { font-size:22px; font-weight:700; color:#0f766e; }
-        .brand .subtitle { color:#475569; font-size:13px; }
-        h2.title { color:#059669; text-align:center; margin:6px 0 18px; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial; background:#ffffff; margin:0; padding:0; }
+        .hero { background:#0f9488; color:#fff; padding:44px 20px; text-align:center; }
+        .hero img { max-width:120px; display:block; margin:0 auto 12px; }
+        .hero h1 { font-size:28px; margin:18px 0 0; font-weight:700; }
+        .content { background:#ffffff; padding:36px 20px; max-width:720px; margin:0 auto; }
+        .container { max-width:620px; margin:0 auto; }
         .meta { color:#374151; font-size:14px; }
         .booking-info { background:#f8fafc; padding:16px; border-radius:8px; margin:18px 0; border-left:4px solid #34d399; }
         .btn { display:inline-block; background:#10b981; color:white; padding:12px 22px; border-radius:8px; text-decoration:none; font-weight:600; }
-        .footer { text-align:center; color:#6b7280; font-size:13px; margin-top:20px; }
+        .footer { text-align:center; color:#94a3b8; font-size:13px; padding:24px 0; }
     </style>
 </head>
 <body>
-    <div class="email-wrapper">
-        <div class="card">
-            <div class="brand">
-                <div class="logo">RENZMAN SPA</div>
-                <div class="subtitle">Premium Spa Services</div>
-            </div>
+    <div class="hero">
+        @if(isset($message))
+            <img src="{{ $message->embed(public_path('images/logo trans.png')) }}" alt="Renzman Logo">
+        @endif
+        <h1>How was your experience?</h1>
+    </div>
 
-            <h2 class="title">How was your experience?</h2>
-
+    <div class="content">
+        <div class="container">
             <p class="meta">Hi {{ $booking->client_name }},</p>
 
             <p class="meta">Thank you for choosing Renzman Spa! We hope you enjoyed your recent {{ $booking->service->name ?? 'spa service' }} with {{ $booking->therapist->name ?? 'our therapist' }}.</p>
