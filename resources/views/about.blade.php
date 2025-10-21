@@ -33,7 +33,7 @@
     }
 </style>
 
-<div class="relative min-h-screen w-full bg-gradient-to-br from-cyan-500 via-teal-500 to-emerald-600 text-white overflow-x-hidden">
+<div class="relative min-h-screen w-full text-black overflow-x-hidden bg-cover bg-center bg-no-repeat" style="background-image: url('{{ asset('images/store4.jpg') }}');">
     
     <!-- Header Section -->
     <header x-data="{ open: false }" class="fixed top-0 left-0 right-0 z-50 p-2 sm:p-4">
@@ -73,7 +73,7 @@
             <div class="glass-panel rounded-3xl p-6 sm:p-8 md:p-12">
                 <div class="text-center max-w-4xl mx-auto">
                     <h1 class="text-3xl sm:text-4xl md:text-5xl font-bold">About Renzman</h1>
-                    <p class="mt-4 text-base sm:text-lg text-cyan-100">Your trusted partner in relaxation and wellness since our inception.</p>
+                    <p class="mt-4 text-base sm:text-lg text-black">Your trusted partner in relaxation and wellness since our inception.</p>
                 </div>
 
                 <div class="mt-12 sm:mt-16 grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center">
@@ -82,11 +82,11 @@
                     </div>
                     <div class="glass-panel rounded-2xl p-6 sm:p-8">
                         <h2 class="text-2xl sm:text-3xl font-bold">Our Mission</h2>
-                        <p class="mt-4 text-cyan-100 text-sm sm:text-base">
+                        <p class="mt-4 text-black text-sm sm:text-base">
                             At Renzman, our mission is to provide an accessible escape from the stresses of daily life. We believe in the power of touch and the importance of self-care. Our team of expert therapists is dedicated to delivering personalized treatments that not only soothe tired muscles but also restore balance to your mind and spirit.
                         </p>
                         <h2 class="text-2xl sm:text-3xl font-bold mt-6 sm:mt-8">Our Story</h2>
-                        <p class="mt-4 text-cyan-100 text-sm sm:text-base">
+                        <p class="mt-4 text-black text-sm sm:text-base">
                             Founded on the principles of quality, care, and community, Renzman started as a small, local massage parlor with a big dream: to make professional wellness services available to everyone. We've grown into a well-loved establishment with multiple branches, yet we've never lost the personal touch that defines us.
                         </p>
                     </div>
@@ -100,25 +100,25 @@
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center md:text-left">
                     <div>
                         <h3 class="font-bold text-lg">About Renzman</h3>
-                        <p class="text-sm text-cyan-200 mt-2">Providing top-quality relaxation and wellness services to help you find your peace and rejuvenate your body.</p>
+                        <p class="text-sm text-black mt-2">Providing top-quality relaxation and wellness services to help you find your peace and rejuvenate your body.</p>
                     </div>
                     <div>
-                        <h3 class="font-bold text-lg">Quick Links</h3>
-                        <ul class="mt-2 space-y-1 text-sm text-cyan-200">
-                           <li><a href="{{ route('landing') }}#services" class="hover:text-white">Services</a></li>
-                           <li><a href="{{ route('landing') }}#branches" class="hover:text-white">Branches</a></li>
-                           <li><a href="{{ route('about') }}" class="hover:text-white">About Us</a></li>
+                                <h3 class="font-bold text-lg">Quick Links</h3>
+                                <ul class="mt-2 space-y-1 text-sm text-black">
+                                    <li><a href="{{ route('landing') }}#services" class="hover:text-black">Services</a></li>
+                                    <li><a href="{{ route('landing') }}#branches" class="hover:text-black">Branches</a></li>
+                                    <li><a href="{{ route('about') }}" class="hover:text-black">About Us</a></li>
                         </ul>
                     </div>
                     <div>
                         <h3 class="font-bold text-lg">Contact Us</h3>
-                        <ul class="mt-2 space-y-1 text-sm text-cyan-200">
+                        <ul class="mt-2 space-y-1 text-sm text-black">
                             <li>Email: contact@renzman.com</li>
                             <li>Phone: (02) 8123-4567</li>
                         </ul>
                     </div>
                 </div>
-                <div class="border-t border-white/20 mt-8 pt-6 text-center text-sm text-cyan-200">
+                <div class="border-t border-white/20 mt-8 pt-6 text-center text-sm text-black">
                     <p>&copy; {{ date('Y') }} Renzman. All rights reserved.</p>
                 </div>
             </div>

@@ -22,7 +22,7 @@
 
         <div class="p-8 md:p-12">
             <div class="mb-8">
-                <div class="flex justify-between items-center text-sm font-semibold text-cyan-100 mb-2">
+                <div class="flex justify-between items-center text-sm font-semibold text-black mb-2">
                     <span class="text-black">Step 5/5: Verification</span>
                     <span class="text-black">100%</span>
                 </div>
