@@ -144,6 +144,68 @@ class DashboardController extends Controller
         ];
     }
 
+    private function aggregateOverallMetrics(): array
+    {
+        $result = Booking::selectRaw(<<<SQL
+                COUNT(*) as total_bookings,
+                SUM(CASE WHEN status = 'Completed' THEN price ELSE 0 END) as total_revenue,
+                SUM(CASE WHEN status = 'Completed' THEN price - COALESCE(cost, 0) ELSE 0 END) as total_profit,
+                SUM(CASE WHEN status = 'Completed' THEN 1 ELSE 0 END) as completed_count,
+                SUM(CASE WHEN status = 'Cancelled' THEN 1 ELSE 0 END) as cancelled_count,
+                SUM(CASE WHEN status = 'Pending' THEN 1 ELSE 0 END) as pending_count,
+                SUM(CASE WHEN status = 'Confirmed' THEN 1 ELSE 0 END) as confirmed_count,
+                SUM(CASE WHEN status = 'In Progress' THEN 1 ELSE 0 END) as in_progress_count,
+                AVG(rating) as average_rating
+            SQL)->first();
+
+        return [
+            'total_bookings' => (int) ($result->total_bookings ?? 0),
+            'total_revenue' => (float) ($result->total_revenue ?? 0),
+            'total_profit' => (float) ($result->total_profit ?? 0),
+            'completed_count' => (int) ($result->completed_count ?? 0),
+            'cancelled_count' => (int) ($result->cancelled_count ?? 0),
+            'pending_count' => (int) ($result->pending_count ?? 0),
+            'confirmed_count' => (int) ($result->confirmed_count ?? 0),
+            'in_progress_count' => (int) ($result->in_progress_count ?? 0),
+            'average_rating' => $result && $result->average_rating !== null
+                ? round((float) $result->average_rating, 2)
+                : null,
+        ];
+    }
+
+    private function aggregateRangeMetrics(Carbon $start, Carbon $end): array
+    {
+        $result = Booking::selectRaw(<<<SQL
+                COUNT(*) as total,
+                SUM(CASE WHEN status = 'Completed' THEN price ELSE 0 END) as revenue,
+                SUM(CASE WHEN status = 'Completed' THEN 1 ELSE 0 END) as completed,
+                SUM(CASE WHEN status = 'Cancelled' THEN 1 ELSE 0 END) as cancelled
+            SQL)
+            ->whereBetween('start_time', [$start, $end])
+            ->first();
+
+        return [
+            'total' => (int) ($result->total ?? 0),
+            'revenue' => (float) ($result->revenue ?? 0),
+            'completed' => (int) ($result->completed ?? 0),
+            'cancelled' => (int) ($result->cancelled ?? 0),
+        ];
+    }
+
+    private function getCachedDashboardMetrics(): array
+    {
+        return Cache::remember('dashboard:metrics', now()->addSeconds(60), function () {
+            $now = Carbon::now();
+
+            return [
+                'overall' => $this->aggregateOverallMetrics(),
+                'today' => $this->aggregateRangeMetrics($now->copy()->startOfDay(), $now->copy()->endOfDay()),
+                'week' => $this->aggregateRangeMetrics($now->copy()->startOfWeek(), $now->copy()->endOfWeek()),
+                'month' => $this->aggregateRangeMetrics($now->copy()->startOfMonth(), $now->copy()->endOfMonth()),
+            ];
+        });
+    }
+
     /**
      * Display the admin dashboard with statistics and booking management.
      */
@@ -179,46 +241,34 @@ class DashboardController extends Controller
             ->whereYear('start_time', $prevYear)
             ->sum('price');
 
-        $totalRevenue = Booking::where('status', 'Completed')->sum('price');
-        $totalProfit = Booking::where('status', 'Completed')->sum(DB::raw('price - COALESCE(cost,0)'));
-        $totalCancellations = Booking::where('status', 'Cancelled')->count();
-        $totalCompleted = Booking::where('status', 'Completed')->count();
-        
-        // Enhanced booking statistics
-        $todaysBookings = Booking::whereDate('start_time', Carbon::today())->count();
-        $todaysRevenue = Booking::whereDate('start_time', Carbon::today())
-            ->where('status', 'Completed')
-            ->sum('price');
-        $todaysCancellations = Booking::whereDate('start_time', Carbon::today())
-            ->where('status', 'Cancelled')
-            ->count();
-        $todaysCompleted = Booking::whereDate('start_time', Carbon::today())
-            ->where('status', 'Completed')
-            ->count();
-            
-        // Weekly statistics
-        $weekStart = Carbon::now()->startOfWeek();
-        $weekEnd = Carbon::now()->endOfWeek();
-        $weeklyBookings = Booking::whereBetween('start_time', [$weekStart, $weekEnd])->count();
-        $weeklyRevenue = Booking::whereBetween('start_time', [$weekStart, $weekEnd])
-            ->where('status', 'Completed')
-            ->sum('price');
-            
-        // Monthly statistics for current month
-        $monthStart = Carbon::now()->startOfMonth();
-        $monthEnd = Carbon::now()->endOfMonth();
-        $currentMonthBookings = Booking::whereBetween('start_time', [$monthStart, $monthEnd])->count();
-        $currentMonthRevenue = Booking::whereBetween('start_time', [$monthStart, $monthEnd])
-            ->where('status', 'Completed')
-            ->sum('price');
-            
-        // Status breakdown
+        $metrics = $this->getCachedDashboardMetrics();
+        $overall = $metrics['overall'];
+        $todayMetrics = $metrics['today'];
+        $weekMetrics = $metrics['week'];
+        $monthMetrics = $metrics['month'];
+
+        $totalRevenue = $overall['total_revenue'];
+        $totalProfit = $overall['total_profit'];
+        $totalCancellations = $overall['cancelled_count'];
+        $totalCompleted = $overall['completed_count'];
+
+        $todaysBookings = $todayMetrics['total'];
+        $todaysRevenue = $todayMetrics['revenue'];
+        $todaysCancellations = $todayMetrics['cancelled'];
+        $todaysCompleted = $todayMetrics['completed'];
+
+        $weeklyBookings = $weekMetrics['total'];
+        $weeklyRevenue = $weekMetrics['revenue'];
+
+        $currentMonthBookings = $monthMetrics['total'];
+        $currentMonthRevenue = $monthMetrics['revenue'];
+
         $statusCounts = [
-            'pending' => Booking::where('status', 'Pending')->count(),
-            'confirmed' => Booking::where('status', 'Confirmed')->count(),
-            'in_progress' => Booking::where('status', 'In Progress')->count(),
-            'completed' => Booking::where('status', 'Completed')->count(),
-            'cancelled' => Booking::where('status', 'Cancelled')->count(),
+            'pending' => $overall['pending_count'],
+            'confirmed' => $overall['confirmed_count'],
+            'in_progress' => $overall['in_progress_count'],
+            'completed' => $overall['completed_count'],
+            'cancelled' => $overall['cancelled_count'],
         ];
 
         $stats = [
@@ -244,7 +294,7 @@ class DashboardController extends Controller
             'currentMonthRevenue' => $currentMonthRevenue,
             
             // Total Statistics
-            'totalBookings' => Booking::count(),
+            'totalBookings' => $overall['total_bookings'],
             'totalRevenue' => $totalRevenue,
             'totalProfit' => $totalProfit,
             'totalCancellations' => $totalCancellations,
@@ -259,9 +309,13 @@ class DashboardController extends Controller
             'cancelledBookings' => $statusCounts['cancelled'],
             
             // Additional Metrics
-            'averageRating' => Booking::whereNotNull('rating')->avg('rating'),
-            'completionRate' => $totalCompleted > 0 ? round(($totalCompleted / Booking::count()) * 100, 1) : 0,
-            'cancellationRate' => $totalCancellations > 0 ? round(($totalCancellations / Booking::count()) * 100, 1) : 0,
+            'averageRating' => $overall['average_rating'],
+            'completionRate' => $overall['total_bookings'] > 0
+                ? round(($totalCompleted / $overall['total_bookings']) * 100, 1)
+                : 0,
+            'cancellationRate' => $overall['total_bookings'] > 0
+                ? round(($totalCancellations / $overall['total_bookings']) * 100, 1)
+                : 0,
             
             // Charts Data
             'topServices' => $topServices,

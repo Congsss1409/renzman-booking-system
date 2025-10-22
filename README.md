@@ -120,6 +120,13 @@ After copying, follow the XAMPP or Docker steps above and run `artisan migrate` 
 - `public/build` or built assets exist
 - Writable `storage/` and `bootstrap/cache`
 
+## 🕒 Automate scheduled tasks (Windows)
+
+1. Open Task Scheduler → Create Task → set it to run whether user is logged on or not.
+2. On the **Triggers** tab add a new trigger: Daily, repeat task every 1 minute, indefinitely.
+3. On the **Actions** tab add `C:\xampp\php\php.exe` as the program, set **Start in** to `C:\xampp\htdocs\renzman-booking-system`, and use `artisan schedule:run` as arguments.
+4. Save the task and run it once manually to verify; check `storage/logs/laravel.log` for scheduler output.
+
 ---
 
 ## 🧾 Payroll & PDF export notes

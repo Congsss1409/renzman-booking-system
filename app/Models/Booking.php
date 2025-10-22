@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 
 class Booking extends Model
@@ -62,6 +63,27 @@ class Booking extends Model
                 $booking->feedback_token = (string) Str::uuid();
             }
         });
+
+        static::created(function () {
+            static::flagDashboardRefresh();
+        });
+
+        static::updated(function () {
+            static::flagDashboardRefresh();
+        });
+
+        static::deleted(function () {
+            static::flagDashboardRefresh();
+        });
+    }
+
+    protected static function flagDashboardRefresh(): void
+    {
+        Cache::forget('dashboard:metrics');
+        Cache::put('dashboard:last-update', [
+            'id' => (string) Str::uuid(),
+            'timestamp' => now()->toIso8601String(),
+        ], now()->addDay());
     }
 
     /**

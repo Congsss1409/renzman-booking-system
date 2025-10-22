@@ -22,10 +22,12 @@ class Kernel extends ConsoleKernel
      * @param  \Illuminate\Console\Scheduling\Schedule  $schedule
      * @return void
      */
-    protected function schedule(Schedule $schedule)
+    protected function schedule(Schedule $schedule): void
     {
-        // This line tells Laravel to run our booking status update command every minute.
-        $schedule->command('bookings:update-status')->everyMinute();
+        $schedule
+            ->command('bookings:update-status')
+            ->everyFiveMinutes()
+            ->withoutOverlapping();
     }
 
     /**

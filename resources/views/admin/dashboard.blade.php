@@ -4,71 +4,75 @@
 
 @section('content')
 
-<div class="space-y-8">
+<div class="space-y-6 sm:space-y-8">
     {{-- Smooth scrolling for modal and overflow containers --}}
     <style>
         html, body { scroll-behavior: smooth; }
         .smooth-scroll { scroll-behavior: smooth; -webkit-overflow-scrolling: touch; }
+        #topServicesChart { width: 100% !important; height: 100% !important; }
     </style>
     <!-- Page Header -->
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-            <h1 class="text-4xl font-bold text-gray-800">Dashboard</h1>
+            <h1 class="text-3xl sm:text-4xl font-bold text-gray-800">Dashboard</h1>
             <p class="text-gray-500 mt-1">Welcome back, here's a summary of your activities.</p>
         </div>
         <button 
             type="button"
             x-data 
             @click.prevent="$dispatch('open-modal', 'appointment-modal')" 
-            class="font-semibold bg-gradient-to-r from-teal-400 to-cyan-600 hover:from-teal-500 hover:to-cyan-700 text-white py-3 px-6 rounded-full shadow-lg transition-transform transform hover:scale-105 whitespace-nowrap">
+            class="w-full sm:w-auto text-center font-semibold bg-gradient-to-r from-teal-400 to-cyan-600 hover:from-teal-500 hover:to-cyan-700 text-white py-3 px-6 rounded-full shadow-lg transition-transform transform hover:scale-105 sm:whitespace-nowrap">
             + NEW APPOINTMENT
         </button>
     </div>
 
     <!-- Revenue Analytics Filter removed -->
     <!-- Dashboard Stats Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-6">
-        <div class="bg-gradient-to-br from-teal-400 to-cyan-600 text-white p-6 rounded-2xl shadow-xl transform hover:-translate-y-1 transition-all duration-300">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-6 gap-6">
+    <div class="bg-gradient-to-br from-teal-400 to-cyan-600 text-white p-4 sm:p-6 rounded-2xl shadow-xl transform hover:-translate-y-1 transition-all duration-300">
             <div class="flex justify-between items-start"><h4 class="text-lg font-semibold">Today's Bookings</h4><svg class="w-8 h-8 opacity-80" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg></div>
-            <p class="text-6xl font-bold mt-4">{{ $todaysBookings }}</p>
+            <p class="mt-4 text-4xl sm:text-5xl 2xl:text-6xl font-bold">{{ $todaysBookings }}</p>
         </div>
-        <div class="bg-gradient-to-br from-teal-400 to-cyan-600 text-white p-6 rounded-2xl shadow-xl transform hover:-translate-y-1 transition-all duration-300">
+    <div class="bg-gradient-to-br from-teal-400 to-cyan-600 text-white p-4 sm:p-6 rounded-2xl shadow-xl transform hover:-translate-y-1 transition-all duration-300">
             <div class="flex justify-between items-start"><h4 class="text-lg font-semibold">Total Bookings</h4><svg class="w-8 h-8 opacity-80" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg></div>
-            <p class="text-6xl font-bold mt-4">{{ $totalBookings }}</p>
+            <p class="mt-4 text-4xl sm:text-5xl 2xl:text-6xl font-bold">{{ $totalBookings }}</p>
         </div>
         <div 
-            class="bg-gradient-to-br from-teal-400 to-cyan-600 text-white p-6 rounded-2xl shadow-xl transform hover:-translate-y-1 transition-all duration-300 cursor-pointer hover:shadow-2xl"
+            class="bg-gradient-to-br from-teal-400 to-cyan-600 text-white p-4 sm:p-6 rounded-2xl shadow-xl transform hover:-translate-y-1 transition-all duration-300 cursor-pointer hover:shadow-2xl"
             x-data 
             @click="$dispatch('open-modal', 'revenue-modal')">
             <div class="flex justify-between items-start"><h4 class="text-lg font-semibold">Total Revenue</h4><svg class="w-8 h-8 opacity-80" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v.01M12 6v-1m0-1V4m0 2.01M12 18v-1m0-1v-1m0 2v1m0 1v1M4 6h16M4 10h16M4 14h16M4 18h16"></path></svg></div>
-            <p class="text-5xl font-bold mt-4">₱{{ number_format($totalRevenue, 2) }}</p>
+            <div class="mt-4 flex flex-nowrap items-baseline gap-1 font-bold text-2xl sm:text-3xl lg:text-4xl 2xl:text-5xl">
+                <span class="text-xl sm:text-2xl lg:text-3xl 2xl:text-4xl leading-none">₱</span>
+                <span class="tracking-tight leading-tight">{{ number_format($totalRevenue, 2) }}</span>
+            </div>
             <div class="mt-2 text-sm opacity-75">Click to view details</div>
         </div>
-        <div class="bg-gradient-to-br from-teal-400 to-cyan-600 text-white p-6 rounded-2xl shadow-xl transform hover:-translate-y-1 transition-all duration-300">
+    <div class="bg-gradient-to-br from-teal-400 to-cyan-600 text-white p-4 sm:p-6 rounded-2xl shadow-xl transform hover:-translate-y-1 transition-all duration-300">
             <div class="flex justify-between items-start"><h4 class="text-lg font-semibold">Average Rating</h4><svg class="w-8 h-8 opacity-80" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg></div>
-            <p class="text-5xl font-bold mt-4">{{ number_format($averageRating, 2) }} <span class="text-yellow-300">★</span></p>
+            <p class="mt-4 text-3xl sm:text-4xl 2xl:text-5xl font-bold">{{ number_format($averageRating, 2) }} <span class="text-yellow-300">★</span></p>
         </div>
-        <div class="bg-gradient-to-br from-green-200 to-green-400 text-green-900 p-6 rounded-2xl shadow-xl transform hover:-translate-y-1 transition-all duration-300">
+    <div class="bg-gradient-to-br from-green-200 to-green-400 text-green-900 p-4 sm:p-6 rounded-2xl shadow-xl transform hover:-translate-y-1 transition-all duration-300">
             <div class="flex justify-between items-start"><h4 class="text-lg font-semibold">Completed Bookings</h4><svg class="w-8 h-8 opacity-80" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg></div>
-            <p class="text-5xl font-bold mt-4">{{ $totalCompleted }}</p>
+            <p class="mt-4 text-3xl sm:text-4xl 2xl:text-5xl font-bold">{{ $totalCompleted }}</p>
         </div>
-        <div class="bg-gradient-to-br from-red-200 to-red-400 text-red-900 p-6 rounded-2xl shadow-xl transform hover:-translate-y-1 transition-all duration-300">
+    <div class="bg-gradient-to-br from-red-200 to-red-400 text-red-900 p-4 sm:p-6 rounded-2xl shadow-xl transform hover:-translate-y-1 transition-all duration-300">
             <div class="flex justify-between items-start"><h4 class="text-lg font-semibold">Cancellations</h4><svg class="w-8 h-8 opacity-80" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></div>
-            <p class="text-5xl font-bold mt-4">{{ $totalCancellations }}</p>
+            <p class="mt-4 text-3xl sm:text-4xl 2xl:text-5xl font-bold">{{ $totalCancellations }}</p>
         </div>
     </div>
 
 
     <!-- Main Content Grid -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8 items-start">
         
         <!-- Left Column: All Bookings Table -->
-        <div class="lg:col-span-2 bg-white p-6 rounded-2xl shadow-lg">
-            <div class="flex flex-col sm:flex-row justify-between items-center mb-4 gap-4">
+        <div class="lg:col-span-2 bg-white p-4 sm:p-6 rounded-2xl shadow-lg">
+            <div class="flex flex-col sm:flex-row justify-between items-stretch sm:items-center mb-4 gap-4">
                 <h2 class="text-2xl font-bold text-gray-800">All Bookings</h2>
-                <form action="{{ route('admin.dashboard') }}" method="GET" class="flex items-center">
-                    <input type="text" name="search" placeholder="Search bookings..." value="{{ request('search') }}" class="w-full sm:w-64 p-2 border border-gray-300 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-teal-500">
-                    <button type="submit" class="bg-teal-500 text-white p-2 rounded-r-lg hover:bg-teal-600"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg></button>
+                <form action="{{ route('admin.dashboard') }}" method="GET" class="flex w-full sm:w-auto items-stretch gap-2 sm:gap-0">
+                    <input type="text" name="search" placeholder="Search bookings..." value="{{ request('search') }}" class="w-full sm:w-64 p-2 border border-gray-300 rounded-lg sm:rounded-l-lg sm:rounded-r-none focus:outline-none focus:ring-2 focus:ring-teal-500">
+                    <button type="submit" class="flex items-center justify-center bg-teal-500 text-white p-2 rounded-lg sm:rounded-r-lg sm:rounded-l-none hover:bg-teal-600"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg></button>
                 </form>
             </div>
 
@@ -125,7 +129,7 @@
 
         <!-- Right Column: Analytics Sidebar -->
         <div class="space-y-8">
-            <div class="bg-white p-6 rounded-2xl shadow-lg">
+            <div class="bg-white p-4 sm:p-6 rounded-2xl shadow-lg">
                 <h3 class="text-xl font-bold text-gray-800 mb-4">Top Services</h3>
                 <div class="space-y-4">
                     @forelse($topServices as $service)
@@ -141,13 +145,19 @@
                     @endforelse
                 </div>
             </div>
-            <div class="bg-white p-6 rounded-2xl shadow-lg flex justify-center items-center"><div class="w-full max-w-xs"><canvas id="topServicesChart"></canvas></div></div>
+            <div class="bg-white p-4 sm:p-6 rounded-2xl shadow-lg">
+                <div class="w-full max-w-sm mx-auto">
+                    <div class="relative h-48 sm:h-56">
+                        <canvas id="topServicesChart"></canvas>
+                    </div>
+                </div>
+            </div>
         </div>
 
     </div>
 
     <!-- Therapist Booking History (moved below all bookings table) -->
-    <div class="bg-white p-6 rounded-2xl shadow-lg mt-8">
+    <div class="bg-white p-4 sm:p-6 rounded-2xl shadow-lg mt-8">
         <h3 class="text-xl font-bold text-gray-800 mb-4">Therapist Booking History</h3>
         <!-- Therapist Search -->
         <div class="mb-4">
@@ -298,7 +308,7 @@
                 <!-- Step 3: Date & Time -->
                 <div x-show="currentStep === 3" x-transition>
                     <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
-                        <div class="bg-gray-50 p-6 rounded-lg min-w-[320px] xl:min-w-[380px]">
+                        <div class="bg-gray-50 p-6 rounded-lg w-full sm:min-w-[320px] xl:min-w-[380px]">
                             <div class="flex items-center justify-between mb-4">
                                 <button type="button" @click="prevMonth()" class="p-2 rounded-full hover:bg-gray-200 focus:outline-none"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg></button>
                                 <div class="text-lg font-semibold" x-text="`${months[month]} ${year}`"></div>
@@ -318,7 +328,7 @@
                                 </template>
                             </div>
                         </div>
-                        <div class="min-w-[220px] xl:min-w-[260px]">
+                        <div class="w-full sm:min-w-[220px] xl:min-w-[260px]">
                             <label class="block text-lg font-semibold mb-2">Available Times for <span class="text-gray-800 font-bold" x-text="selectedDateFormatted"></span></label>
                             <div class="bg-gray-50 rounded-lg p-6 h-[284px] overflow-y-auto flex flex-col gap-4 smooth-scroll">
                                 <div x-show="loadingSlots" class="flex items-center justify-center h-full"><svg class="animate-spin h-8 w-8 text-teal-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg></div>
@@ -692,7 +702,97 @@ document.addEventListener('alpine:init', () => {
 document.addEventListener('DOMContentLoaded', () => {
     Chart.defaults.font.family = "'Poppins', sans-serif"; Chart.defaults.color = '#64748b';
     const topServicesCtx = document.getElementById('topServicesChart')?.getContext('2d');
-    if (topServicesCtx) { new Chart(topServicesCtx, { type: 'doughnut', data: { labels: @json($topServicesLabels), datasets: [{ label: 'Bookings', data: @json($topServicesData), backgroundColor: ['#2dd4bf', '#22d3ee', '#60a5fa', '#a78bfa', '#f87171'], borderColor: '#FFFFFF', borderWidth: 4, }] }, options: { responsive: true, cutout: '70%', plugins: { legend: { position: 'bottom' }, title: { display: true, text: 'Top Services by Bookings', font: { size: 18, weight: '600' }, padding: { bottom: 20 } } } } }); }
+    if (topServicesCtx) {
+        new Chart(topServicesCtx, {
+            type: 'doughnut',
+            data: {
+                labels: @json($topServicesLabels),
+                datasets: [{
+                    label: 'Bookings',
+                    data: @json($topServicesData),
+                    backgroundColor: ['#2dd4bf', '#22d3ee', '#60a5fa', '#a78bfa', '#f87171'],
+                    borderColor: '#FFFFFF',
+                    borderWidth: 4,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '70%',
+                layout: { padding: 10 },
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            usePointStyle: true,
+                            padding: 12,
+                        },
+                    },
+                    title: {
+                        display: true,
+                        text: 'Top Services by Bookings',
+                        font: { size: 18, weight: '600' },
+                        padding: { bottom: 16 },
+                    },
+                },
+            },
+        });
+    }
+
+    if ('EventSource' in window) {
+        const sseUrl = '{{ route('admin.dashboard.events') }}';
+        let source = null;
+        let reconnectTimer = null;
+        let reloadPending = false;
+
+        const closeSource = () => {
+            if (source) {
+                source.close();
+                source = null;
+            }
+        };
+
+        const scheduleReconnect = () => {
+            if (reconnectTimer) {
+                return;
+            }
+            closeSource();
+            reconnectTimer = setTimeout(() => {
+                reconnectTimer = null;
+                connect();
+            }, 5000);
+        };
+
+        const queueReload = () => {
+            if (reloadPending) {
+                return;
+            }
+            reloadPending = true;
+
+            const attemptReload = () => {
+                if (document.body.style.overflow === 'hidden') {
+                    setTimeout(attemptReload, 3000);
+                    return;
+                }
+                window.location.reload();
+            };
+
+            setTimeout(attemptReload, 1000);
+        };
+
+        const connect = () => {
+            closeSource();
+            source = new EventSource(sseUrl);
+
+            source.addEventListener('bookings.updated', queueReload);
+            source.addEventListener('stream.stopped', scheduleReconnect);
+            source.onerror = scheduleReconnect;
+        };
+
+        connect();
+    } else {
+        console.warn('EventSource is not supported; automatic refresh is disabled.');
+    }
     
     const cancelButtons = document.querySelectorAll('.cancel-button');
     cancelButtons.forEach(button => {
