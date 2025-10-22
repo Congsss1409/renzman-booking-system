@@ -1,0 +1,77 @@
+name: Deploy Laravel to Hostinger
+
+# This action runs on every push to the 'main' branch
+on:
+  push:
+    branches:
+      - main  # Change this to 'master' if that's your production branch
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest # Use a standard Linux runner
+
+    steps:
+    # 1. Get the latest code from your repo
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    # 2. Set up the PHP environment
+    - name: Set up PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.2' # Match your Hostinger PHP version
+        extensions: mbstring, dom, fileinfo, mysql
+        
+    # 3. Install Composer (PHP) dependencies
+    - name: Install Composer Dependencies
+      run: composer install --no-interaction --no-dev --prefer-dist --optimize-autoloader
+
+    # 4. Set up Node.js to build your assets (CSS/JS)
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18' # Match your local version
+        
+    # 5. Install NPM (JS) dependencies and build assets
+    - name: Install NPM Dependencies and Build
+      run: |
+        npm install
+        npm run build
+
+    # 6. Create the production .env file from your GitHub Secret
+    - name: Create .env file
+      run: echo "${{ secrets.PROD_ENV }}" > .env
+
+    # 7. Generate a new app key (if not set in your secret) and optimize Laravel
+    - name: Run Laravel optimizations
+      run: |
+        php artisan key:generate --force
+        php artisan config:cache
+        php artisan route:cache
+        php artisan view:cache
+        
+    # 8. Deploy the built files to Hostinger using rsync over SSH
+    - name: Deploy files via rsync
+      uses: easingthemes/ssh-deploy@v5.0.0
+      with:
+        SSH_PRIVATE_KEY: ${{ secrets.HOST_SSH_KEY }}
+        REMOTE_HOST: ${{ secrets.HOST_IP }}
+        REMOTE_USER: ${{ secrets.HOST_USER }}
+        TARGET: ${{ secrets.HOST_TARGET_PATH }}
+        SOURCE: "./"
+        # Exclude files you don't want to deploy
+        EXCLUDE: "/.git/, /.github/, /node_modules/, /storage/logs/"
+
+    # 9. Run post-deployment commands on your Hostinger server
+    - name: Run post-deploy commands (e.g., migrate database)
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.HOST_IP }}
+        username: ${{ secrets.HOST_USER }}
+        key: ${{ secrets.HOST_SSH_KEY }}
+        script: |
+          cd ${{ secrets.HOST_TARGET_PATH }}
+          # Run database migrations
+          php artisan migrate --force
+          # Optional: Link storage folder
+          php artisan storage:link
