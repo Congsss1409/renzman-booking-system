@@ -136,7 +136,46 @@ After copying, follow the XAMPP or Docker steps above and run `artisan migrate` 
 
 ---
 
-## 🛠 Troubleshooting
+## �️ Favicon and site branding
+
+- A site-wide favicon has been added to make the app show your brand in browser tabs. The following Blade layout files were updated to reference a single favicon file at `public/favicon.png`:
+	- `resources/views/layouts/app.blade.php`
+	- `resources/views/layouts/admin.blade.php`
+	- `resources/views/layouts/Booking.blade.php`
+
+- A placeholder `public/favicon.png` (small PNG) was added so the site will immediately serve a favicon. Replace that file with your preferred image (your attached logo) to show your real favicon.
+
+How to replace the placeholder (Windows PowerShell):
+
+```powershell
+# copy your image into the project public folder (rename if needed)
+cp C:\path\to\your\renzman-logo.png C:\xampp\htdocs\renzman-booking-system\public\favicon.png
+```
+
+Browser caching note: browsers cache favicons aggressively. After replacing the file, clear cache, hard-refresh, or open the site in a private/incognito window to see the change immediately.
+
+Optional — generate multi-size favicons (recommended)
+- For best cross-browser and device support you can generate a set of icons and an ICO file. A quick way locally is to use an online favicon generator or install a CLI tool like ImageMagick and run:
+
+```powershell
+# Example (ImageMagick required)
+magick convert public\favicon.png -define icon:auto-resize=64,48,32,16 public\favicon.ico
+magick convert public\favicon.png -resize 180x180 public\apple-touch-icon.png
+```
+
+Then add additional link tags to the layouts (optional) pointing to the generated files:
+
+```html
+<link rel="icon" type="image/png" href="{{ asset('favicon-32x32.png') }}" sizes="32x32">
+<link rel="icon" type="image/png" href="{{ asset('favicon-16x16.png') }}" sizes="16x16">
+<link rel="apple-touch-icon" href="{{ asset('apple-touch-icon.png') }}">
+<link rel="shortcut icon" href="{{ asset('favicon.ico') }}">
+```
+
+
+---
+
+## �🛠 Troubleshooting
 
 - "Missing vendor" — either run Composer on another machine and copy `vendor/`, or install Composer locally.
 - "Missing public/build" — build assets on another machine and copy `public/build`.
