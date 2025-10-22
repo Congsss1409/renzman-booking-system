@@ -22,8 +22,6 @@
         height: 100vh;
         scroll-behavior: smooth;
         -webkit-overflow-scrolling: touch; /* momentum scrolling on iOS */
-        /* keep the first section visible under the fixed header */
-        padding-top: var(--header-height);
         /* ensure anchor jumps account for the fixed header */
         scroll-padding-top: calc(var(--header-height) + 8px);
     }
@@ -38,6 +36,14 @@
         justify-content: center;
         align-items: center;
         padding: 4rem 1rem; /* slightly reduced padding on mobile */
+    }
+
+    /* Only offset the very first section visually so the header doesn't overlap it.
+       Using :first-of-type keeps the scroll container background flush with the top. */
+    .scroll-section:first-of-type {
+        padding-top: calc(var(--header-height) + 1.25rem);
+        padding-bottom: 2rem; /* ensure hero has breathing room */
+        box-sizing: border-box;
     }
     @media (min-width: 640px) {
         .scroll-section {
