@@ -53,7 +53,7 @@
     <div class="relative z-10">
         <header class="p-4 sticky top-0 z-50">
             <div class="container mx-auto flex justify-between items-center header-glass rounded-full p-2 px-6 shadow-lg">
-                <a href="{{ route('landing') }}"><img src="{{ asset('images/logo_white.png') }}" alt="Renzman Logo" class="h-16"></a>
+                <a href="{{ route('landing') }}"><img src="{{ asset('images/logo_white.png') }}" alt="Renzman Logo" class="logo-responsive"></a>
                 <nav class="hidden md:flex items-center space-x-8 text-gray-200">
                     <a href="{{ route('landing') }}" class="hover:text-white transition-colors">Home</a>
                     <a href="{{ route('services') }}" class="hover:text-white transition-colors">Services</a>

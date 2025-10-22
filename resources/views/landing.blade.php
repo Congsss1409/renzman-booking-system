@@ -54,12 +54,82 @@
         border: 1px solid rgba(255, 255, 255, 0.1);
     }
     .mobile-nav {
-        background: rgba(0, 0, 0, 0.4);
-        backdrop-filter: blur(10px);
-        -webkit-backdrop-filter: blur(10px);
-    }
-</style>
+        <style>
+            /* Smooth scrolling for anchor navigation and overflow containers */
+            html, body { scroll-behavior: smooth; }
+            /* Main container for the full-page scroll effect */
+            /* scroll-padding-top prevents fixed header from covering anchored targets */
+            .scroll-container {
+                scroll-snap-type: y mandatory;
+                overflow-y: auto;
+                height: 100vh;
+                scroll-behavior: smooth;
+                -webkit-overflow-scrolling: touch; /* momentum scrolling on iOS */
+                scroll-padding-top: 6rem; /* adjust if header height changes */
+            }
+            /* Each section is a snap point. Use min-height so content can grow on small screens */
+            .scroll-section {
+                scroll-snap-align: start;
+                min-height: calc(100vh - 6rem);
+                position: relative;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                padding: 4.5rem 1rem; /* compact padding for small screens */
+                box-sizing: border-box;
+            }
+            @media (min-width: 640px) {
+                .scroll-section {
+                    padding: 6rem 1.5rem; /* Restore padding for larger screens */
+                    min-height: calc(100vh - 6rem);
+                }
+            }
+            /* Bouncing animation for the scroll arrow */
+            .bounce-animation {
+                animation: bounce 2s infinite;
+            }
+            @keyframes bounce {
+                0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+                40% { transform: translateY(-20px); }
+                60% { transform: translateY(-10px); }
+            }
+            /* Glassmorphism panel style */
+            .glass-panel {
+                background: rgba(255, 255, 255, 0.08);
+                backdrop-filter: blur(12px);
+                -webkit-backdrop-filter: blur(12px);
+                border: 1px solid rgba(255, 255, 255, 0.12);
+            }
+            /* Fixed header glass panel style */
+            .header-glass {
+                background: rgba(0, 0, 0, 0.28);
+                backdrop-filter: blur(10px);
+                -webkit-backdrop-filter: blur(10px);
+                border: 1px solid rgba(255, 255, 255, 0.08);
+            }
+            .mobile-nav {
+                background: rgba(0, 0, 0, 0.45);
+                backdrop-filter: blur(8px);
+                -webkit-backdrop-filter: blur(8px);
+            }
 
+            /* Small tweaks to ensure images and cards scale well on small devices */
+            .glass-panel img,
+            .glass-panel .object-cover {
+                max-height: 48vh;
+            }
+            .container img.logo-responsive { height: 36px; }
+            @media (min-width: 640px) { .container img.logo-responsive { height: 44px; } }
+            @media (min-width: 1024px) { .container img.logo-responsive { height: 56px; } }
+        </style>
+        background: rgba(0, 0, 0, 0.4);
+    <header x-data="{ open: false }" class="fixed top-0 left-0 right-0 z-50 p-2 sm:p-4" style="--header-height:6rem;">
+        <div class="container mx-auto flex justify-between items-center header-glass rounded-full p-2 px-4 sm:px-6 shadow-lg">
+            <a href="{{ route('landing') }}" class="flex items-center" aria-label="Renzman Home">
+                <img src="{{ asset('images/logo_white.png') }}" alt="Renzman Logo" class="logo-responsive" />
+            </a>
+            <nav class="hidden md:flex items-center space-x-8 text-gray-200">
 <div class="scroll-container bg-gradient-to-br from-cyan-500 via-teal-500 to-emerald-600 text-white overflow-x-hidden">
     <!-- Header (fixed for all sections) -->
     <header x-data="{ open: false }" class="fixed top-0 left-0 right-0 z-50 p-2 sm:p-4">
