@@ -64,14 +64,11 @@ jobs:
 
     # 9. Run post-deployment commands on your Hostinger server
     - name: Run post-deploy commands (e.g., migrate database)
-      uses: appleboy/ssh-action@master
-      with:
-        host: ${{ secrets.HOST_IP }}
-        username: ${{ secrets.HOST_USER }}
-        key: ${{ secrets.HOST_SSH_KEY }}
-        script: |
-          cd ${{ secrets.HOST_TARGET_PATH }}
-          # Run database migrations
-          php artisan migrate --force
-          # Optional: Link storage folder
-          php artisan storage:link
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST_IP }}
+          username: ${{ secrets.HOST_USER }}
+          key: ${{ secrets.HOST_SSH_KEY }}
+          script: |
+            cd ${{ secrets.HOST_TARGET_PATH }} && php artisan migrate --force
+            cd ${{ secrets.HOST_TARGET_PATH }} && php artisan storage:link
