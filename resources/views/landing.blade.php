@@ -4,32 +4,55 @@
 
 @section('content')
 <style>
+    :root {
+        /* header height used to offset fixed header for small screens */
+        --header-height: 64px;
+    }
+    @media (min-width: 640px) {
+        :root { --header-height: 80px; }
+    }
+
     /* Smooth scrolling for anchor navigation and overflow containers */
-    html, body { scroll-behavior: smooth; }
+    html, body { scroll-behavior: smooth; height: 100%; }
+
     /* Main container for the full-page scroll effect */
     .scroll-container {
         scroll-snap-type: y mandatory;
-        overflow-y: scroll;
+        overflow-y: auto;
         height: 100vh;
         scroll-behavior: smooth;
         -webkit-overflow-scrolling: touch; /* momentum scrolling on iOS */
+        /* keep the first section visible under the fixed header */
+        padding-top: var(--header-height);
+        /* ensure anchor jumps account for the fixed header */
+        scroll-padding-top: calc(var(--header-height) + 8px);
     }
-    /* Each section is a snap point */
+
+    /* Each section is a snap point and respects header height */
     .scroll-section {
         scroll-snap-align: start;
-        height: 100vh;
+        min-height: calc(100vh - var(--header-height));
         position: relative;
         display: flex;
         flex-direction: column;
         justify-content: center;
         align-items: center;
-        padding: 5rem 1rem; /* Adjusted padding for mobile */
+        padding: 4rem 1rem; /* slightly reduced padding on mobile */
     }
     @media (min-width: 640px) {
         .scroll-section {
             padding: 6rem 1.5rem; /* Restore padding for larger screens */
         }
     }
+
+    /* Ensure header occupies a predictable height so offsets work */
+    header {
+        height: var(--header-height);
+        top: 0;
+        left: 0;
+        right: 0;
+    }
+
     /* Bouncing animation for the scroll arrow */
     .bounce-animation {
         animation: bounce 2s infinite;
@@ -39,25 +62,45 @@
         40% { transform: translateY(-20px); }
         60% { transform: translateY(-10px); }
     }
+
     /* Glassmorphism panel style */
     .glass-panel {
-        background: rgba(255, 255, 255, 0.1);
-        backdrop-filter: blur(15px);
-        -webkit-backdrop-filter: blur(15px);
-        border: 1px solid rgba(255, 255, 255, 0.2);
+        background: rgba(255, 255, 255, 0.08);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.12);
     }
+
     /* Fixed header glass panel style */
     .header-glass {
         background: rgba(0, 0, 0, 0.25);
         backdrop-filter: blur(12px);
         -webkit-backdrop-filter: blur(12px);
         border: 1px solid rgba(255, 255, 255, 0.1);
+        padding: 0.4rem 0.75rem; /* reduce pill size on small screens */
+        border-radius: 12px;
     }
+    @media (min-width: 768px) {
+        .header-glass { padding: 0.5rem 1rem; border-radius: 9999px; }
+    }
+
     .mobile-nav {
         background: rgba(0, 0, 0, 0.4);
         backdrop-filter: blur(10px);
         -webkit-backdrop-filter: blur(10px);
     }
+
+    /* Responsive typography tweaks */
+    .scroll-section h1 {
+        font-size: clamp(1.75rem, 6vw, 3.75rem);
+        line-height: 1.05;
+    }
+
+    /* Make service tiles and panels less tall on small screens */
+    .glass-panel.rounded-2xl { padding: 1.25rem; }
+
+    /* Accessibility: ensure focused targets are visible */
+    .scroll-section :focus { outline: 2px solid rgba(255,255,255,0.12); outline-offset: 3px; }
 </style>
 
 <div class="scroll-container bg-gradient-to-br from-cyan-500 via-teal-500 to-emerald-600 text-white overflow-x-hidden">
