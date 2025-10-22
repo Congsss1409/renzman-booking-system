@@ -70,5 +70,7 @@ jobs:
           username: ${{ secrets.HOST_USER }}
           key: ${{ secrets.HOST_SSH_KEY }}
           script: |
-            cd ${{ secrets.HOST_TARGET_PATH }} && php artisan migrate --force
-            cd ${{ secrets.HOST_TARGET_PATH }} && php artisan storage:link
+            cd ${{ secrets.HOST_TARGET_PATH }}
+            php artisan migrate --force
+            rm -f public/storage
+            php artisan storage:link
