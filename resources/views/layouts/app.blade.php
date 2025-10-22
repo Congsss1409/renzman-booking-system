@@ -21,7 +21,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 
     <style>
-        body { font-family: 'Poppins', sans-serif; }
+        /* Prevent iOS Safari from auto-resizing text and improve font smoothing */
+        html { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
+        body { font-family: 'Poppins', sans-serif; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
         [x-cloak] { display: none !important; }
     </style>
 </head>

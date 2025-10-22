@@ -69,11 +69,11 @@
         </header>
 
         <!-- Main Content -->
-        <main class="container mx-auto px-4 sm:px-6 pt-28 pb-16">
+                    <main class="container mx-auto px-3 sm:px-6 pt-24 pb-16">
             <div class="glass-panel rounded-3xl p-6 sm:p-8 md:p-12">
                 <div class="text-center">
-                    <h1 class="text-3xl sm:text-4xl md:text-5xl font-bold">Our Signature Services</h1>
-                    <p class="mt-4 text-base sm:text-lg text-black">Discover the perfect treatment to rejuvenate your body and mind.</p>
+                                <h1 class="text-2xl sm:text-3xl md:text-4xl font-bold leading-tight">Our Signature Services</h1>
+                                <p class="mt-3 text-sm sm:text-base text-black max-w-xl mx-auto">Discover the perfect treatment to rejuvenate your body and mind.</p>
                 </div>
 
                 <div class="mt-12 sm:mt-16 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
