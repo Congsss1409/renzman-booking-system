@@ -232,9 +232,13 @@ class PayrollController extends Controller
     {
         $payroll->load('therapist', 'items', 'payments');
 
+        $company_name = config('app.name', 'Renzman Spa');
+        $company_logo_url = asset('images/logo_white.png');
+        $employee_name = $payroll->therapist->name ?? 'Unknown Employee';
+
         // If dompdf is installed, use it. Otherwise return the HTML view.
         if (class_exists(\Dompdf\Dompdf::class) || class_exists(\Barryvdh\DomPDF\Facade::class)) {
-            $html = View::make('payrolls.pdf', compact('payroll'))->render();
+            $html = View::make('payrolls.pdf', compact('payroll', 'company_name', 'company_logo_url', 'employee_name'))->render();
 
             // Prefer barryvdh/laravel-dompdf if available
             if (class_exists(\Barryvdh\DomPDF\Facade::class)) {
@@ -253,6 +257,6 @@ class PayrollController extends Controller
         }
 
         // If no PDF library, return the HTML view so it can be printed in browser
-        return view('payrolls.pdf', compact('payroll'));
+        return view('payrolls.pdf', compact('payroll', 'company_name', 'company_logo_url', 'employee_name'));
     }
 }

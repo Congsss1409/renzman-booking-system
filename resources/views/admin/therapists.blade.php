@@ -15,10 +15,33 @@
         </a>
     </div>
 
+    <!-- Filters -->
+    <form id="therapist-filters" action="{{ route('admin.therapists.index') }}" method="GET" class="bg-white p-4 sm:p-6 rounded-2xl shadow-lg border flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+        <div class="flex flex-col sm:flex-row gap-4 w-full lg:w-auto">
+            <div class="w-full sm:w-48">
+                <label for="branch" class="block text-sm font-medium text-gray-600 mb-1">Filter by branch</label>
+                <select id="branch" name="branch" class="w-full rounded-lg border-gray-300 focus:border-teal-500 focus:ring-teal-500">
+                    <option value="all">All branches</option>
+                    @foreach(($branches ?? collect()) as $branch)
+                        <option value="{{ $branch->id }}" @selected(($selectedBranch ?? request('branch')) == $branch->id)>{{ $branch->name }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="flex-1">
+                <label for="search" class="block text-sm font-medium text-gray-600 mb-1">Search therapists</label>
+                <input id="search" type="text" name="search" value="{{ $search ?? request('search') }}" placeholder="Search by name or branch" class="w-full rounded-lg border-gray-300 focus:border-teal-500 focus:ring-teal-500" />
+            </div>
+        </div>
+        <div class="flex gap-3 justify-end">
+            <a href="{{ route('admin.therapists.index') }}" class="px-5 py-2 rounded-full border border-gray-300 text-gray-600 font-medium hover:bg-gray-100">Reset</a>
+            <button type="submit" class="px-6 py-2 rounded-full bg-gradient-to-r from-teal-400 to-cyan-600 text-white font-semibold shadow-md hover:from-teal-500 hover:to-cyan-700">Apply</button>
+        </div>
+    </form>
+
     <!-- Therapists Grid -->
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         @forelse($therapists as $therapist)
-            <div class="bg-stone-50 rounded-2xl p-6 text-center shadow-lg border hover:shadow-xl transition-shadow duration-300">
+            <div class="bg-stone-50 rounded-2xl p-6 text-center shadow-lg border hover:shadow-xl transition-shadow duration-300 flex flex-col h-full">
                 <img src="{{ $therapist->image_url ? $therapist->image_url . '?v=' . $therapist->updated_at->timestamp : 'https://ui-avatars.com/api/?name=' . urlencode($therapist->name) . '&color=FFFFFF&background=059669&size=128' }}" alt="{{ $therapist->name }}" class="w-24 h-24 mx-auto rounded-full mb-4 object-cover border-4 border-white shadow-md">
                 <p class="text-xl font-bold text-gray-800">{{ $therapist->name }}</p>
                 <p class="font-semibold text-teal-500">Therapist</p>
@@ -26,19 +49,19 @@
                     <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"></path></svg>
                     {{ $therapist->branch->name ?? 'No Branch Assigned' }}
                 </p>
-                <div class="mt-6 flex justify-center gap-4">
-                    <a href="{{ route('admin.therapists.edit', $therapist->id) }}" class="font-semibold bg-cyan-400 text-white py-2 px-8 rounded-full shadow-md transition-transform transform hover:scale-105">EDIT</a>
-                    <form action="{{ route('admin.therapists.destroy', $therapist->id) }}" method="POST" class="delete-form">
+                <div class="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:justify-center sm:gap-2">
+                    <a href="{{ route('admin.therapists.edit', $therapist->id) }}" class="w-full sm:flex-1 font-semibold bg-cyan-400 text-white py-2 px-6 rounded-full shadow-md transition-transform transform hover:scale-105">EDIT</a>
+                    <form action="{{ route('admin.therapists.destroy', $therapist->id) }}" method="POST" class="delete-form w-full sm:flex-1">
                         @csrf
                         @method('DELETE')
-                        <button type="button" class="font-semibold bg-red-500 text-white py-2 px-8 rounded-full shadow-md transition-transform transform hover:scale-105 delete-button">DELETE</button>
+                        <button type="button" class="w-full font-semibold bg-red-500 text-white py-2 px-6 rounded-full shadow-md transition-transform transform hover:scale-105 delete-button">DELETE</button>
                     </form>
                 </div>
             </div>
         @empty
             <div class="col-span-full text-center py-12 text-gray-500">
                 <p class="font-bold text-lg">No therapists found.</p>
-                <p>Click the "Add Therapist" button to get started.</p>
+                <p>Try adjusting your filters or search.</p>
             </div>
         @endforelse
     </div>
@@ -81,6 +104,33 @@ document.addEventListener('DOMContentLoaded', () => {
             })
         });
     });
+
+    const filterForm = document.getElementById('therapist-filters');
+    const branchSelect = document.getElementById('branch');
+    const searchInput = document.getElementById('search');
+    let searchDebounce;
+
+    const submitFilters = () => {
+        if (!filterForm) {
+            return;
+        }
+        if (typeof filterForm.requestSubmit === 'function') {
+            filterForm.requestSubmit();
+        } else {
+            filterForm.submit();
+        }
+    };
+
+    if (filterForm && branchSelect) {
+        branchSelect.addEventListener('change', submitFilters);
+    }
+
+    if (filterForm && searchInput) {
+        searchInput.addEventListener('input', () => {
+            clearTimeout(searchDebounce);
+            searchDebounce = setTimeout(submitFilters, 350);
+        });
+    }
 });
 </script>
 @endpush

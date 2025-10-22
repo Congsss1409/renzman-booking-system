@@ -53,7 +53,6 @@ Route::post('/2fa/resend', [TwoFactorController::class, 'resend'])->name('2fa.re
 
 // --- Protected Admin Routes ---
 Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
-    Route::get('/dashboard/events', [\App\Http\Controllers\Admin\EventStreamController::class, 'bookings'])->name('dashboard.events');
     // Revenue Export
     Route::get('/revenue/export/pdf', [\App\Http\Controllers\Admin\RevenueReportController::class, 'monthlyPdf'])->name('revenue.export.pdf');
     Route::get('/revenue/export/excel', [\App\Http\Controllers\Admin\RevenueExcelExportController::class, 'monthlyExcel'])->name('revenue.export.excel');

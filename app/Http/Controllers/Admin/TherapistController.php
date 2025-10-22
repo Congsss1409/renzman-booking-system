@@ -14,10 +14,30 @@ class TherapistController extends Controller
     /**
      * Display a listing of the therapists.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $therapists = Therapist::with('branch')->orderBy('name')->paginate(12);
-        return view('admin.therapists', compact('therapists'));
+        $search = trim((string) $request->input('search', ''));
+        $selectedBranch = $request->input('branch');
+
+        $therapistsQuery = Therapist::with('branch');
+
+        if ($selectedBranch && $selectedBranch !== 'all') {
+            $therapistsQuery->where('branch_id', $selectedBranch);
+        }
+
+        if ($search !== '') {
+            $therapistsQuery->where(function ($query) use ($search) {
+                $query->where('name', 'like', "%{$search}%")
+                    ->orWhereHas('branch', function ($branchQuery) use ($search) {
+                        $branchQuery->where('name', 'like', "%{$search}%");
+                    });
+            });
+        }
+
+        $therapists = $therapistsQuery->orderBy('name')->paginate(12)->withQueryString();
+        $branches = Branch::orderBy('name')->get();
+
+        return view('admin.therapists', compact('therapists', 'branches', 'selectedBranch', 'search'));
     }
 
     /**

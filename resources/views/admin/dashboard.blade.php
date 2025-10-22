@@ -42,8 +42,8 @@
             x-data 
             @click="$dispatch('open-modal', 'revenue-modal')">
             <div class="flex justify-between items-start"><h4 class="text-lg font-semibold">Total Revenue</h4><svg class="w-8 h-8 opacity-80" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v.01M12 6v-1m0-1V4m0 2.01M12 18v-1m0-1v-1m0 2v1m0 1v1M4 6h16M4 10h16M4 14h16M4 18h16"></path></svg></div>
-            <div class="mt-4 flex flex-nowrap items-baseline gap-1 font-bold text-2xl sm:text-3xl lg:text-4xl 2xl:text-5xl">
-                <span class="text-xl sm:text-2xl lg:text-3xl 2xl:text-4xl leading-none">₱</span>
+            <div class="mt-4 flex flex-nowrap items-baseline gap-1 font-bold text-xl sm:text-2xl lg:text-3xl 2xl:text-4xl">
+                <span class="text-lg sm:text-xl lg:text-2xl 2xl:text-3xl leading-none">₱</span>
                 <span class="tracking-tight leading-tight">{{ number_format($totalRevenue, 2) }}</span>
             </div>
             <div class="mt-2 text-sm opacity-75">Click to view details</div>
@@ -739,61 +739,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    if ('EventSource' in window) {
-        const sseUrl = '{{ route('admin.dashboard.events') }}';
-        let source = null;
-        let reconnectTimer = null;
-        let reloadPending = false;
-
-        const closeSource = () => {
-            if (source) {
-                source.close();
-                source = null;
-            }
-        };
-
-        const scheduleReconnect = () => {
-            if (reconnectTimer) {
-                return;
-            }
-            closeSource();
-            reconnectTimer = setTimeout(() => {
-                reconnectTimer = null;
-                connect();
-            }, 5000);
-        };
-
-        const queueReload = () => {
-            if (reloadPending) {
-                return;
-            }
-            reloadPending = true;
-
-            const attemptReload = () => {
-                if (document.body.style.overflow === 'hidden') {
-                    setTimeout(attemptReload, 3000);
-                    return;
-                }
-                window.location.reload();
-            };
-
-            setTimeout(attemptReload, 1000);
-        };
-
-        const connect = () => {
-            closeSource();
-            source = new EventSource(sseUrl);
-
-            source.addEventListener('bookings.updated', queueReload);
-            source.addEventListener('stream.stopped', scheduleReconnect);
-            source.onerror = scheduleReconnect;
-        };
-
-        connect();
-    } else {
-        console.warn('EventSource is not supported; automatic refresh is disabled.');
-    }
-    
     const cancelButtons = document.querySelectorAll('.cancel-button');
     cancelButtons.forEach(button => {
         button.addEventListener('click', function(e) {

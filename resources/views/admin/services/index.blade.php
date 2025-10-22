@@ -18,19 +18,19 @@
     <!-- Services Grid -->
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         @forelse($services as $service)
-            <div class="bg-stone-50 rounded-2xl p-6 text-center shadow-lg border hover:shadow-xl transition-shadow duration-300 flex flex-col justify-between">
+            <div class="bg-stone-50 rounded-2xl p-6 text-center shadow-lg border hover:shadow-xl transition-shadow duration-300 flex flex-col h-full">
                 <div>
                     <h3 class="text-xl font-bold text-gray-800">{{ $service->name }}</h3>
                     <p class="text-gray-500 mb-2 text-sm">{{ $service->description }}</p>
                     <p class="font-semibold text-teal-500">Duration: {{ $service->duration }} mins</p>
                     <p class="text-4xl font-bold text-gray-800 my-4">₱{{ number_format($service->price, 2) }}</p>
                 </div>
-                <div class="mt-6 flex justify-center gap-4">
-                    <a href="{{ route('admin.services.edit', $service->id) }}" class="font-semibold bg-cyan-400 text-white py-2 px-8 rounded-full shadow-md transition-transform transform hover:scale-105">EDIT</a>
-                    <form action="{{ route('admin.services.destroy', $service->id) }}" method="POST" class="delete-form">
+                <div class="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:justify-center sm:gap-2">
+                    <a href="{{ route('admin.services.edit', $service->id) }}" class="w-full sm:flex-1 font-semibold bg-cyan-400 text-white py-2 px-6 rounded-full shadow-md transition-transform transform hover:scale-105">EDIT</a>
+                    <form action="{{ route('admin.services.destroy', $service->id) }}" method="POST" class="delete-form w-full sm:flex-1">
                         @csrf
                         @method('DELETE')
-                        <button type="button" class="font-semibold bg-red-500 text-white py-2 px-8 rounded-full shadow-md transition-transform transform hover:scale-105 delete-button">DELETE</button>
+                        <button type="button" class="w-full font-semibold bg-red-500 text-white py-2 px-6 rounded-full shadow-md transition-transform transform hover:scale-105 delete-button">DELETE</button>
                     </form>
                 </div>
             </div>

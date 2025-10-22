@@ -17,6 +17,10 @@
     
     <!-- HoldOn.js CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/holdon.js/dist/HoldOn.min.css">
+    <script>
+        // Provide a no-op fallback so missing HoldOn.js never breaks navigation.
+        window.HoldOn = window.HoldOn || { open() {}, close() {} };
+    </script>
 
     <!-- Alpine.js -->
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
@@ -134,12 +138,23 @@
                 backgroundColor: "#0d9488", // teal-600
                 textColor: "white"
             };
+            const holdOnAvailable = typeof HoldOn !== 'undefined';
+            if (!holdOnAvailable) {
+                console.warn('HoldOn.js failed to load; loading overlay disabled.');
+            }
+            const openHoldOn = () => {
+                if (!holdOnAvailable) {
+                    return false;
+                }
+                HoldOn.open(loadingOptions);
+                return true;
+            };
             document.querySelectorAll('form').forEach(form => {
-                form.addEventListener('submit', function() { HoldOn.open(loadingOptions); });
+                form.addEventListener('submit', function() { openHoldOn(); });
             });
             document.querySelectorAll('.sidebar-link').forEach(link => {
-                link.addEventListener('click', function(e) {
-                    if (!this.classList.contains('active')) { HoldOn.open(loadingOptions); }
+                link.addEventListener('click', function() {
+                    if (!this.classList.contains('active')) { openHoldOn(); }
                 });
             });
         });

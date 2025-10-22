@@ -56,7 +56,7 @@ class EventStreamController extends Controller
                     break;
                 }
 
-                sleep(3);
+                usleep(500000); // poll twice a second to keep UI updates snappy
             }
         });
 
