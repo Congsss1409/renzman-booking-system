@@ -38,12 +38,7 @@ jobs:
           npm run build
 
       # 6. Generate a new app key (if not set in your secret) and optimize Laravel
-      - name: Run Laravel optimizations (on runner)
-        run: |
-          php artisan key:generate --force
-          php artisan config:cache
-          php artisan route:cache
-          php artisan view:cache
+        # 6. (No runner-side environment write) — Laravel optimizations will be run on the remote host after .env is in place
 
       # 8. Deploy the built files to Hostinger using rsync over SSH
       - name: Deploy files via rsync
@@ -68,6 +63,11 @@ jobs:
             cd ${{ secrets.HOST_TARGET_PATH }}
             # Write .env on the remote server from the secret passed as environment variable
             printf '%s\n' "${{ secrets.PROD_ENV }}" > .env
+              # Ensure app key exists (if PROD_ENV already contains APP_KEY this is harmless)
+              php artisan key:generate --force
+              php artisan config:cache
+              php artisan route:cache
+              php artisan view:cache
             php artisan migrate --force
             rm -f public/storage
             php artisan storage:link
