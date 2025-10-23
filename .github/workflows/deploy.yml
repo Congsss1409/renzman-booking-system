@@ -64,6 +64,7 @@ jobs:
           **/.github*
           **/node_modules*
           **/storage/logs*
+          **/vendor*
 
     # 9. Run post-deployment commands on your Hostinger server
     - name: Run post-deploy commands (e.g., migrate database)
