@@ -159,7 +159,7 @@
                 Book Now
             </a>
             <!-- Facebook icon -->
-            <a href="https://https://www.facebook.com/RenzmanBlindMASSAGE" class="hidden sm:inline-flex social-icon" target="_blank" rel="noopener noreferrer" aria-label="Facebook">
+            <a href="https://www.facebook.com/RenzmanBlindMASSAGE" class="hidden sm:inline-flex social-icon" target="_blank" rel="noopener noreferrer" aria-label="Facebook">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M22 12.07C22 6.48 17.52 2 11.93 2S2 6.48 2 12.07C2 17.09 5.66 21.19 10.44 22v-7.03H8.07v-2.9h2.37V9.41c0-2.35 1.39-3.64 3.52-3.64 1.02 0 2.09.18 2.09.18v2.3h-1.18c-1.16 0-1.52.72-1.52 1.46v1.75h2.59l-.41 2.9h-2.18V22C18.34 21.19 22 17.09 22 12.07z" fill="#fff"/></svg>
             </a>
             <div class="md:hidden">
@@ -307,8 +307,8 @@
                         <div>
                             <h3 class="font-bold text-base sm:text-lg">Contact Us</h3>
                             <ul class="mt-2 space-y-1 text-xs sm:text-sm text-cyan-200">
-                                <li>Email: contact@renzman.com</li>
-                                <li>Phone: (02) 8123-4567</li>
+                                <li>Email: renzman@renzman-massage.com</li>
+                                <li>Phone: 0932-423-3517/0977-392-6564</li>
                             </ul>
                         </div>
                     </div>

@@ -110,13 +110,13 @@
                             <li><a href="{{ route('about') }}" class="hover:text-black">About Us</a></li>
                         </ul>
                     </div>
-                    <div>
-                        <h3 class="font-bold text-lg">Contact Us</h3>
-                        <ul class="mt-2 space-y-1 text-sm text-black">
-                            <li>Email: contact@renzman.com</li>
-                            <li>Phone: (02) 8123-4567</li>
-                        </ul>
-                    </div>
+                     <div>
+                            <h3 class="font-bold text-base sm:text-lg">Contact Us</h3>
+                            <ul class="mt-2 space-y-1 text-xs sm:text-sm text-cyan-200">
+                                <li>Email: renzman@renzman-massage.com</li>
+                                <li>Phone: 0932-423-3517/0977-392-6564</li>
+                            </ul>
+                        </div>
                 </div>
                 <div class="border-t border-white/20 mt-8 pt-6 text-center text-sm text-black">
                     <p>&copy; {{ date('Y') }} Renzman. All rights reserved.</p>
