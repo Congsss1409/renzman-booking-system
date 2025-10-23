@@ -50,7 +50,7 @@ jobs:
         run: |
           php artisan config:cache
           php artisan route:cache
-          php artisan view:cache
+          
 
       # 7. Deploy files to server via FTP
       - name: Deploy to FTP
