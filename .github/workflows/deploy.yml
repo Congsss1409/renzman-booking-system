@@ -20,19 +20,30 @@ jobs:
           # This script runs on your server
           # It's the "automatic" part you wanted
           script: |
+            # 1. Go to the app directory
             cd /home/u689011157/domains/renzman-massage.com/renzman-booking-system
+            
+            # 2. Pull the latest code
             git pull origin main
+            
+            # 3. Install dependencies
             composer install --no-dev --optimize-autoloader
             npm install
             npm run build
             
-            # --- ADD THESE LINES ---
+            # 4. Fix storage permissions and create cache folders
             mkdir -p storage/framework/sessions
             mkdir -p storage/framework/views
             mkdir -p storage/framework/cache/data
             chmod -R 775 storage
-            # -----------------------
-
+            
+            # 5. --- ADDED STORAGE LINK SCRIPT ---
+            # Remove old link from public_html to prevent errors
+            rm -rf /home/u689011157/domains/renzman-massage.com/public_html/storage
+            # Create the correct symlink to the app's public storage
+            ln -s /home/u689011157/domains/renzman-massage.com/renzman-booking-system/storage/app/public /home/u689011157/domains/renzman-massage.com/public_html/storage
+            
+            # 6. Run migrations and cache everything
             php artisan migrate --force
             php artisan config:cache
             php artisan route:cache

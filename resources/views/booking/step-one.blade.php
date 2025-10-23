@@ -8,7 +8,7 @@
         
         <!-- Left Column: Image & Branding -->
         <div class="hidden md:block relative">
-            <img src="{{ asset('images/services-showcase.jpg') }}" class="absolute h-full w-full object-cover" alt="Woman receiving a relaxing massage">
+            <img src="{{ asset('images/massage-hands.jpg') }}" class="absolute h-full w-full object-cover" alt="Massage hands on back">
             <div class="absolute inset-0 bg-teal-800/50"></div>
             <div class="relative z-10 p-12 text-white flex flex-col h-full">
                 <div>
