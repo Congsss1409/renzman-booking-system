@@ -124,7 +124,7 @@
     .scroll-section :focus { outline: 2px solid rgba(255,255,255,0.12); outline-offset: 3px; }
 </style>
 
-<div class="scroll-container bg-gradient-to-br from-cyan-500 via-teal-500 to-emerald-600 text-white overflow-x-hidden">
+<div class="scroll-container text-white overflow-x-hidden" style="background: url('{{ asset('images/store4.jpg') }}') center center / cover no-repeat fixed;">
     <!-- Header (fixed for all sections) -->
     <header x-data="{ open: false }" class="fixed top-0 left-0 right-0 z-50 p-2 sm:p-4">
         <div class="container mx-auto flex justify-between items-center header-glass rounded-full p-2 px-4 sm:px-6 shadow-lg">
@@ -155,15 +155,22 @@
         </div>
     </header>
 
-    <!-- Page 1: Hero Section -->
-    <section class="scroll-section text-center" style="background-image: url('{{ asset('images/store1.jpg') }}'); background-size: cover; background-position: center;">
-        <div class="absolute inset-0 bg-black/50"></div>
+    <!-- Page 1: Hero Section with Highlighted Renzman Blind Massage -->
+    <section class="scroll-section text-center relative">
+        <div class="absolute inset-0 bg-black/70"></div>
         <div class="relative z-10 flex flex-col items-center px-4">
-            <h1 class="text-3xl sm:text-4xl md:text-6xl font-bold leading-tight drop-shadow-lg">Be Relaxed.<br>Be Rejuvenated. Be Relieved.</h1>
-            <p class="mt-4 text-base sm:text-lg md:text-xl max-w-2xl mx-auto text-gray-200 drop-shadow-md">
-                Escape the everyday and discover a new level of peace and rejuvenation.
+            <div class="mb-8 mt-8">
+                <div class="inline-block glass-panel p-6 rounded-3xl shadow-2xl" style="backdrop-filter: blur(8px); background: rgba(0,0,0,0.45); border: 2px solid rgba(255,255,255,0.12);">
+                    <img src="{{ asset('images/store1.jpg') }}" alt="Renzman Blind Massage Sign" class="mx-auto rounded-xl shadow-lg w-full max-w-2xl border-4 border-white/20">
+                    <h1 class="mt-6 text-4xl sm:text-5xl md:text-7xl font-extrabold text-white drop-shadow-lg tracking-tight">Renzman Blind Massage</h1>
+                    <p class="mt-4 text-lg sm:text-2xl text-cyan-100 font-semibold drop-shadow-md">Be Relaxed. Be Rejuvenated. Be Relieved.</p>
+                </div>
+            </div>
+            <p class="mt-8 text-base sm:text-lg md:text-xl max-w-2xl mx-auto text-cyan-100 drop-shadow-md">
+                Escape the everyday and discover a new level of peace and rejuvenation.<br>
+                <span class="font-bold text-white">Experience the art of healing touch at Renzman.</span>
             </p>
-            <a href="{{ route('booking.create.step-one') }}" class="mt-8 inline-block bg-white hover:bg-gray-200 text-teal-600 font-bold py-3 px-8 sm:py-4 sm:px-12 rounded-full shadow-xl transition-transform transform hover:scale-105 text-base sm:text-lg">
+            <a href="{{ route('booking.create.step-one') }}" class="mt-10 inline-block bg-white hover:bg-gray-200 text-teal-600 font-bold py-3 px-8 sm:py-4 sm:px-12 rounded-full shadow-xl transition-transform transform hover:scale-105 text-base sm:text-lg">
                 Book an Appointment
             </a>
         </div>
@@ -176,7 +183,7 @@
     </section>
 
     <!-- Page 2: Services Section -->
-    <section id="services" class="scroll-section" style="background-image: url('{{ asset('images/store2.jpg') }}'); background-size: cover; background-position: center;">
+    <section id="services" class="scroll-section">
         <div class="container mx-auto h-full flex flex-col justify-center">
             <div class="absolute inset-0 bg-black/40"></div>
             <div class="relative z-10 flex flex-col">
@@ -216,7 +223,7 @@
     </section>
 
     <!-- Page 3: Our Branches Section -->
-    <section id="branches" class="scroll-section" style="background-image: url('{{ asset('images/store3.jpg') }}'); background-size: cover; background-position: center;">
+    <section id="branches" class="scroll-section">
         <div class="container mx-auto h-full flex flex-col justify-center">
             <div class="absolute inset-0 bg-black/30"></div>
             <div class="relative z-10 flex flex-col">
@@ -246,7 +253,7 @@
     </section>
 
     <!-- Page 4: Testimonials & Footer Section -->
-    <section id="testimonials" class="scroll-section" style="background-image: url('{{ asset('images/store4.jpg') }}'); background-size: cover; background-position: center;">
+    <section id="testimonials" class="scroll-section">
         <div class="container mx-auto h-full flex flex-col justify-center">
             <div class="absolute inset-0 bg-black/35"></div>
             <div class="relative z-10 flex flex-col">
