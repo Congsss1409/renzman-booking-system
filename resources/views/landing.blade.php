@@ -50,29 +50,18 @@
     .main-navbar nav a:hover, .main-navbar nav a.active { background: rgba(255,255,255,0.06); }
     .main-navbar nav a:focus { outline: 3px solid rgba(255,255,255,0.12); outline-offset:4px; }
     .main-navbar .nav-right { display:flex; align-items:center; gap:0.75rem; }
-    .main-navbar .search-box { background: rgba(255,255,255,0.95); border-radius:9999px; padding:6px 12px; border:none; font-size:0.95rem; color:#083344; min-width:140px; }
-    .main-navbar .social {
-        display: flex;
-        gap: 0.7rem;
-        align-items: center;
-    }
-    .main-navbar .social a {
-        color: #fff;
-        font-size: 1.2rem;
-        transition: color 0.2s;
-    }
-    .main-navbar .social a:hover {
-        color: #f6f6fa;
-    }
-    .hero-content { display:flex; gap:2rem; align-items:center; justify-content:space-between; flex:1 1 0%; padding:3.5rem 1rem; max-width:1200px; margin:0 auto; width:100%; }
-    .hero-left { flex:1 1 0%; padding:2rem; color:#062425; display:flex; flex-direction:column; align-items:flex-start; justify-content:center; }
-    .hero-title { font-size:3.25rem; font-weight:900; line-height:1.02; margin-bottom:0.8rem; color:#052f2b; text-shadow: 0 6px 18px rgba(4,16,18,0.08); }
-    .hero-desc { font-size:1.05rem; margin-bottom:1.6rem; color: rgba(3,15,15,0.85); max-width:520px; }
-    .hero-btn { background:#ffffff; color:var(--primary-via); font-weight:800; border-radius:9999px; padding:0.9rem 1.8rem; font-size:1rem; box-shadow:0 10px 30px rgba(16,185,129,0.06); transition:transform .12s ease, box-shadow .12s ease; }
+    .main-navbar .social { display:flex; gap:0.7rem; align-items:center; }
+    .main-navbar .social a { color:#fff; display:inline-flex; width:36px; height:36px; align-items:center; justify-content:center; border-radius:8px; transition:background .12s, color .12s; }
+    .main-navbar .social a:hover { background: rgba(255,255,255,0.06); }
+    .hero-content { display:flex; gap:2rem; align-items:center; justify-content:space-between; flex:1 1 0%; padding:5.5rem 1rem 4rem; max-width:1200px; margin:0 auto; width:100%; }
+    .hero-left { flex:1 1 0%; padding:2rem; color:#fff; display:flex; flex-direction:column; align-items:flex-start; justify-content:center; }
+    .hero-title { font-size:4rem; font-weight:900; line-height:1.02; margin-bottom:0.8rem; color:#fff; text-shadow: 0 8px 28px rgba(0,0,0,0.22); }
+    .hero-desc { font-size:1.05rem; margin-bottom:1.6rem; color: rgba(255,255,255,0.92); max-width:520px; }
+    .hero-btn { background:#ffffff; color:#000; font-weight:800; border-radius:9999px; padding:0.9rem 1.8rem; font-size:1rem; box-shadow:0 10px 30px rgba(0,0,0,0.08); transition:transform .12s ease, box-shadow .12s ease; }
     .hero-btn:hover { transform:translateY(-3px); box-shadow:0 18px 40px rgba(16,185,129,0.12); }
     .hero-btn:focus { outline: 3px solid rgba(6,182,212,0.16); outline-offset:6px; }
     .hero-right { flex:1 1 0%; display:flex; align-items:center; justify-content:center; padding:2rem; }
-    .hero-img { max-width:520px; width:100%; border-radius:1.25rem; box-shadow:0 20px 60px rgba(2,6,23,0.12); background:#fff; object-fit:cover; border:8px solid rgba(255,255,255,0.22); }
+    .hero-img { max-width:620px; width:100%; border-radius:1.25rem; box-shadow:0 30px 80px rgba(2,6,23,0.14); background:#fff; object-fit:cover; border:8px solid rgba(255,255,255,0.22); }
     @media (max-width: 960px) {
         .hero-content { flex-direction:column-reverse; gap:1.5rem; padding:2rem 1rem; }
         .hero-left, .hero-right { padding:1rem; text-align:center; align-items:center; }
@@ -93,6 +82,14 @@
     @media (max-width: 640px) { .grid-responsive { grid-template-columns: 1fr; } }
     .section { padding:4rem 0; }
     @media (max-width:640px) { .section { padding:2rem 0; } }
+
+    /* Text color rules: only black and white */
+    body { color: #000; }
+    /* Hero and nav use white text for contrast */
+    .main-navbar, .hero-left, .hero-title, .hero-desc { color: #fff !important; }
+    /* Section overlays should show white text; cards use black text */
+    section.scroll-section { color: #fff; }
+    .glass-panel, .service-card, .testimonial-card { color: #000; }
 
     /* Sections styling to match the hero look */
     section.scroll-section { padding:4rem 1rem; position:relative; }
@@ -122,10 +119,16 @@
         </nav>
         <div class="nav-right">
             <input type="text" class="search-box" placeholder="Search" aria-label="Search site" />
-            <div class="social" aria-hidden="true">
-                <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
-                <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
-                <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+            <div class="social" aria-hidden="false">
+                <a href="#" aria-label="Facebook">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M22 12.07C22 6.48 17.52 2 11.93 2S2 6.48 2 12.07C2 17.09 5.66 21.19 10.44 22v-7.03H8.07v-2.9h2.37V9.41c0-2.35 1.39-3.64 3.52-3.64 1.02 0 2.09.18 2.09.18v2.3h-1.18c-1.16 0-1.52.72-1.52 1.46v1.75h2.59l-.41 2.9h-2.18V22C18.34 21.19 22 17.09 22 12.07z" fill="#fff"/></svg>
+                </a>
+                <a href="#" aria-label="Instagram">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M7 2h10a5 5 0 015 5v10a5 5 0 01-5 5H7a5 5 0 01-5-5V7a5 5 0 015-5zm5 6.2a4.8 4.8 0 100 9.6 4.8 4.8 0 000-9.6zm4.9-2.5a1.1 1.1 0 11-2.2 0 1.1 1.1 0 012.2 0z" fill="#fff"/></svg>
+                </a>
+                <a href="#" aria-label="Twitter">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M22 5.92c-.6.27-1.24.45-1.92.53a3.32 3.32 0 001.45-1.84 6.56 6.56 0 01-2.08.8 3.28 3.28 0 00-5.59 2.99A9.31 9.31 0 013 4.86a3.28 3.28 0 001.02 4.37c-.5-.02-.97-.15-1.38-.38v.04c0 1.6 1.13 2.92 2.63 3.23a3.28 3.28 0 01-1.48.06c.42 1.3 1.64 2.24 3.09 2.27A6.57 6.57 0 012 19.54a9.27 9.27 0 005.03 1.47c6.03 0 9.33-4.99 9.33-9.32v-.43c.64-.46 1.2-1.04 1.64-1.7-.58.26-1.2.45-1.84.53z" fill="#fff"/></svg>
+                </a>
             </div>
         </div>
     </header>
