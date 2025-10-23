@@ -113,7 +113,7 @@
     <header class="main-navbar">
         <div class="logo">
             <a href="{{ route('landing') }}">
-                <img src="{{ asset('images/renzman-logo.png') }}" alt="Renzman logo" />
+                <img src="{{ asset('images/logo trans.png') }}" alt="Renzman logo" />
             </a>
         </div>
         <button class="mobile-toggle" id="mobileToggle" aria-expanded="false" aria-controls="mainNav">☰</button>
