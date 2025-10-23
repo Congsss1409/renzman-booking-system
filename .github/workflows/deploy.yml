@@ -41,6 +41,23 @@ jobs:
         # 6. (No runner-side environment write) — Laravel optimizations will be run on the remote host after .env is in place
 
       # 8. Deploy the built files to Hostinger using rsync over SSH
+      # 8a. Optional: Check SSH connectivity from the runner (debugging step)
+      - name: Check SSH connectivity
+        if: always()
+        run: |
+          set -e
+          mkdir -p ~/.ssh
+          printf '%s\n' "${{ secrets.HOST_SSH_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          PORT=${{ secrets.HOST_SSH_PORT }}
+          if [ -z "$PORT" ]; then
+            PORT=22
+          fi
+          echo "Using SSH port: $PORT"
+          echo "Testing SSH connectivity to ${{ secrets.HOST_USER }}@${{ secrets.HOST_IP }}"
+          # Run a verbose SSH attempt to show why connection may be failing (timeout, auth, DNS)
+          ssh -o StrictHostKeyChecking=no -o ConnectTimeout=10 -i ~/.ssh/deploy_key -p "$PORT" -vvv "${{ secrets.HOST_USER }}@${{ secrets.HOST_IP }}" exit || true
+
       - name: Deploy files via rsync
         uses: easingthemes/ssh-deploy@v5.0.0
         with:
