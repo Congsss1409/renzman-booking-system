@@ -68,9 +68,9 @@
     .main-navbar .social { display:flex; gap:0.7rem; align-items:center; }
     .main-navbar .social a { color:#fff; display:inline-flex; width:36px; height:36px; align-items:center; justify-content:center; border-radius:8px; transition:background .12s, color .12s; }
     .main-navbar .social a:hover { background: rgba(255,255,255,0.06); }
-    .hero-content { display:flex; gap:2rem; align-items:center; justify-content:space-between; flex:1 1 0%; padding:5.5rem 1rem 4rem; max-width:1200px; margin:0 auto; width:100%; }
+    .hero-content { display:flex; gap:2.5rem; align-items:center; justify-content:space-between; flex:1 1 0%; padding:7.5rem 1rem 6rem; max-width:1300px; margin:0 auto; width:100%; }
     .hero-left { flex:1 1 0%; padding:2rem; display:flex; flex-direction:column; align-items:flex-start; justify-content:center; }
-    .hero-title { font-size:4rem; font-weight:900; line-height:1.02; margin-bottom:0.8rem; color:#fff; text-shadow: 0 8px 28px rgba(0,0,0,0.22); }
+    .hero-title { font-size:5.25rem; font-weight:900; line-height:0.98; margin-bottom:0.6rem; color:#fff; text-shadow: 0 10px 36px rgba(0,0,0,0.26); }
     .hero-desc { font-size:1.05rem; margin-bottom:1.6rem; color: #000 !important; max-width:520px; }
     .hero-btn { background:#ffffff; color:#000 !important; font-weight:800; border-radius:9999px; padding:0.9rem 1.8rem; font-size:1rem; box-shadow:0 10px 30px rgba(0,0,0,0.08); transition:transform .12s ease, box-shadow .12s ease; }
     .hero-btn:hover { transform:translateY(-3px); box-shadow:0 18px 40px rgba(0,0,0,0.12); }
@@ -79,12 +79,17 @@
         .hero-left .hero-title { color: #fff !important; }
         .hero-left .hero-desc { color: #000 !important; }
     .hero-right { flex:1 1 0%; display:flex; align-items:center; justify-content:center; padding:2rem; }
-    .hero-img { max-width:620px; width:100%; border-radius:1.25rem; box-shadow:0 30px 80px rgba(2,6,23,0.14); background:#fff; object-fit:cover; border:8px solid rgba(255,255,255,0.22); }
+    .hero-img { max-width:900px; width:100%; border-radius:1.5rem; box-shadow:0 40px 110px rgba(2,6,23,0.16); background:#fff; object-fit:cover; border:10px solid rgba(255,255,255,0.22); }
+    @media (max-width: 1200px) {
+        .hero-content { padding:6rem 1rem 4.5rem; }
+        .hero-title { font-size:4rem; }
+        .hero-img { max-width:720px; }
+    }
     @media (max-width: 960px) {
-        .hero-content { flex-direction:column-reverse; gap:1.5rem; padding:2rem 1rem; }
+        .hero-content { flex-direction:column-reverse; gap:1.5rem; padding:2.5rem 1rem; }
         .hero-left, .hero-right { padding:1rem; text-align:center; align-items:center; }
-        .hero-title { font-size:2rem; }
-        .hero-img { max-width:360px; }
+        .hero-title { font-size:2.25rem; }
+        .hero-img { max-width:420px; }
     }
     @media (max-width: 520px) {
         .main-navbar { width: calc(100% - 20px); margin: 0.6rem auto; }
@@ -155,7 +160,7 @@
             <a href="{{ route('booking.create.step-one') }}" class="hero-btn">Book an Appointment</a>
         </div>
         <div class="hero-right">
-            <img src="{{ asset('images/store1.jpg') }}" alt="Renzman Blind Massage" class="hero-img" />
+            <img src="{{ asset('images/thera.png') }}" alt="Our therapists at Renzman" class="hero-img" />
         </div>
     </div>
 </div>
