@@ -42,6 +42,20 @@
         width: calc(100% - 48px);
         max-width: 1200px;
     }
+    /* header glass style used on About page navbar */
+    .header-glass {
+        background: rgba(0, 0, 0, 0.25);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        padding: 0.4rem 0.75rem;
+        border-radius: 12px;
+    }
+    .mobile-nav {
+        background: rgba(0, 0, 0, 0.4);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+    }
     .main-navbar .mobile-toggle { display:none; background:transparent; border:none; color:inherit; font-size:1.2rem; }
     .main-navbar .logo { font-size: 1.1rem; font-weight: 800; display:flex; align-items:center; gap:0.5rem; }
     .main-navbar .logo img { height: 36px; display:block; }
@@ -130,32 +144,29 @@
 
 
 <div class="hero-bg">
-    <header class="main-navbar">
-        <div class="logo">
-            <a href="{{ route('landing') }}">
-                <img src="{{ asset('images/logo trans.png') }}" alt="Renzman logo" />
+    <header x-data="{ open: false }" class="fixed top-0 left-0 right-0 z-50 p-2 sm:p-4">
+        <div class="container mx-auto flex justify-between items-center header-glass rounded-full p-2 px-4 sm:px-6 shadow-lg">
+            <a href="{{ route('landing') }}"><img src="{{ asset('images/logo_white.png') }}" alt="Renzman Logo" class="h-10 sm:h-12"></a>
+            <nav class="hidden md:flex items-center space-x-8 text-gray-200">
+                <a href="{{ route('landing') }}" class="hover:text-white transition-colors">Home</a>
+                <a href="{{ route('services') }}" class="hover:text-white transition-colors">Services</a>
+                <a href="{{ route('about') }}" class="font-bold text-white">About Us</a>
+            </nav>
+            <a href="{{ route('booking.create.step-one') }}" class="hidden sm:inline-block bg-white text-teal-600 font-bold py-2 px-6 text-sm sm:py-3 sm:px-8 sm:text-base rounded-full shadow-md hover:bg-cyan-100 transition-all transform hover:scale-105">
+                Book Now
             </a>
-        </div>
-        <button class="mobile-toggle" id="mobileToggle" aria-expanded="false" aria-controls="mainNav">☰</button>
-        <nav id="mainNav">
-            <a href="#" class="active">Home</a>
-            <a href="#services">Services</a>
-            <a href="#branches">Branches</a>
-            <a href="#testimonials">Testimonials</a>
-            <a href="{{ route('about') }}">About Us</a>
-        </nav>
-        <div class="nav-right">
-            <div class="social" aria-hidden="false">
-                <a href="#" aria-label="Facebook">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M22 12.07C22 6.48 17.52 2 11.93 2S2 6.48 2 12.07C2 17.09 5.66 21.19 10.44 22v-7.03H8.07v-2.9h2.37V9.41c0-2.35 1.39-3.64 3.52-3.64 1.02 0 2.09.18 2.09.18v2.3h-1.18c-1.16 0-1.52.72-1.52 1.46v1.75h2.59l-.41 2.9h-2.18V22C18.34 21.19 22 17.09 22 12.07z" fill="#fff"/></svg>
-                </a>
-                <a href="#" aria-label="Instagram">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M7 2h10a5 5 0 015 5v10a5 5 0 01-5 5H7a5 5 0 01-5-5V7a5 5 0 015-5zm5 6.2a4.8 4.8 0 100 9.6 4.8 4.8 0 000-9.6zm4.9-2.5a1.1 1.1 0 11-2.2 0 1.1 1.1 0 012.2 0z" fill="#fff"/></svg>
-                </a>
-                <a href="#" aria-label="Twitter">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M22 5.92c-.6.27-1.24.45-1.92.53a3.32 3.32 0 001.45-1.84 6.56 6.56 0 01-2.08.8 3.28 3.28 0 00-5.59 2.99A9.31 9.31 0 013 4.86a3.28 3.28 0 001.02 4.37c-.5-.02-.97-.15-1.38-.38v.04c0 1.6 1.13 2.92 2.63 3.23a3.28 3.28 0 01-1.48.06c.42 1.3 1.64 2.24 3.09 2.27A6.57 6.57 0 012 19.54a9.27 9.27 0 005.03 1.47c6.03 0 9.33-4.99 9.33-9.32v-.43c.64-.46 1.2-1.04 1.64-1.7-.58.26-1.2.45-1.84.53z" fill="#fff"/></svg>
-                </a>
+            <div class="md:hidden">
+                <button @click="open = !open" class="text-white focus:outline-none">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                </button>
             </div>
+        </div>
+        <!-- Mobile Menu -->
+        <div x-show="open" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 -translate-y-2" x-transition:enter-end="opacity-100 translate-y-0" x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100 translate-y-0" x-transition:leave-end="opacity-0 -translate-y-2" @click.away="open = false" class="md:hidden mt-3 mobile-nav rounded-2xl shadow-lg">
+            <a href="{{ route('landing') }}" @click="open = false" class="block text-center py-3 px-4 text-white hover:bg-white/10 rounded-t-2xl">Home</a>
+            <a href="{{ route('services') }}" @click="open = false" class="block text-center py-3 px-4 text-white hover:bg-white/10">Services</a>
+            <a href="{{ route('about') }}" @click="open = false" class="block text-center py-3 px-4 text-white bg-white/10 font-bold">About Us</a>
+            <a href="{{ route('booking.create.step-one') }}" class="block text-center bg-white/20 hover:bg-white/30 text-white font-bold py-4 px-4 rounded-b-2xl">Book Now</a>
         </div>
     </header>
     <div class="hero-content">
