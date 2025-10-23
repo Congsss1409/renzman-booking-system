@@ -26,6 +26,11 @@
                 </div>
                 <div class="mt-6 flex justify-center gap-4">
                     <a href="{{ route('admin.branches.edit', $branch) }}" class="font-semibold bg-cyan-400 text-white py-2 px-8 rounded-full shadow-md transition-transform transform hover:scale-105">EDIT IMAGE</a>
+                    <form action="{{ route('admin.branches.destroy', $branch) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this branch?');">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="font-semibold bg-red-500 text-white py-2 px-8 rounded-full shadow-md transition-transform transform hover:scale-105 ml-2">DELETE</button>
+                    </form>
                 </div>
             </div>
         @empty
