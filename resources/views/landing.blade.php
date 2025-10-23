@@ -44,6 +44,7 @@
     }
     .main-navbar .mobile-toggle { display:none; background:transparent; border:none; color:inherit; font-size:1.2rem; }
     .main-navbar .logo { font-size: 1.1rem; font-weight: 800; display:flex; align-items:center; gap:0.5rem; }
+    .main-navbar .logo img { height: 36px; display:block; }
     .main-navbar .logo .icon { font-size:1.4rem; }
     .main-navbar nav { display:flex; gap:1.25rem; align-items:center; }
     .main-navbar nav a { color: rgba(255,255,255,0.95); font-weight:600; text-decoration:none; padding:6px 8px; border-radius:8px; }
@@ -54,12 +55,12 @@
     .main-navbar .social a { color:#fff; display:inline-flex; width:36px; height:36px; align-items:center; justify-content:center; border-radius:8px; transition:background .12s, color .12s; }
     .main-navbar .social a:hover { background: rgba(255,255,255,0.06); }
     .hero-content { display:flex; gap:2rem; align-items:center; justify-content:space-between; flex:1 1 0%; padding:5.5rem 1rem 4rem; max-width:1200px; margin:0 auto; width:100%; }
-    .hero-left { flex:1 1 0%; padding:2rem; color:#fff; display:flex; flex-direction:column; align-items:flex-start; justify-content:center; }
+    .hero-left { flex:1 1 0%; padding:2rem; display:flex; flex-direction:column; align-items:flex-start; justify-content:center; }
     .hero-title { font-size:4rem; font-weight:900; line-height:1.02; margin-bottom:0.8rem; color:#fff; text-shadow: 0 8px 28px rgba(0,0,0,0.22); }
     .hero-desc { font-size:1.05rem; margin-bottom:1.6rem; color: rgba(255,255,255,0.92); max-width:520px; }
-    .hero-btn { background:#ffffff; color:#000; font-weight:800; border-radius:9999px; padding:0.9rem 1.8rem; font-size:1rem; box-shadow:0 10px 30px rgba(0,0,0,0.08); transition:transform .12s ease, box-shadow .12s ease; }
-    .hero-btn:hover { transform:translateY(-3px); box-shadow:0 18px 40px rgba(16,185,129,0.12); }
-    .hero-btn:focus { outline: 3px solid rgba(6,182,212,0.16); outline-offset:6px; }
+    .hero-btn { background:#ffffff; color:#000 !important; font-weight:800; border-radius:9999px; padding:0.9rem 1.8rem; font-size:1rem; box-shadow:0 10px 30px rgba(0,0,0,0.08); transition:transform .12s ease, box-shadow .12s ease; }
+    .hero-btn:hover { transform:translateY(-3px); box-shadow:0 18px 40px rgba(0,0,0,0.12); }
+    .hero-btn:focus { outline: 3px solid rgba(0,0,0,0.12); outline-offset:6px; }
     .hero-right { flex:1 1 0%; display:flex; align-items:center; justify-content:center; padding:2rem; }
     .hero-img { max-width:620px; width:100%; border-radius:1.25rem; box-shadow:0 30px 80px rgba(2,6,23,0.14); background:#fff; object-fit:cover; border:8px solid rgba(255,255,255,0.22); }
     @media (max-width: 960px) {
@@ -87,9 +88,8 @@
     body { color: #000 !important; }
     /* Force white for header and hero text */
     .main-navbar, .main-navbar * { color: #fff !important; }
-    .hero-left, .hero-left * { color: #fff !important; }
-    .hero-title { color: #fff !important; }
-    .hero-desc { color: rgba(255,255,255,0.95) !important; }
+    /* limit white forcing to title and description only, allow buttons and other elements to override */
+    .hero-left .hero-title, .hero-left .hero-desc { color: #fff !important; }
     /* Sections should default to white headings and black card text */
     section.scroll-section h2, section.scroll-section .section-sub { color: #fff !important; }
     .glass-panel, .service-card, .testimonial-card { color: #000 !important; }
@@ -112,7 +112,9 @@
 <div class="hero-bg">
     <header class="main-navbar">
         <div class="logo">
-            <span class="icon">👐</span> Renzman
+            <a href="{{ route('landing') }}">
+                <img src="{{ asset('images/renzman-logo.png') }}" alt="Renzman logo" />
+            </a>
         </div>
         <button class="mobile-toggle" id="mobileToggle" aria-expanded="false" aria-controls="mainNav">☰</button>
         <nav id="mainNav">

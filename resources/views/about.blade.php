@@ -83,11 +83,11 @@
                     <div class="glass-panel rounded-2xl p-6 sm:p-8">
                         <h2 class="text-2xl sm:text-3xl font-bold">Our Mission</h2>
                         <p class="mt-4 text-black text-sm sm:text-base">
-                            At Renzman, our mission is to provide an accessible escape from the stresses of daily life. We believe in the power of touch and the importance of self-care. Our team of expert therapists is dedicated to delivering personalized treatments that not only soothe tired muscles but also restore balance to your mind and spirit.
+                            At Renzman Blind Massage Therapy, our mission is to promote wellness, relaxation, and inclusivity through professional and compassionate massage services. We aim to provide every client with a personalized healing experience that relieves stress, eases body tension, and rejuvenates both mind and spirit. Beyond physical wellness, Renzman also advocates for empowerment and equal opportunity by providing sustainable employment to visually impaired massage therapists, proving that true skill is felt by the hands, not just seen by the eyes.
                         </p>
                         <h2 class="text-2xl sm:text-3xl font-bold mt-6 sm:mt-8">Our Story</h2>
                         <p class="mt-4 text-black text-sm sm:text-base">
-                            Founded on the principles of quality, care, and community, Renzman started as a small, local massage parlor with a big dream: to make professional wellness services available to everyone. We've grown into a well-loved establishment with multiple branches, yet we've never lost the personal touch that defines us.
+                            Renzman began with a simple yet meaningful goal — to create a space where clients can find comfort, while also offering livelihood and dignity to visually impaired individuals. From a small local massage service, Renzman has grown into a recognized and trusted name in wellness, known for its professional care, calming ambiance, and client-centered service. Over the years, we have continuously improved our facilities and technologies, such as adopting an Appointment Management System and mobile application to make booking sessions faster, easier, and more organized. Despite our expansion, our core values of compassion, respect, and accessibility remain at the heart of everything we do.
                         </p>
                     </div>
                 </div>
@@ -100,7 +100,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center md:text-left">
                     <div>
                         <h3 class="font-bold text-lg">About Renzman</h3>
-                        <p class="text-sm text-black mt-2">Providing top-quality relaxation and wellness services to help you find your peace and rejuvenate your body.</p>
+                        <p class="text-sm text-black mt-2">Renzman Blind Massage Therapy offers professional and relaxing massage services delivered by skilled visually impaired therapists. Each session is designed to relieve tension, reduce stress, and promote overall well-being. We take pride in providing a welcoming and comfortable environment where clients can unwind and restore balance to both body and mind. Through our commitment to quality service and inclusivity, Renzman continues to promote relaxation, confidence, and empowerment—one soothing massage at a time.
                     </div>
                     <div>
                                 <h3 class="font-bold text-lg">Quick Links</h3>
