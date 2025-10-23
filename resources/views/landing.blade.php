@@ -46,10 +46,13 @@
         box-sizing: border-box;
     }
 
-    /* Remove extra space at the bottom of the last section */
+    /* Remove extra space and prevent background bleed at the bottom of the last section */
     .scroll-section:last-of-type {
         padding-bottom: 0 !important;
-        min-height: calc(100vh - var(--header-height));
+        height: calc(100vh - var(--header-height));
+        min-height: unset;
+        overflow: hidden;
+        position: relative;
     }
 
     @media (min-width: 640px) {
