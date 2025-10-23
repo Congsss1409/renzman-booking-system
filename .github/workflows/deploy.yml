@@ -50,7 +50,9 @@ jobs:
         run: |
           php artisan config:cache
           php artisan route:cache
-          
+       
+      - name: Remove node_modules
+        run: rm -rf node_modules   
 
       # 7. Deploy files to server via FTP
       - name: Deploy to FTP
