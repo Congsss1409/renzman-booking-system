@@ -1,5 +1,4 @@
-name: Deploy to Hostinger (Fast)
-
+name: Deploy to Hostinger via SSH
 on:
   push:
     branches:
@@ -10,66 +9,22 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. Check out the repository code
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      # 2. Set up Node.js (for building CSS/JS)
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '18' # Or your project's node version
-
-      # 3. Install NPM dependencies and build assets
-      - name: Install NPM dependencies
-        run: npm install
-      - name: Build assets
-        run: npm run build
-
-      # 4. Deploy only app files via FTP (FAST)
-      # This uploads your app and public/build folders
-      - name: Deploy to FTP
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
-        with:
-          server: ${{ secrets.FTP_SERVER }}
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          local-dir: ./
-          server-dir: ${{ secrets.SERVER_PATH }}/
-          
-          # This is the magic: we now EXCLUDE vendor
-          exclude: |
-            **/.git*
-            **/.github*
-            **/node_modules*
-            **/vendor* # <-- NEW: Exclude vendor folder
-            .editorconfig
-            .env
-            .env.example
-            .gitignore
-            composer.lock
-            package.json
-            package-lock.json
-            phpunit.xml
-            README.md
-            vite.config.js
-            /storage/logs/*
-            /storage/framework/cache/*
-            /storage/framework/sessions/*
-            /storage/framework/views/*
-
-      # 5. Run commands on server via SSH (FAST)
-      # This runs 'composer install' and 'artisan' on your server
-      - name: Run server-side commands
+      - name: Deploy to Server
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: ${{ secrets.SSH_PORT }}
+          
+          # This script runs on your server
+          # It's the "automatic" part you wanted
           script: |
-            cd ${{ secrets.SERVER_PATH }}
+            cd /home/u689011157/domains/renzman-massage.com/renzman-booking-system
+            git pull origin main
             composer install --no-dev --optimize-autoloader
+            npm install
+            npm run build
             php artisan migrate --force
             php artisan config:cache
             php artisan route:cache
