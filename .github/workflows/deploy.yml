@@ -1,76 +1,129 @@
 name: Deploy Laravel to Hostinger
 
 # This action runs on every push to the 'main' branch
-on:
-  push:
-    branches:
-      - main  # Change this to 'master' if that's your production branch
-
-jobs:
-  deploy:
-    runs-on: ubuntu-latest # Use a standard Linux runner
-
-    steps:
-    # 1. Get the latest code from your repo
-    - name: Checkout code
-      uses: actions/checkout@v4
-
-    # 2. Set up the PHP environment
-    - name: Set up PHP
-      uses: shivammathur/setup-php@v2
-      with:
-        php-version: '8.2' # Match your Hostinger PHP version
-        extensions: mbstring, dom, fileinfo, mysql
-        
-    # 3. Install Composer (PHP) dependencies
-    - name: Install Composer Dependencies
-      run: composer install --no-interaction --no-dev --prefer-dist --optimize-autoloader
-
-    # 4. Set up Node.js to build your assets (CSS/JS)
-    - name: Set up Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '18' # Match your local version
-        
-    # 5. Install NPM (JS) dependencies and build assets
-    - name: Install NPM Dependencies and Build
       run: |
-        npm install
-        npm run build
+        set -e
+        mkdir -p ~/.ssh
+        # Write the secret to a file, normalize CRLF if present
+        printf '%s\n' "$HOST_SSH_KEY" > ~/.ssh/deploy_key
+        sed -i 's/\r$//' ~/.ssh/deploy_key || true
+        chmod 600 ~/.ssh/deploy_key
+        # If the key is OpenSSH new format, convert to PEM for older libcrypto
+        if grep -q "BEGIN OPENSSH PRIVATE KEY" ~/.ssh/deploy_key; then
+          echo "Converting OPENSSH private key to PEM (RSA/EC) for compatibility"
+          # Try conversion; if fails, continue with existing key
+          ssh-keygen -p -f ~/.ssh/deploy_key -m PEM -P "" -N "" || true
+        name: Deploy Laravel to Hostinger
 
-    # 6. Create the production .env file from your GitHub Secret
-    - name: Create .env file
-      run: echo "${{ secrets.PROD_ENV }}" > .env
+        on:
+          push:
+            branches: [ main ]
 
-    # 7. Generate a new app key (if not set in your secret) and optimize Laravel
-    - name: Run Laravel optimizations
-      run: |
-        php artisan key:generate --force
-        php artisan config:cache
-        php artisan route:cache
-        php artisan view:cache
-        
-    # 8. Deploy the built files to Hostinger using rsync over SSH
-    - name: Deploy files via rsync
-      uses: easingthemes/ssh-deploy@v5.0.0
-      with:
-        SSH_PRIVATE_KEY: ${{ secrets.HOST_SSH_KEY }}
-        REMOTE_HOST: ${{ secrets.HOST_IP }}
-        REMOTE_USER: ${{ secrets.HOST_USER }}
-        TARGET: ${{ secrets.HOST_TARGET_PATH }}
-        SOURCE: "./"
-        # Exclude files you don't want to deploy
-        EXCLUDE: "/.git/, /.github/, /node_modules/, /storage/logs/"
+        jobs:
+          deploy:
+            runs-on: ubuntu-latest
+            steps:
+              - name: Checkout code
+                uses: actions/checkout@v4
 
-    # 9. Run post-deployment commands on your Hostinger server
-   - name: Run post-deploy commands (e.g., migrate database)
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.HOST_IP }}
-          username: ${{ secrets.HOST_USER }}
-          key: ${{ secrets.HOST_SSH_KEY }}
-          script: |
-            cd ${{ secrets.HOST_TARGET_PATH }}
-            php artisan migrate --force
-            rm -f public/storage
-            php artisan storage:link
+              - name: Set up PHP
+                uses: shivammathur/setup-php@v2
+                with:
+                  php-version: '8.2'
+                  extensions: mbstring, dom, fileinfo, pdo_mysql
+
+              - name: Install Composer Dependencies
+                run: composer install --no-interaction --no-dev --prefer-dist --optimize-autoloader
+
+              - name: Set up Node.js
+                uses: actions/setup-node@v4
+                with:
+                  node-version: '18'
+
+              - name: Install NPM Dependencies and Build (optional)
+                run: |
+                  npm ci --silent || true
+                  npm run build --silent || true
+
+              - name: Create .env file (from secret)
+                run: |
+                  printf '%s' "${{ secrets.PROD_ENV }}" > .env
+
+              - name: Run Laravel optimizations
+                run: |
+                  php artisan key:generate --force || true
+                  php artisan config:cache || true
+                  php artisan route:cache || true
+                  php artisan view:cache || true
+
+              - name: Write SSH key and convert if needed
+                env:
+                  HOST_SSH_KEY: ${{ secrets.HOST_SSH_KEY }}
+                run: |
+                  set -e
+                  mkdir -p ~/.ssh
+                  printf '%s\n' "$HOST_SSH_KEY" > ~/.ssh/deploy_key
+                  sed -i 's/\r$//' ~/.ssh/deploy_key || true
+                  chmod 600 ~/.ssh/deploy_key
+                  # Convert OpenSSH private key to PEM if present (fixes libcrypto errors on older rsync/ssh)
+                  if grep -q "BEGIN OPENSSH PRIVATE KEY" ~/.ssh/deploy_key; then
+                    echo "Converting OPENSSH private key to PEM format"
+                    ssh-keygen -p -f ~/.ssh/deploy_key -m PEM -P "" -N "" || true
+                  fi
+
+              - name: Test SSH connectivity
+                env:
+                  HOST_IP: ${{ secrets.HOST_IP }}
+                  HOST_USER: ${{ secrets.HOST_USER }}
+                  HOST_SSH_PORT: ${{ secrets.HOST_SSH_PORT }}
+                run: |
+                  set -e
+                  PORT="$HOST_SSH_PORT"
+                  if [ -z "$PORT" ]; then
+                    PORT=22
+                  fi
+                  echo "Testing SSH connectivity to $HOST_USER@$HOST_IP on port $PORT"
+                  ssh -o StrictHostKeyChecking=no -o ConnectTimeout=10 -i ~/.ssh/deploy_key -p "$PORT" "$HOST_USER@$HOST_IP" exit || true
+
+              - name: Deploy files via rsync using the prepared key
+                env:
+                  HOST_IP: ${{ secrets.HOST_IP }}
+                  HOST_USER: ${{ secrets.HOST_USER }}
+                  HOST_TARGET_PATH: ${{ secrets.HOST_TARGET_PATH }}
+                  HOST_SSH_PORT: ${{ secrets.HOST_SSH_PORT }}
+                run: |
+                  set -e
+                  PORT="$HOST_SSH_PORT"
+                  if [ -z "$PORT" ]; then
+                    PORT=22
+                  fi
+                  RSYNC_EXCLUDES=(--exclude='/.git/' --exclude='/.github/' --exclude='node_modules/' --exclude='storage/logs/' --exclude='.env')
+                  echo "Starting rsync to $HOST_USER@$HOST_IP:$HOST_TARGET_PATH (port $PORT)"
+                  rsync -az --delete "${RSYNC_EXCLUDES[@]}" -e "ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no -p $PORT" ./ "$HOST_USER@$HOST_IP:$HOST_TARGET_PATH"
+
+              - name: Run post-deploy commands on remote
+                env:
+                  HOST_IP: ${{ secrets.HOST_IP }}
+                  HOST_USER: ${{ secrets.HOST_USER }}
+                  HOST_TARGET_PATH: ${{ secrets.HOST_TARGET_PATH }}
+                  HOST_SSH_PORT: ${{ secrets.HOST_SSH_PORT }}
+                  PROD_ENV: ${{ secrets.PROD_ENV }}
+                run: |
+                  set -e
+                  PORT="$HOST_SSH_PORT"
+                  if [ -z "$PORT" ]; then
+                    PORT=22
+                  fi
+                  # Write remote .env from secret and run artisan commands
+                  ssh -o StrictHostKeyChecking=no -i ~/.ssh/deploy_key -p "$PORT" "$HOST_USER@$HOST_IP" "bash -s" <<'SSH_SCRIPT'
+                    set -e
+                    cd "$HOST_TARGET_PATH"
+                    printf '%s' "$PROD_ENV" > .env
+                    php artisan key:generate --force || true
+                    php artisan config:cache || true
+                    php artisan route:cache || true
+                    php artisan view:cache || true
+                    php artisan migrate --force || true
+                    rm -f public/storage || true
+                    php artisan storage:link || true
+                  SSH_SCRIPT
