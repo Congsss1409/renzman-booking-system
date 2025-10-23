@@ -57,7 +57,7 @@ jobs:
     - name: Get list of changed files
       id: changed-files
       run: |
-        git fetch --prune --unshallow || true
+        git fetch || true
         echo "CHANGED_FILES=$(git diff --name-only ${{ github.sha }}^ ${{ github.sha }} | tr '\n' ' ')" >> $GITHUB_ENV
 
     # 9. Upload only changed files via lftp

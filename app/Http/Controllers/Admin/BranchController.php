@@ -1,14 +1,3 @@
-    // Delete a branch
-    public function destroy(Branch $branch)
-    {
-        // Optionally, delete branch image from storage
-        if ($branch->image_url && strpos($branch->image_url, '/storage/') === 0) {
-            $path = substr($branch->image_url, 9);
-            Storage::disk('public')->delete($path);
-        }
-        $branch->delete();
-        return redirect()->route('admin.branches.index')->with('success', 'Branch deleted successfully.');
-    }
 <?php
 
 namespace App\Http\Controllers\Admin;

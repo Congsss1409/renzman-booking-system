@@ -83,7 +83,6 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
     Route::get('branches/{branch}/edit', [BranchController::class, 'edit'])->name('branches.edit');
     Route::post('branches/{branch}', [BranchController::class, 'update'])->name('branches.update');
     Route::post('branches/{branch}/remove-image', [BranchController::class, 'removeImage'])->name('branches.remove-image');
-    Route::delete('branches/{branch}', [BranchController::class, 'destroy'])->name('branches.destroy');
 
     // User Management (Admins only)
     Route::middleware(\App\Http\Middleware\EnsureUserIsAdmin::class)->group(function () {
