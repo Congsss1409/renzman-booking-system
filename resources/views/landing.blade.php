@@ -84,12 +84,17 @@
     @media (max-width:640px) { .section { padding:2rem 0; } }
 
     /* Text color rules: only black and white */
-    body { color: #000; }
-    /* Hero and nav use white text for contrast */
-    .main-navbar, .hero-left, .hero-title, .hero-desc { color: #fff !important; }
-    /* Section overlays should show white text; cards use black text */
-    section.scroll-section { color: #fff; }
-    .glass-panel, .service-card, .testimonial-card { color: #000; }
+    body { color: #000 !important; }
+    /* Force white for header and hero text */
+    .main-navbar, .main-navbar * { color: #fff !important; }
+    .hero-left, .hero-left * { color: #fff !important; }
+    .hero-title { color: #fff !important; }
+    .hero-desc { color: rgba(255,255,255,0.95) !important; }
+    /* Sections should default to white headings and black card text */
+    section.scroll-section h2, section.scroll-section .section-sub { color: #fff !important; }
+    .glass-panel, .service-card, .testimonial-card { color: #000 !important; }
+    /* Remove teal accent classes by overriding common utility selectors */
+    .text-cyan-100, .text-cyan-200, .text-teal-600, .text-cyan-100 * { color: inherit !important; }
 
     /* Sections styling to match the hero look */
     section.scroll-section { padding:4rem 1rem; position:relative; }
@@ -118,7 +123,6 @@
             <a href="{{ route('about') }}">About Us</a>
         </nav>
         <div class="nav-right">
-            <input type="text" class="search-box" placeholder="Search" aria-label="Search site" />
             <div class="social" aria-hidden="false">
                 <a href="#" aria-label="Facebook">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M22 12.07C22 6.48 17.52 2 11.93 2S2 6.48 2 12.07C2 17.09 5.66 21.19 10.44 22v-7.03H8.07v-2.9h2.37V9.41c0-2.35 1.39-3.64 3.52-3.64 1.02 0 2.09.18 2.09.18v2.3h-1.18c-1.16 0-1.52.72-1.52 1.46v1.75h2.59l-.41 2.9h-2.18V22C18.34 21.19 22 17.09 22 12.07z" fill="#fff"/></svg>
