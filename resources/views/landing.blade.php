@@ -4,183 +4,210 @@
 
 @section('content')
 <style>
-    :root {
-        /* header height used to offset fixed header for small screens */
-        --header-height: 64px;
+    body, html {
+        min-height: 100vh;
+        background: #f6f6fa;
     }
-    @media (min-width: 640px) {
-        :root { --header-height: 80px; }
-    }
-
-    /* Smooth scrolling for anchor navigation and overflow containers */
-    html, body { scroll-behavior: smooth; height: 100%; }
-
-    /* Main container for the full-page scroll effect */
-    .scroll-container {
-        scroll-snap-type: y mandatory;
-        overflow-y: auto;
-        height: 100vh;
-        scroll-behavior: smooth;
-        -webkit-overflow-scrolling: touch; /* momentum scrolling on iOS */
-        /* ensure anchor jumps account for the fixed header */
-        scroll-padding-top: calc(var(--header-height) + 8px);
-    }
-
-
-    /* Each section is a snap point and respects header height */
-    .scroll-section {
-        scroll-snap-align: start;
-        min-height: calc(100vh - var(--header-height));
-        position: relative;
+    .hero-bg {
+        background: linear-gradient(90deg, #a259e6 0%, #f6f6fa 100%);
+        min-height: 100vh;
         display: flex;
         flex-direction: column;
-        justify-content: center;
+    }
+    .main-navbar {
+        background: #a259e6;
+        color: #fff;
+        padding: 0.75rem 0;
+        display: flex;
         align-items: center;
-        padding: 4rem 1rem;
-    }
-
-    /* Only offset the very first section visually so the header doesn't overlap it. */
-    .scroll-section:first-of-type {
-        padding-top: calc(var(--header-height) + 1.25rem);
-        padding-bottom: 0;
-        box-sizing: border-box;
-        height: calc(100vh - var(--header-height));
-        min-height: unset;
-    }
-
-    /* Remove extra space and prevent background bleed at the bottom of the last section */
-    .scroll-section:last-of-type {
-        padding-bottom: 0 !important;
-        height: calc(100vh - var(--header-height));
-        min-height: unset;
-        overflow: hidden;
+        justify-content: space-between;
         position: relative;
+        z-index: 10;
     }
-
-    @media (min-width: 640px) {
-        .scroll-section {
-            padding: 6rem 1.5rem;
+    .main-navbar .logo {
+        font-size: 2rem;
+        font-weight: bold;
+        letter-spacing: 1px;
+        display: flex;
+        align-items: center;
+    }
+    .main-navbar .logo .icon {
+        margin-right: 0.5rem;
+        font-size: 2.2rem;
+    }
+    .main-navbar nav {
+        display: flex;
+        gap: 2rem;
+        align-items: center;
+    }
+    .main-navbar nav a {
+        color: #fff;
+        font-weight: 600;
+        font-size: 1.1rem;
+        text-decoration: none;
+        padding-bottom: 0.2rem;
+        border-bottom: 2px solid transparent;
+        transition: border 0.2s;
+    }
+    .main-navbar nav a.active, .main-navbar nav a:hover {
+        border-bottom: 2px solid #fff;
+    }
+    .main-navbar .nav-right {
+        display: flex;
+        align-items: center;
+        gap: 1.2rem;
+    }
+    .main-navbar .search-box {
+        background: #fff;
+        border-radius: 9999px;
+        padding: 0.3rem 1.2rem;
+        border: none;
+        font-size: 1rem;
+        color: #333;
+        outline: none;
+        margin-right: 0.5rem;
+        min-width: 120px;
+    }
+    .main-navbar .social {
+        display: flex;
+        gap: 0.7rem;
+        align-items: center;
+    }
+    .main-navbar .social a {
+        color: #fff;
+        font-size: 1.2rem;
+        transition: color 0.2s;
+    }
+    .main-navbar .social a:hover {
+        color: #f6f6fa;
+    }
+    .hero-content {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        flex: 1 1 0%;
+        padding: 3rem 0 0 0;
+        max-width: 1200px;
+        margin: 0 auto;
+        width: 100%;
+    }
+    .hero-left {
+        flex: 1 1 0%;
+        padding: 2rem 2rem 2rem 0;
+        color: #fff;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: center;
+    }
+    .hero-title {
+        font-size: 3rem;
+        font-weight: 900;
+        line-height: 1.1;
+        margin-bottom: 1.2rem;
+        letter-spacing: -1px;
+        text-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    }
+    .hero-desc {
+        font-size: 1.1rem;
+        margin-bottom: 2rem;
+        color: #f6f6fa;
+        max-width: 420px;
+    }
+    .hero-btn {
+        background: #fff;
+        color: #a259e6;
+        font-weight: bold;
+        border: none;
+        border-radius: 9999px;
+        padding: 0.9rem 2.2rem;
+        font-size: 1.1rem;
+        box-shadow: 0 2px 12px rgba(162,89,230,0.12);
+        transition: background 0.2s, color 0.2s, transform 0.2s;
+        cursor: pointer;
+    }
+    .hero-btn:hover {
+        background: #f6f6fa;
+        color: #7c3aed;
+        transform: scale(1.04);
+    }
+    .hero-right {
+        flex: 1 1 0%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem 2rem 2rem 0;
+    }
+    .hero-img {
+        max-width: 400px;
+        width: 100%;
+        border-radius: 2.5rem;
+        box-shadow: 0 8px 32px rgba(162,89,230,0.18);
+        background: #fff;
+        object-fit: cover;
+    }
+    @media (max-width: 900px) {
+        .hero-content {
+            flex-direction: column;
+            padding: 2rem 0 0 0;
         }
-        .scroll-section:last-of-type {
-            padding-bottom: 0 !important;
+        .hero-left, .hero-right {
+            padding: 1.5rem 1rem;
+            align-items: center;
+            text-align: center;
+        }
+        .hero-left {
+            align-items: center;
         }
     }
-
-    /* Ensure header occupies a predictable height so offsets work */
-    header {
-        height: var(--header-height);
-        top: 0;
-        left: 0;
-        right: 0;
+    @media (max-width: 600px) {
+        .main-navbar {
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        .hero-title {
+            font-size: 2rem;
+        }
+        .hero-img {
+            max-width: 260px;
+        }
     }
-
-    /* Bouncing animation for the scroll arrow */
-    .bounce-animation {
-        animation: bounce 2s infinite;
-    }
-    @keyframes bounce {
-        0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
-        40% { transform: translateY(-20px); }
-        60% { transform: translateY(-10px); }
-    }
-
-    /* Glassmorphism panel style */
-    .glass-panel {
-        background: rgba(255, 255, 255, 0.08);
-        backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px);
-        border: 1px solid rgba(255, 255, 255, 0.12);
-    }
-
-    /* Fixed header glass panel style */
-    .header-glass {
-        background: rgba(0, 0, 0, 0.25);
-        backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        padding: 0.4rem 0.75rem; /* reduce pill size on small screens */
-        border-radius: 12px;
-    }
-    @media (min-width: 768px) {
-        .header-glass { padding: 0.5rem 1rem; border-radius: 9999px; }
-    }
-
-    .mobile-nav {
-        background: rgba(0, 0, 0, 0.4);
-        backdrop-filter: blur(10px);
-        -webkit-backdrop-filter: blur(10px);
-    }
-
-    /* Responsive typography tweaks */
-    .scroll-section h1 {
-        font-size: clamp(1.75rem, 6vw, 3.75rem);
-        line-height: 1.05;
-    }
-
-    /* Make service tiles and panels less tall on small screens */
-    .glass-panel.rounded-2xl { padding: 1.25rem; }
-
-    /* Accessibility: ensure focused targets are visible */
-    .scroll-section :focus { outline: 2px solid rgba(255,255,255,0.12); outline-offset: 3px; }
 </style>
 
-<div class="scroll-container text-white overflow-x-hidden" style="background: url('{{ asset('images/store4.jpg') }}') center center / cover no-repeat fixed;">
-    <!-- Header (fixed for all sections) -->
-    <header x-data="{ open: false }" class="fixed top-0 left-0 right-0 z-50 p-2 sm:p-4">
-        <div class="container mx-auto flex justify-between items-center header-glass rounded-full p-2 px-4 sm:px-6 shadow-lg">
-            <a href="{{ route('landing') }}">
-                
-            <nav class="hidden md:flex items-center space-x-8 text-gray-200">
-                <a href="#services" class="hover:text-white transition-colors">Services</a>
-                <a href="#branches" class="hover:text-white transition-colors">Branches</a>
-                <a href="#testimonials" class="hover:text-white transition-colors">Testimonials</a>
-                <a href="{{ route('about') }}" class="hover:text-white transition-colors">About Us</a>
-            </nav>
-            <a href="{{ route('booking.create.step-one') }}" class="hidden sm:inline-block bg-white text-teal-600 font-bold py-2 px-6 text-sm sm:py-3 sm:px-8 sm:text-base rounded-full shadow-md hover:bg-cyan-100 transition-all transform hover:scale-105">
-                Book Now
-            </a>
-            <div class="md:hidden">
-                <button @click="open = !open" class="text-white focus:outline-none">
-                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
-                </button>
-            </div>
+
+<div class="hero-bg">
+    <header class="main-navbar">
+        <div class="logo">
+            <span class="icon">👐</span> Renzman
         </div>
-        <!-- Mobile Menu -->
-        <div x-show="open" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 transform -translate-y-2" x-transition:enter-end="opacity-100 transform translate-y-0" x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100 transform translate-y-0" x-transition:leave-end="opacity-0 transform -translate-y-2" @click.away="open = false" class="md:hidden mt-3 mobile-nav rounded-2xl shadow-lg">
-            <a href="#services" @click="open = false" class="block text-center py-3 px-4 text-white hover:bg-white/10 rounded-t-2xl">Services</a>
-            <a href="#branches" @click="open = false" class="block text-center py-3 px-4 text-white hover:bg-white/10">Branches</a>
-            <a href="#testimonials" @click="open = false" class="block text-center py-3 px-4 text-white hover:bg-white/10">Testimonials</a>
-            <a href="{{ route('about') }}" @click="open = false" class="block text-center py-3 px-4 text-white hover:bg-white/10">About Us</a>
-            <a href="{{ route('booking.create.step-one') }}" class="block text-center bg-white/20 hover:bg-white/30 text-white font-bold py-4 px-4 rounded-b-2xl">Book Now</a>
+        <nav>
+            <a href="#" class="active">Home</a>
+            <a href="#services">Services</a>
+            <a href="#branches">Branches</a>
+            <a href="#testimonials">Testimonials</a>
+            <a href="{{ route('about') }}">About Us</a>
+        </nav>
+        <div class="nav-right">
+            <input type="text" class="search-box" placeholder="Search" />
+            <div class="social">
+                <a href="#"><i class="fab fa-facebook-f"></i></a>
+                <a href="#"><i class="fab fa-instagram"></i></a>
+                <a href="#"><i class="fab fa-twitter"></i></a>
+            </div>
         </div>
     </header>
-
-    <!-- Page 1: Hero Section with Highlighted Renzman Blind Massage -->
-    <section class="scroll-section text-center relative">
-        <div class="absolute inset-0 bg-black/70"></div>
-        <div class="relative z-10 flex flex-col items-center px-4">
-            <div class="mb-8 mt-8">
-                <div class="inline-block glass-panel p-6 rounded-3xl shadow-2xl" style="backdrop-filter: blur(8px); background: rgba(0,0,0,0.45); border: 2px solid rgba(255,255,255,0.12);">
-                    <img src="{{ asset('images/store1.jpg') }}" alt="Renzman Blind Massage Sign" class="mx-auto rounded-xl shadow-lg w-full max-w-2xl border-4 border-white/20">
-                    <h1 class="mt-6 text-4xl sm:text-5xl md:text-7xl font-extrabold text-white drop-shadow-lg tracking-tight">Renzman Blind Massage</h1>
-                    <p class="mt-4 text-lg sm:text-2xl text-cyan-100 font-semibold drop-shadow-md">Be Relaxed. Be Rejuvenated. Be Relieved.</p>
-                </div>
-            </div>
-            <p class="mt-8 text-base sm:text-lg md:text-xl max-w-2xl mx-auto text-cyan-100 drop-shadow-md">
-                Escape the everyday and discover a new level of peace and rejuvenation.<br>
-                <span class="font-bold text-white">Experience the art of healing touch at Renzman.</span>
-            </p>
-            <a href="{{ route('booking.create.step-one') }}" class="mt-10 inline-block bg-white hover:bg-gray-200 text-teal-600 font-bold py-3 px-8 sm:py-4 sm:px-12 rounded-full shadow-xl transition-transform transform hover:scale-105 text-base sm:text-lg">
-                Book an Appointment
-            </a>
+    <div class="hero-content">
+        <div class="hero-left">
+            <div class="hero-title">IT'S TIME<br>FOR THAT <span style="color:#fff; background:#a259e6; border-radius:0.5rem; padding:0 0.5rem;">RENZMAN</span> MASSAGE!</div>
+            <div class="hero-desc">Escape the everyday and discover a new level of peace and rejuvenation. Experience the art of healing touch at Renzman.</div>
+            <a href="{{ route('booking.create.step-one') }}" class="hero-btn">Book an Appointment</a>
         </div>
-        <div class="absolute bottom-8 sm:bottom-10 left-1/2 -translate-x-1/2 z-10">
-            <a href="#services" class="flex flex-col items-center bounce-animation">
-                <span class="text-sm">Scroll Down</span>
-                <svg class="w-5 h-5 sm:w-6 sm:h-6 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-            </a>
+        <div class="hero-right">
+            <img src="{{ asset('images/store1.jpg') }}" alt="Renzman Blind Massage" class="hero-img" />
         </div>
-    </section>
+    </div>
+</div>
 
     <!-- Page 2: Services Section -->
     <section id="services" class="scroll-section">
