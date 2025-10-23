@@ -36,7 +36,7 @@ jobs:
     - name: Install NPM Dependencies and Build
       run: |
         npm install
-        npm run build
+        
 
     # 6. Create the production .env file from your GitHub Secret
     - name: Create .env file
