@@ -1,78 +1,85 @@
-name: Deploy Laravel to Hostinger
+# GitHub Action for deploying a Laravel project to Hostinger via FTP
 
-# This action runs on every push to the 'main' branch
+name: Deploy to Hostinger
+
+# Triggers the workflow on a push event to the 'main' branch
 on:
   push:
     branches:
-      - main  # Change this to 'master' if that's your production branch
+      - main  # Or 'master', or whichever branch you want to deploy from
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest # Use a standard Linux runner
+    runs-on: ubuntu-latest
 
     steps:
-    # 1. Get the latest code from your repo
-    - name: Checkout code
-      uses: actions/checkout@v4
-      with:
-        fetch-depth: 2
+      # 1. Check out the repository code
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-    # 2. Set up the PHP environment
-    - name: Set up PHP
-      uses: shivammathur/setup-php@v2
-      with:
-        php-version: '8.2' # Match your Hostinger PHP version
-        extensions: mbstring, dom, fileinfo, mysql
-        
-    # 3. Install Composer (PHP) dependencies
-    - name: Install Composer Dependencies
-      run: composer install --no-interaction --no-dev --prefer-dist --optimize-autoloader
+      # 2. Set up PHP environment
+      # ⚠️ IMPORTANT: Change '8.2' to match your project's PHP version
+      # Check your composer.json file for the "php" requirement (e.g., "^8.1")
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2' # <-- CHECK AND CHANGE THIS
+          extensions: mbstring, xml, ctype, json, tokenizer, dom, pdo_mysql
+          tools: composer
+        env:
+          COMPOSER_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-    # 4. Set up Node.js to build your assets (CSS/JS)
-    - name: Set up Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '18' # Match your local version
-        
-    # 5. Install NPM (JS) dependencies and build assets
-    - name: Install NPM Dependencies and Build
-      run: |
-        npm install
-        
+      # 3. Install Composer dependencies
+      - name: Install Composer dependencies
+        run: composer install --no-dev --optimize-autoloader
 
-    # 6. Create the production .env file from your GitHub Secret
-    - name: Create .env file
-      run: echo "${{ secrets.PROD_ENV }}" > .env
+      # 4. Set up Node.js (for building CSS/JS)
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18' # Or your project's node version
 
-    # 7. Generate a new app key (if not set in your secret) and optimize Laravel
-    - name: Run Laravel optimizations
-      run: |
-        php artisan key:generate --force
-        php artisan config:cache
-        php artisan route:cache
-        
-        
+      # 5. Install NPM dependencies and build assets
+      - name: Install NPM dependencies
+        run: npm install
+      - name: Build assets
+        run: npm run build
 
-    # 8. Get list of changed files
-    - name: Get list of changed files
-      id: changed-files
-      run: |
-        git fetch || true
-        echo "CHANGED_FILES=$(git diff --name-only ${{ github.sha }}^ ${{ github.sha }} | tr '\n' ' ')" >> $GITHUB_ENV
+      # 6. Run Laravel optimizations
+      - name: Optimize Laravel
+        run: |
+          php artisan config:cache
+          php artisan route:cache
+          php artisan view:cache
 
-    # 9. Upload only changed files via lftp
-    - name: Upload changed files via lftp
-      env:
-        FTP_HOST: 145.79.28.22
-        FTP_USER: u689011157
-        FTP_PASS: Rg34f/7rewzeUaj.
-        FTP_TARGET: /domains/renzman-massage.com
-        CHANGED_FILES: ${{ env.CHANGED_FILES }}
-      run: |
-        sudo apt-get update && sudo apt-get install -y lftp
-        for file in $CHANGED_FILES; do
-          if [ -f "$file" ]; then
-            lftp -u "$FTP_USER","$FTP_PASS" -e "set ftp:ssl-allow no; put -O $FTP_TARGET $file; bye" $FTP_HOST
-          fi
-        done
+      # 7. Deploy files to server via FTP
+      - name: Deploy to FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          local-dir: ./
+          server-dir: /renzman-booking-system/
 
+          # Exclude files that don't need to be on the server
+          # This prevents overwriting your .env file!
+          exclude: |
+            **/.git*
+            **/.github*
+            **/node_modules*
+            .editorconfig
+            .env
+            .env.example
+            .gitignore
+            composer.json
+            composer.lock
+            package.json
+            package-lock.json
+            phpunit.xml
+            README.md
+            vite.config.js
+            /storage/logs/*
+            /storage/framework/cache/*
+            /storage/framework/sessions/*
+            /storage/framework/views/*
