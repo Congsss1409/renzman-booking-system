@@ -50,17 +50,20 @@ jobs:
         php artisan route:cache
         
         
-    # 8. Deploy the built files to Hostinger using rsync over SSH
-    - name: Deploy files via rsync
-      uses: easingthemes/ssh-deploy@v5.0.0
+    # 8. Deploy the built files to Hostinger using FTP
+    - name: Deploy files via FTP
+      uses: SamKirkland/FTP-Deploy-Action@v4.3.4
       with:
-        SSH_PRIVATE_KEY: ${{ secrets.HOST_SSH_KEY }}
-        REMOTE_HOST: ${{ secrets.HOST_IP }}
-        REMOTE_USER: ${{ secrets.HOST_USER }}
-        TARGET: ${{ secrets.HOST_TARGET_PATH }}
-        SOURCE: "./"
-        # Exclude files you don't want to deploy
-        EXCLUDE: "/.git/, /.github/, /node_modules/, /storage/logs/"
+        server: ${{ secrets.FTP_SERVER }}
+        username: ${{ secrets.FTP_USERNAME }}
+        password: ${{ secrets.FTP_PASSWORD }}
+        server-dir: ${{ secrets.FTP_TARGET_PATH }}
+        local-dir: ./
+        exclude: |
+          **/.git*
+          **/.github*
+          **/node_modules*
+          **/storage/logs*
 
     # 9. Run post-deployment commands on your Hostinger server
     - name: Run post-deploy commands (e.g., migrate database)
