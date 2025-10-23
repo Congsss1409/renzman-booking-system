@@ -54,9 +54,9 @@ jobs:
     - name: Deploy files via FTP
       uses: SamKirkland/FTP-Deploy-Action@v4.3.4
       with:
-        server: ftp.example.com         # <-- Put your FTP server here
-        username: your_ftp_username     # <-- Put your FTP username here
-        password: your_ftp_password     # <-- Put your FTP password here
+        server: ftp://145.79.28.22        # <-- Put your FTP server here
+        username: u689011157   # <-- Put your FTP username here
+        password: Rg34f/7rewzeUaj.   # <-- Put your FTP password here
         server-dir: /public_html/       # <-- Put your FTP target path here
         local-dir: ./
         exclude: |
