@@ -63,7 +63,7 @@ jobs:
         FTP_HOST: 145.79.28.22
         FTP_USER: u689011157
         FTP_PASS: Rg34f/7rewzeUaj.
-        FTP_TARGET: /public_html/
+        FTP_TARGET: /domains/renzman-massage.com
         CHANGED_FILES: ${{ env.CHANGED_FILES }}
       run: |
         sudo apt-get update && sudo apt-get install -y lftp
