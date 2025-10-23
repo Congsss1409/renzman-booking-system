@@ -66,6 +66,8 @@ jobs:
           REMOTE_USER: ${{ secrets.HOST_USER }}
           TARGET: ${{ secrets.HOST_TARGET_PATH }}
           SOURCE: "./"
+          # Pass custom port if set
+          PORT: ${{ secrets.HOST_SSH_PORT }}
           # Exclude files you don't want to deploy
           EXCLUDE: "/.git/,/.github/,/node_modules/,/storage/logs/,/.env"
 
