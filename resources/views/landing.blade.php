@@ -3,7 +3,9 @@
 @section('title', 'Welcome to Renzman')
 
 @section('content')
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
 <style>
+    :root { font-family: 'Poppins', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial; }
     :root{
         --primary-from: #06b6d4; /* cyan-500 */
         --primary-via: #14b8a6;  /* teal-500 */
@@ -11,12 +13,19 @@
         --accent: #065f46;
     }
     body, html { min-height: 100vh; }
+    /* Use store4.jpg as a full fixed background for the whole page */
+    body {
+        background: url('{{ asset('images/store4.jpg') }}') center center / cover no-repeat fixed, linear-gradient(135deg, var(--primary-from), var(--primary-via) 45%, var(--primary-to));
+        -webkit-font-smoothing:antialiased;
+        -moz-osx-font-smoothing:grayscale;
+    }
+
     .hero-bg {
-        background: linear-gradient(135deg, var(--primary-from), var(--primary-via) 45%, var(--primary-to));
         min-height: 100vh;
         display: flex;
         flex-direction: column;
         color: #083344;
+        background: transparent; /* background comes from body */
     }
     .main-navbar {
         background: rgba(0,0,0,0.18);
@@ -33,6 +42,7 @@
         width: calc(100% - 48px);
         max-width: 1200px;
     }
+    .main-navbar .mobile-toggle { display:none; background:transparent; border:none; color:inherit; font-size:1.2rem; }
     .main-navbar .logo { font-size: 1.1rem; font-weight: 800; display:flex; align-items:center; gap:0.5rem; }
     .main-navbar .logo .icon { font-size:1.4rem; }
     .main-navbar nav { display:flex; gap:1.25rem; align-items:center; }
@@ -74,7 +84,26 @@
         .hero-title { font-size:1.5rem; }
         .hero-img { max-width:220px; }
         .main-navbar nav { display:none; }
+        .main-navbar .mobile-toggle { display:block; }
     }
+
+    /* responsive cards layout */
+    .grid-responsive { display:grid; grid-template-columns: repeat(3, 1fr); gap:1.25rem; }
+    @media (max-width: 992px) { .grid-responsive { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 640px) { .grid-responsive { grid-template-columns: 1fr; } }
+    .section { padding:4rem 0; }
+    @media (max-width:640px) { .section { padding:2rem 0; } }
+
+    /* Sections styling to match the hero look */
+    section.scroll-section { padding:4rem 1rem; position:relative; }
+    .glass-panel { background: rgba(255,255,255,0.06); border-radius:1rem; padding:1rem; border:1px solid rgba(255,255,255,0.08); }
+    .section-inner { max-width:1200px; margin:0 auto; }
+    h2.section-title { font-size:2rem; color:#062425; margin-bottom:0.5rem; }
+    p.section-sub { color: rgba(3,15,15,0.7); margin-bottom:1.25rem; }
+    .service-card { background: rgba(255,255,255,0.9); border-radius:1rem; padding:1rem; box-shadow:0 8px 30px rgba(2,6,23,0.06); }
+    .branch-card { border-radius:0.75rem; overflow:hidden; box-shadow:0 8px 30px rgba(2,6,23,0.06); }
+    .testimonial-card { background: rgba(255,255,255,0.95); padding:1rem; border-radius:1rem; box-shadow:0 6px 24px rgba(2,6,23,0.06); }
+    footer .glass-panel { background: rgba(255,255,255,0.04); }
 </style>
 
 
@@ -83,7 +112,8 @@
         <div class="logo">
             <span class="icon">👐</span> Renzman
         </div>
-        <nav>
+        <button class="mobile-toggle" id="mobileToggle" aria-expanded="false" aria-controls="mainNav">☰</button>
+        <nav id="mainNav">
             <a href="#" class="active">Home</a>
             <a href="#services">Services</a>
             <a href="#branches">Branches</a>
@@ -91,11 +121,11 @@
             <a href="{{ route('about') }}">About Us</a>
         </nav>
         <div class="nav-right">
-            <input type="text" class="search-box" placeholder="Search" />
-            <div class="social">
-                <a href="#"><i class="fab fa-facebook-f"></i></a>
-                <a href="#"><i class="fab fa-instagram"></i></a>
-                <a href="#"><i class="fab fa-twitter"></i></a>
+            <input type="text" class="search-box" placeholder="Search" aria-label="Search site" />
+            <div class="social" aria-hidden="true">
+                <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
             </div>
         </div>
     </header>
@@ -294,6 +324,18 @@
             target.focus({ preventScroll: true });
         }, DURATION + 20);
     }, false);
+})();
+
+// Mobile nav toggle
+(function(){
+    const toggle = document.getElementById('mobileToggle');
+    const nav = document.getElementById('mainNav');
+    if (!toggle || !nav) return;
+    toggle.addEventListener('click', function(){
+        const expanded = this.getAttribute('aria-expanded') === 'true';
+        this.setAttribute('aria-expanded', String(!expanded));
+        if (nav.style.display === 'block') { nav.style.display = ''; } else { nav.style.display = 'block'; }
+    });
 })();
 </script>
 
