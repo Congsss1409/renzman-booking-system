@@ -1,12 +1,9 @@
-# GitHub Action for deploying a Laravel project to Hostinger via FTP
+name: Deploy to Hostinger (Fast)
 
-name: Deploy to Hostinger
-
-# Triggers the workflow on a push event to the 'main' branch
 on:
   push:
     branches:
-      - main  # Or 'master', or whichever branch you want to deploy from
+      - main # Or your default branch
 
 jobs:
   deploy:
@@ -17,44 +14,20 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # 2. Set up PHP environment
-      # ⚠️ IMPORTANT: Change '8.2' to match your project's PHP version
-      # Check your composer.json file for the "php" requirement (e.g., "^8.1")
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: '8.2' # <-- CHECK AND CHANGE THIS
-          extensions: mbstring, xml, ctype, json, tokenizer, dom, pdo_mysql
-          tools: composer
-        env:
-          COMPOSER_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      # 3. Install Composer dependencies
-      - name: Install Composer dependencies
-        run: composer install --no-dev --optimize-autoloader
-
-      # 4. Set up Node.js (for building CSS/JS)
+      # 2. Set up Node.js (for building CSS/JS)
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '18' # Or your project's node version
 
-      # 5. Install NPM dependencies and build assets
+      # 3. Install NPM dependencies and build assets
       - name: Install NPM dependencies
         run: npm install
       - name: Build assets
         run: npm run build
 
-      # 6. Run Laravel optimizations
-      - name: Optimize Laravel
-        run: |
-          php artisan config:cache
-          php artisan route:cache
-       
-      - name: Remove node_modules
-        run: rm -rf node_modules   
-
-      # 7. Deploy files to server via FTP
+      # 4. Deploy only app files via FTP (FAST)
+      # This uploads your app and public/build folders
       - name: Deploy to FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.4
         with:
@@ -62,19 +35,18 @@ jobs:
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
           local-dir: ./
-          server-dir: /renzman-booking-system/
-
-          # Exclude files that don't need to be on the server
-          # This prevents overwriting your .env file!
+          server-dir: ${{ secrets.SERVER_PATH }}/
+          
+          # This is the magic: we now EXCLUDE vendor
           exclude: |
             **/.git*
             **/.github*
             **/node_modules*
+            **/vendor* # <-- NEW: Exclude vendor folder
             .editorconfig
             .env
             .env.example
             .gitignore
-            composer.json
             composer.lock
             package.json
             package-lock.json
@@ -85,3 +57,19 @@ jobs:
             /storage/framework/cache/*
             /storage/framework/sessions/*
             /storage/framework/views/*
+
+      # 5. Run commands on server via SSH (FAST)
+      # This runs 'composer install' and 'artisan' on your server
+      - name: Run server-side commands
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          script: |
+            cd ${{ secrets.SERVER_PATH }}
+            composer install --no-dev --optimize-autoloader
+            php artisan migrate --force
+            php artisan config:cache
+            php artisan route:cache

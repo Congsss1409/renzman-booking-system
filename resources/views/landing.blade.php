@@ -26,6 +26,7 @@
         scroll-padding-top: calc(var(--header-height) + 8px);
     }
 
+
     /* Each section is a snap point and respects header height */
     .scroll-section {
         scroll-snap-align: start;
@@ -35,19 +36,28 @@
         flex-direction: column;
         justify-content: center;
         align-items: center;
-        padding: 4rem 1rem; /* slightly reduced padding on mobile */
+        padding: 4rem 1rem;
     }
 
-    /* Only offset the very first section visually so the header doesn't overlap it.
-       Using :first-of-type keeps the scroll container background flush with the top. */
+    /* Only offset the very first section visually so the header doesn't overlap it. */
     .scroll-section:first-of-type {
         padding-top: calc(var(--header-height) + 1.25rem);
-        padding-bottom: 2rem; /* ensure hero has breathing room */
+        padding-bottom: 2rem;
         box-sizing: border-box;
     }
+
+    /* Remove extra space at the bottom of the last section */
+    .scroll-section:last-of-type {
+        padding-bottom: 0 !important;
+        min-height: calc(100vh - var(--header-height));
+    }
+
     @media (min-width: 640px) {
         .scroll-section {
-            padding: 6rem 1.5rem; /* Restore padding for larger screens */
+            padding: 6rem 1.5rem;
+        }
+        .scroll-section:last-of-type {
+            padding-bottom: 0 !important;
         }
     }
 
