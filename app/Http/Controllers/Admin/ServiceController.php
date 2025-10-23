@@ -32,7 +32,7 @@ class ServiceController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required|string|max:255',
+            'name' => 'required|string|max:255|unique:services,name',
             'description' => 'nullable|string',
             'price' => 'required|numeric|min:0',
             'duration' => 'required|integer|min:1',
@@ -71,7 +71,7 @@ class ServiceController extends Controller
     public function update(Request $request, Service $service)
     {
         $request->validate([
-            'name' => 'required|string|max:255',
+            'name' => 'required|string|max:255|unique:services,name,' . $service->id,
             'description' => 'nullable|string',
             'price' => 'required|numeric|min:0',
             'duration' => 'required|integer|min:1',
