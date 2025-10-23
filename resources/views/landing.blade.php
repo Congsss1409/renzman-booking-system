@@ -73,8 +73,28 @@
         .main-navbar { width: calc(100% - 20px); margin: 0.6rem auto; }
         .hero-title { font-size:1.5rem; }
         .hero-img { max-width:220px; }
+        .main-navbar { padding:0.6rem; }
         .main-navbar nav { display:none; }
         .main-navbar .mobile-toggle { display:block; }
+        /* mobile dropdown nav */
+        .main-navbar nav {
+            position: absolute;
+            top: calc(100% + 10px);
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            background: rgba(0,0,0,0.14);
+            padding: 14px 16px;
+            border-radius: 18px;
+            width: calc(100% - 40px);
+            max-width: 420px;
+            box-shadow: 0 8px 30px rgba(2,6,23,0.12);
+            z-index: 50;
+        }
+        .main-navbar nav a { padding: 10px 12px; }
+        .main-navbar.open nav { display: flex; }
     }
 
     /* responsive cards layout */
@@ -251,7 +271,7 @@
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center md:text-left">
                         <div>
                             <h3 class="font-bold text-base sm:text-lg">About Renzman</h3>
-                            <p class="text-xs sm:text-sm text-cyan-200 mt-2">Providing top-quality relaxation and wellness services to help you find your peace and rejuvenate your body.</p>
+                            <p class="text-xs sm:text-sm text-cyan-200 mt-2">Renzman Blind Massage Therapy offers professional and relaxing massage services delivered by skilled visually impaired therapists. Each session is designed to relieve tension, reduce stress, and promote overall well-being. We take pride in providing a welcoming and comfortable environment where clients can unwind and restore balance to both body and mind. Through our commitment to quality service and inclusivity, Renzman continues to promote relaxation, confidence, and empowerment—one soothing massage at a time. </p>
                         </div>
                         <div>
                             <h3 class="font-bold text-base sm:text-lg">Quick Links</h3>
@@ -343,7 +363,7 @@
     toggle.addEventListener('click', function(){
         const expanded = this.getAttribute('aria-expanded') === 'true';
         this.setAttribute('aria-expanded', String(!expanded));
-        if (nav.style.display === 'block') { nav.style.display = ''; } else { nav.style.display = 'block'; }
+        document.querySelector('.main-navbar').classList.toggle('open');
     });
 })();
 </script>
