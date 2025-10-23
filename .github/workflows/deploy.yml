@@ -14,6 +14,8 @@ jobs:
     # 1. Get the latest code from your repo
     - name: Checkout code
       uses: actions/checkout@v4
+      with:
+        fetch-depth: 2
 
     # 2. Set up the PHP environment
     - name: Set up PHP

@@ -1,4 +1,3 @@
-
 <?php
 
 namespace App\Http\Controllers\Admin;
@@ -10,21 +9,6 @@ use Illuminate\Support\Facades\Storage;
 
 class BranchController extends Controller
 {
-    // Delete branch
-    public function destroy(Branch $branch)
-    {
-        try {
-            // Delete the associated image from storage if it exists
-            if ($branch->image_url && strpos($branch->image_url, '/storage/') === 0) {
-                $path = substr($branch->image_url, 9);
-                Storage::disk('public')->delete($path);
-            }
-            $branch->delete();
-            return redirect()->route('admin.branches.index')->with('success', 'Branch deleted successfully.');
-        } catch (\Illuminate\Database\QueryException $e) {
-            return redirect()->route('admin.branches.index')->with('error', 'Cannot delete branch. It may be associated with other records.');
-        }
-    }
     // List branches in admin
     public function index()
     {

@@ -24,13 +24,8 @@
                     <h3 class="text-xl font-bold text-gray-800">{{ $branch->name }}</h3>
                     <p class="text-gray-500 mb-2 text-sm">{{ $branch->address ?? 'Address not set' }}</p>
                 </div>
-                <div class="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:justify-center sm:gap-2">
-                    <a href="{{ route('admin.branches.edit', $branch) }}" class="w-full sm:flex-1 font-semibold bg-cyan-400 text-white py-2 px-6 rounded-full shadow-md transition-transform transform hover:scale-105">EDIT IMAGE</a>
-                    <form action="{{ route('admin.branches.destroy', $branch) }}" method="POST" class="delete-form w-full sm:flex-1">
-                        @csrf
-                        @method('DELETE')
-                        <button type="button" class="w-full font-semibold bg-red-500 text-white py-2 px-6 rounded-full shadow-md transition-transform transform hover:scale-105 delete-button">DELETE</button>
-                    </form>
+                <div class="mt-6 flex justify-center gap-4">
+                    <a href="{{ route('admin.branches.edit', $branch) }}" class="font-semibold bg-cyan-400 text-white py-2 px-8 rounded-full shadow-md transition-transform transform hover:scale-105">EDIT IMAGE</a>
                 </div>
             </div>
         @empty
@@ -47,33 +42,3 @@
     </div>
 </div>
 @endsection
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-    const deleteButtons = document.querySelectorAll('.delete-button');
-    deleteButtons.forEach(button => {
-        button.addEventListener('click', function(e) {
-            e.preventDefault();
-            const form = this.closest('form');
-            Swal.fire({
-                title: 'Are you sure?',
-                text: "You won't be able to revert this!",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#14b8a6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Yes, delete it!'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    Swal.fire({
-                        title: 'Deleting...',
-                        text: 'Please wait.',
-                        allowOutsideClick: false,
-                        didOpen: () => { Swal.showLoading(); }
-                    });
-                    form.submit();
-                }
-            })
-        });
-    });
-});
-</script>
