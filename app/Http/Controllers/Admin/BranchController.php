@@ -25,14 +25,8 @@ class BranchController extends Controller
     // Store new branch
     public function store(Request $request)
     {
-
         $request->validate([
-            'name' => [
-                'required',
-                'string',
-                'max:255',
-                'unique:branches,name',
-            ],
+            'name' => 'required|string|max:255',
             'address' => 'nullable|string|max:500',
             'image' => 'nullable|image|max:2048',
         ]);
