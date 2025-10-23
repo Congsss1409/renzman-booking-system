@@ -42,8 +42,10 @@
     /* Only offset the very first section visually so the header doesn't overlap it. */
     .scroll-section:first-of-type {
         padding-top: calc(var(--header-height) + 1.25rem);
-        padding-bottom: 2rem;
+        padding-bottom: 0;
         box-sizing: border-box;
+        height: calc(100vh - var(--header-height));
+        min-height: unset;
     }
 
     /* Remove extra space and prevent background bleed at the bottom of the last section */
