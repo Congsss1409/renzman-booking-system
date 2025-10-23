@@ -37,12 +37,8 @@ jobs:
           npm install
           npm run build
 
-      # 6. Create the production .env file from your GitHub Secret
-      - name: Create .env file
-        run: echo "${{ secrets.PROD_ENV }}" > .env
-
-      # 7. Generate a new app key (if not set in your secret) and optimize Laravel
-      - name: Run Laravel optimizations
+      # 6. Generate a new app key (if not set in your secret) and optimize Laravel
+      - name: Run Laravel optimizations (on runner)
         run: |
           php artisan key:generate --force
           php artisan config:cache
@@ -70,6 +66,8 @@ jobs:
           key: ${{ secrets.HOST_SSH_KEY }}
           script: |
             cd ${{ secrets.HOST_TARGET_PATH }}
+            # Write .env on the remote server from the secret passed as environment variable
+            printf '%s\n' "${{ secrets.PROD_ENV }}" > .env
             php artisan migrate --force
             rm -f public/storage
             php artisan storage:link
