@@ -63,14 +63,14 @@ jobs:
         EXCLUDE: "/.git/, /.github/, /node_modules/, /storage/logs/"
 
     # 9. Run post-deployment commands on your Hostinger server
-   - name: Run post-deploy commands (e.g., migrate database)
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.HOST_IP }}
-          username: ${{ secrets.HOST_USER }}
-          key: ${{ secrets.HOST_SSH_KEY }}
-          script: |
-            cd ${{ secrets.HOST_TARGET_PATH }}
-            php artisan migrate --force
-            rm -f public/storage
-            php artisan storage:link
+    - name: Run post-deploy commands (e.g., migrate database)
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.HOST_IP }}
+        username: ${{ secrets.HOST_USER }}
+        key: ${{ secrets.HOST_SSH_KEY }}
+        script: |
+          cd ${{ secrets.HOST_TARGET_PATH }}
+          php artisan migrate --force
+          rm -f public/storage
+          php artisan storage:link
