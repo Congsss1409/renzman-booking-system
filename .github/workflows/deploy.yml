@@ -66,8 +66,8 @@ jobs:
           REMOTE_USER: ${{ secrets.HOST_USER }}
           TARGET: ${{ secrets.HOST_TARGET_PATH }}
           SOURCE: "./"
-          # Pass custom port if set
-          PORT: ${{ secrets.HOST_SSH_PORT }}
+          # Use recognized input name for port
+          REMOTE_PORT: ${{ secrets.HOST_SSH_PORT }}
           # Exclude files you don't want to deploy
           EXCLUDE: "/.git/,/.github/,/node_modules/,/storage/logs/,/.env"
 
@@ -78,6 +78,7 @@ jobs:
           host: ${{ secrets.HOST_IP }}
           username: ${{ secrets.HOST_USER }}
           key: ${{ secrets.HOST_SSH_KEY }}
+          port: ${{ secrets.HOST_SSH_PORT }}
           script: |
             cd ${{ secrets.HOST_TARGET_PATH }}
             # Write .env on the remote server from the secret passed as environment variable
