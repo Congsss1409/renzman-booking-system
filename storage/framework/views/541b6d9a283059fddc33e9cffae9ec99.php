@@ -40,14 +40,14 @@
 </head>
 <body class="bg-gray-100">
 
-    <div x-data="{ sidebarOpen: false }" class="flex min-h-screen lg:h-screen bg-gray-100">
+    <div x-data="{ sidebarOpen: false }" class="flex flex-col lg:flex-row min-h-screen lg:h-screen bg-gray-100">
         <!-- Floating hamburger (shows when sidebar is closed on mobile) -->
         <button x-cloak x-show="!sidebarOpen" @click="sidebarOpen = true" class="lg:hidden fixed top-4 left-4 z-50 bg-white text-teal-700 p-2 rounded-full shadow-md focus:outline-none">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
         </button>
 
         <!-- Sidebar -->
-        <aside :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'" class="fixed inset-y-0 left-0 w-64 flex-shrink-0 bg-gradient-to-b from-teal-600 to-cyan-700 text-teal-100 flex flex-col transform transition-transform duration-300 ease-in-out z-30 lg:relative lg:translate-x-0">
+    <aside :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'" class="fixed inset-y-0 left-0 w-64 flex-shrink-0 bg-gradient-to-b from-teal-600 to-cyan-700 text-teal-100 flex flex-col transform transition-transform duration-300 ease-in-out z-30 lg:relative lg:translate-x-0">
             <div class="h-20 flex items-center justify-center text-2xl font-bold text-white">
                 <img src="<?php echo e(asset('images/logo_white.png')); ?>" alt="Logo" class="h-16 w-auto">
             </div>
@@ -100,7 +100,7 @@
         </aside>
 
         <!-- Main content & Header -->
-        <div class="flex-1 flex flex-col overflow-hidden">
+    <div class="flex-1 flex flex-col overflow-hidden w-full">
             <header class="flex justify-between items-center p-4 sm:p-6 bg-white border-b-2 border-gray-200 lg:justify-end">
                 <button @click="sidebarOpen = !sidebarOpen" class="text-gray-500 focus:outline-none lg:hidden">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
@@ -108,7 +108,7 @@
                 <div class="font-semibold">Welcome, <?php echo e(Auth::user()->name); ?></div>
             </header>
             
-            <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 p-4 sm:p-8">
+            <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 p-2 xs:p-4 sm:p-8">
                 <?php echo $__env->yieldContent('content'); ?>
             </main>
         </div>

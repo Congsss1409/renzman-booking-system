@@ -1,8 +1,8 @@
-@extends('layouts.admin')
 
-@section('title', 'Create Payroll')
 
-@section('content')
+<?php $__env->startSection('title', 'Create Payroll'); ?>
+
+<?php $__env->startSection('content'); ?>
 <div class="max-w-2xl mx-auto bg-white p-8 rounded-2xl shadow-lg">
     <!-- Page Header -->
     <div class="flex justify-between items-center mb-6">
@@ -10,33 +10,33 @@
             <h1 class="text-3xl font-bold text-gray-800">Add New Payroll</h1>
             <p class="text-gray-500 mt-1">Create a payroll record. Gross is computed from confirmed bookings.</p>
         </div>
-        <a href="{{ route('admin.payrolls.index') }}" class="font-semibold bg-gray-200 hover:bg-gray-300 text-gray-700 py-2 px-6 rounded-full shadow-md transition-transform transform hover:scale-105 whitespace-nowrap">
+        <a href="<?php echo e(route('admin.payrolls.index')); ?>" class="font-semibold bg-gray-200 hover:bg-gray-300 text-gray-700 py-2 px-6 rounded-full shadow-md transition-transform transform hover:scale-105 whitespace-nowrap">
             &larr; Back to List
         </a>
     </div>
 
-    @if($errors->any())
+    <?php if($errors->any()): ?>
         <div class="mb-4 text-red-600">
             <ul class="list-disc pl-5">
-                @foreach($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
+                <?php $__currentLoopData = $errors->all(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $error): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                    <li><?php echo e($error); ?></li>
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
             </ul>
         </div>
-    @endif
+    <?php endif; ?>
 
     <!-- Add Payroll Form -->
-    <form action="{{ route('admin.payrolls.store') }}" method="POST" class="space-y-6">
-        @csrf
+    <form action="<?php echo e(route('admin.payrolls.store')); ?>" method="POST" class="space-y-6">
+        <?php echo csrf_field(); ?>
 
         <!-- Therapist -->
         <div>
             <label for="therapist_id" class="block text-sm font-semibold text-gray-600 mb-2">Therapist (optional)</label>
             <select id="therapist_id" name="therapist_id" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 bg-white">
                 <option value="">-- Unassigned --</option>
-                @foreach($therapists as $t)
-                    <option value="{{ $t->id }}">{{ $t->name }}</option>
-                @endforeach
+                <?php $__currentLoopData = $therapists; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $t): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                    <option value="<?php echo e($t->id); ?>"><?php echo e($t->name); ?></option>
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
             </select>
         </div>
 
@@ -71,7 +71,7 @@
 
         <!-- Form Actions -->
         <div class="flex justify-end gap-4 pt-4">
-            <a href="{{ route('admin.payrolls.index') }}" class="font-semibold bg-gray-200 hover:bg-gray-300 text-gray-700 py-3 px-8 rounded-full shadow-md transition-transform transform hover:scale-105">
+            <a href="<?php echo e(route('admin.payrolls.index')); ?>" class="font-semibold bg-gray-200 hover:bg-gray-300 text-gray-700 py-3 px-8 rounded-full shadow-md transition-transform transform hover:scale-105">
                 Cancel
             </a>
             <button type="submit" class="font-semibold bg-gradient-to-r from-teal-400 to-cyan-600 hover:from-teal-500 hover:to-cyan-700 text-white py-3 px-8 rounded-full shadow-lg transition-transform transform hover:scale-105">
@@ -80,4 +80,6 @@
         </div>
     </form>
 </div>
-@endsection
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('layouts.admin', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\xampp\htdocs\renzman-booking-system\resources\views/payrolls/create.blade.php ENDPATH**/ ?>

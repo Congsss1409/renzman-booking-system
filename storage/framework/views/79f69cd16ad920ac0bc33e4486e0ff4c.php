@@ -3,33 +3,32 @@
 <?php $__env->startSection('title', 'Branches Management'); ?>
 
 <?php $__env->startSection('content'); ?>
-<div class="space-y-8">
-    <!-- Page Header -->
-    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
-            <h1 class="text-4xl font-bold text-gray-800">Branches <span class="text-teal-500">Management</span></h1>
-            <p class="text-gray-500 mt-1">Add, edit, or manage your branches and their images.</p>
+<div class="max-w-7xl mx-auto p-8">
+    <div class="max-w-2xl mx-auto bg-white p-8 rounded-2xl shadow-lg mb-8">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div>
+                <h1 class="text-4xl font-bold text-gray-800">Branches <span class="text-teal-500">Management</span></h1>
+                <p class="text-gray-500 mt-1">Add, edit, or manage your branches and their images.</p>
+            </div>
+            <a href="<?php echo e(route('admin.branches.create')); ?>" class="font-semibold bg-gradient-to-r from-teal-400 to-cyan-600 hover:from-teal-500 hover:to-cyan-700 text-white py-3 px-6 rounded-full shadow-lg transition-transform transform hover:scale-105 whitespace-nowrap">
+                + ADD BRANCH
+            </a>
         </div>
-        <a href="<?php echo e(route('admin.branches.create')); ?>" class="font-semibold bg-gradient-to-r from-teal-400 to-cyan-600 hover:from-teal-500 hover:to-cyan-700 text-white py-3 px-6 rounded-full shadow-lg transition-transform transform hover:scale-105 whitespace-nowrap">
-            + ADD BRANCH
-        </a>
     </div>
 
     <!-- Branches Grid -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
         <?php $__empty_1 = true; $__currentLoopData = $branches; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $branch): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
-            <div class="bg-stone-50 rounded-2xl p-6 text-center shadow-lg border hover:shadow-xl transition-shadow duration-300 flex flex-col justify-between">
-                <div>
-                    <img src="<?php echo e($branch->image_url ?? asset('images/branch-placeholder.jpg')); ?>" alt="<?php echo e($branch->name); ?>" class="w-32 h-32 mx-auto rounded-lg mb-4 object-cover border-4 border-white shadow-md">
-                    <h3 class="text-xl font-bold text-gray-800"><?php echo e($branch->name); ?></h3>
-                    <p class="text-gray-500 mb-2 text-sm"><?php echo e($branch->address ?? 'Address not set'); ?></p>
-                </div>
-                <div class="mt-6 flex justify-center gap-4">
-                    <a href="<?php echo e(route('admin.branches.edit', $branch)); ?>" class="font-semibold bg-cyan-400 text-white py-2 px-8 rounded-full shadow-md transition-transform transform hover:scale-105">EDIT IMAGE</a>
-                    <form action="<?php echo e(route('admin.branches.destroy', $branch)); ?>" method="POST" class="inline-block" onsubmit="return confirm('Are you sure you want to delete this branch?');">
+            <div class="bg-white rounded-2xl shadow-lg p-6 flex flex-col items-center text-center min-w-0">
+                <img src="<?php echo e($branch->image_url ?? asset('images/branch-placeholder.jpg')); ?>" alt="<?php echo e($branch->name); ?>" class="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 lg:w-32 lg:h-32 rounded-full object-cover border-4 border-white shadow mb-4">
+                <h3 class="text-lg font-bold text-gray-800 break-words"><?php echo e($branch->name); ?></h3>
+                <p class="text-gray-500 mb-2 text-sm break-words"><?php echo e($branch->address ?? 'Address not set'); ?></p>
+                <div class="mt-4 flex flex-col gap-2 w-full">
+                    <a href="<?php echo e(route('admin.branches.edit', $branch)); ?>" class="font-semibold bg-cyan-400 text-white py-2 rounded-full shadow-md transition-transform hover:scale-105 w-full">EDIT IMAGE</a>
+                    <form action="<?php echo e(route('admin.branches.destroy', $branch)); ?>" method="POST" class="w-full" onsubmit="return confirm('Are you sure you want to delete this branch?');">
                         <?php echo csrf_field(); ?>
                         <?php echo method_field('DELETE'); ?>
-                        <button type="submit" class="font-semibold bg-red-500 hover:bg-red-600 text-white py-2 px-8 rounded-full shadow-md transition-transform transform hover:scale-105 ml-2">DELETE</button>
+                        <button type="submit" class="font-semibold bg-red-500 hover:bg-red-600 text-white py-2 rounded-full shadow-md transition-transform hover:scale-105 w-full">DELETE</button>
                     </form>
                 </div>
             </div>
