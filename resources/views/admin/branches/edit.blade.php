@@ -24,7 +24,7 @@
     <form action="{{ route('admin.branches.update', $branch) }}" method="POST" enctype="multipart/form-data" class="space-y-6">
         @csrf
 
-        <div x-data="{ imagePreview: '{{ $branch->image_url ?? asset('images/branch-placeholder.svg') }}' }" class="grid grid-cols-1 sm:grid-cols-3 gap-8 items-start">
+    <div x-data="{ imagePreview: '{{ $branch->image_url ?? asset('images/branch-placeholder.jpg') }}' }" class="grid grid-cols-1 sm:grid-cols-3 gap-8 items-start">
             <div class="col-span-1 flex justify-center sm:justify-start">
                 <div class="bg-gray-50 p-4 rounded-lg">
                     <img :src="imagePreview" alt="Current image preview" class="w-44 h-44 rounded-lg object-cover border-4 border-white shadow-md">

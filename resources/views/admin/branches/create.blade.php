@@ -32,7 +32,7 @@
             <div class="mb-4">
                 <label class="block text-gray-700">Image (optional)</label>
                 <input type="file" name="image" id="image" accept="image/*" class="mt-1 block w-full">
-                <img id="preview" src="{{ asset('images/branch-placeholder.svg') }}" alt="Preview" class="mt-4 w-40 h-32 object-cover rounded" />
+                <img id="preview" src="{{ asset('images/branch-placeholder.jpg') }}" alt="Preview" class="mt-4 w-40 h-32 object-cover rounded" />
             </div>
 
             <div class="flex justify-end">
@@ -57,7 +57,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 reader.onload = function(e) { preview.src = e.target.result; }
                 reader.readAsDataURL(file);
             } else {
-                preview.src = "{{ asset('images/branch-placeholder.svg') }}";
+                preview.src = "{{ asset('images/branch-placeholder.jpg') }}";
             }
         });
     }

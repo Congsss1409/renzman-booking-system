@@ -20,7 +20,7 @@
         @forelse($branches as $branch)
             <div class="bg-stone-50 rounded-2xl p-6 text-center shadow-lg border hover:shadow-xl transition-shadow duration-300 flex flex-col justify-between">
                 <div>
-                    <img src="{{ $branch->image_url ?? asset('images/branch-placeholder.svg') }}" alt="{{ $branch->name }}" class="w-32 h-32 mx-auto rounded-lg mb-4 object-cover border-4 border-white shadow-md">
+                    <img src="{{ $branch->image_url ?? asset('images/branch-placeholder.jpg') }}" alt="{{ $branch->name }}" class="w-32 h-32 mx-auto rounded-lg mb-4 object-cover border-4 border-white shadow-md">
                     <h3 class="text-xl font-bold text-gray-800">{{ $branch->name }}</h3>
                     <p class="text-gray-500 mb-2 text-sm">{{ $branch->address ?? 'Address not set' }}</p>
                 </div>

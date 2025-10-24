@@ -297,7 +297,7 @@
                     @forelse($branches as $branch)
                         <a href="https://www.google.com/maps/search/?api=1&query={{ urlencode($branch->name . ', ' . $branch->address) }}" target="_blank" rel="noopener noreferrer" class="block">
                             <div class="relative rounded overflow-hidden shadow-lg">
-                                <img src="{{ $branch->image_url ?? asset('images/branch-placeholder.svg') }}" alt="{{ $branch->name }}" class="w-full h-64 object-cover">
+                                <img src="{{ $branch->image_url ?? asset('images/branch-placeholder.jpg') }}" alt="{{ $branch->name }}" class="w-full h-64 object-cover">
                                 <div class="absolute inset-0 bg-black opacity-25"></div>
                                 <div class="absolute bottom-0 left-0 p-4 text-white">
                                     <h3 class="text-xl font-bold">{{ $branch->name }}</h3>

@@ -18,22 +18,22 @@ class BranchSeeder extends Seeder
         Branch::create([
             'name' => 'Metro Plaza Malaria',
             'address' => 'Malaria, Caloocan, Metro Manila',
-            'image_url' => '/images/branch-placeholder.svg',
+            'image_url' => '/images/branch-placeholder.jpg',
         ]);
         Branch::create([
             'name' => 'Metro Plaza Bagong Silang',
             'address' => 'Bagong Silang, Caloocan, Metro Manila',
-            'image_url' => '/images/branch-placeholder.svg',
+            'image_url' => '/images/branch-placeholder.jpg',
         ]);
         Branch::create([
             'name' => 'Zabarte Town Center',
             'address' => 'Zabarte Rd, Novaliches, Quezon City',
-            'image_url' => '/images/branch-placeholder.svg',
+            'image_url' => '/images/branch-placeholder.jpg',
         ]);
         Branch::create([
             'name' => 'Metro Plaza Gen Luis',
             'address' => 'Gen. Luis St, Novaliches, Quezon City',
-            'image_url' => '/images/branch-placeholder.svg',
+            'image_url' => '/images/branch-placeholder.jpg',
         ]);
     }
 }
