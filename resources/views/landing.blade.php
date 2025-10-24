@@ -187,10 +187,9 @@
         backdrop-filter: blur(6px);
         border-radius: 1rem;
         padding: 1rem;
-        /* subtle gradient rim */
-        border: 1px solid transparent;
-        border-image: linear-gradient(90deg, rgba(162,89,230,0.36), rgba(16,185,129,0.22)) 1;
-        box-shadow: 0 8px 30px rgba(2,6,23,0.06), 0 0 28px rgba(162,89,230,0.02);
+        /* remove outer border-image (caused visible outer line on some backgrounds) and use inset stroke instead */
+        border: none;
+        box-shadow: 0 8px 30px rgba(2,6,23,0.06), 0 0 28px rgba(162,89,230,0.02), inset 0 0 0 1px rgba(255,255,255,0.35);
     }
     /* glossy sheen to suggest glass */
     .glass-panel::before {
@@ -218,9 +217,9 @@
     .section-inner { max-width:1200px; margin:0 auto; }
     h2.section-title { font-size:2rem; color:#062425; margin-bottom:0.5rem; }
     p.section-sub { color: rgba(3,15,15,0.7); margin-bottom:1.25rem; }
-    .service-card { background: rgba(255,255,255,0.78); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); border-radius:1rem; padding:1rem; box-shadow:0 8px 30px rgba(2,6,23,0.06); border:1px solid rgba(255,255,255,0.32); }
+    .service-card { background: rgba(255,255,255,0.78); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); border-radius:1rem; padding:1rem; box-shadow:0 8px 30px rgba(2,6,23,0.06), inset 0 0 0 1px rgba(255,255,255,0.32); border: none; }
     .branch-card { border-radius:0.75rem; overflow:hidden; box-shadow:0 8px 30px rgba(2,6,23,0.06); }
-    .testimonial-card { background: rgba(255,255,255,0.8); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); padding:1rem; border-radius:1rem; box-shadow:0 6px 24px rgba(2,6,23,0.06); border:1px solid rgba(255,255,255,0.30); }
+    .testimonial-card { background: rgba(255,255,255,0.8); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); padding:1rem; border-radius:1rem; box-shadow:0 6px 24px rgba(2,6,23,0.06), inset 0 0 0 1px rgba(255,255,255,0.30); border: none; }
     footer .glass-panel { background: rgba(255,255,255,0.04); }
 
     /* Force black headings for key sections so they read clearly over the background */
