@@ -77,26 +77,20 @@
 
     .hero-img.animate-float { animation: floatY 5.5s ease-in-out infinite; }
     .hero-btn.animate-pulse { animation: pulseLift 2.8s ease-in-out infinite; }
-    /* Late caption for therapist (subtle, delayed reveal) */
+    /* Late caption for therapist (cloud-like pill under the image) */
     .therapist-caption {
-        /* default hidden badge styles (desktop) */
-        position: absolute;
-        right: -34px;
-        top: 22%;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
+        /* centered pill (cloud-like) */
+        position: relative;
+        display: inline-block;
         text-align: center;
-        width: 180px;
-        min-height: 64px;
-        background: rgba(255,255,255,0.95);
+        background: rgba(255,255,255,0.98);
         color: #062425;
-        padding: 0.6rem 0.9rem;
-        border-radius: 9999px;
+        padding: 0.9rem 1.4rem;
         font-weight:600;
-        font-size:0.9rem;
-        box-shadow: 0 12px 30px rgba(2,6,23,0.09);
-        transform: translateY(8px);
+        font-size:0.95rem;
+        border-radius: 999px;
+        box-shadow: 0 18px 40px rgba(2,6,23,0.10);
+        transform: translateY(12px);
         opacity: 0;
         transition: opacity .6s cubic-bezier(.2,.9,.2,1) .12s, transform .6s cubic-bezier(.2,.9,.2,1) .12s;
         border: 1px solid rgba(0,0,0,0.06);
@@ -107,20 +101,32 @@
         transform: translateY(0);
     }
 
-    /* image wrapper to anchor the caption badge */
-    .hero-img-wrap { position: relative; display: inline-block; }
+    /* image wrapper: center contents so caption sits under the image */
+    .hero-img-wrap { position: relative; display: block; text-align: center; }
 
-    /* responsive: stack caption under image on smaller screens */
+    /* cloud bump decorations for the caption */
+    .therapist-caption::before,
+    .therapist-caption::after {
+        content: '';
+        position: absolute;
+        top: -18px;
+        width: 44px;
+        height: 44px;
+        background: rgba(255,255,255,0.98);
+        border-radius: 50%;
+        box-shadow: 0 18px 40px rgba(2,6,23,0.08);
+        border: 1px solid rgba(0,0,0,0.04);
+    }
+    .therapist-caption::before { left: 8px; }
+    .therapist-caption::after { right: 8px; }
+
+    /* responsive: slightly smaller bumps and spacing on small screens */
     @media (max-width: 960px) {
-        .therapist-caption {
-            position: static;
-            width: auto;
-            min-height: 0;
-            margin: 0.8rem auto 0;
-            display: inline-block;
-            transform: translateY(8px);
-        }
-        .hero-img-wrap { display:block; }
+        .therapist-caption { display: inline-block; margin: 0.8rem auto 0; transform: translateY(12px); }
+        .therapist-caption::before,
+        .therapist-caption::after { width: 32px; height: 32px; top: -12px; }
+        .therapist-caption::before { left: 6px; }
+        .therapist-caption::after { right: 6px; }
     }
 
     header { animation: navIn 520ms cubic-bezier(.2,.9,.2,1) 120ms both; }
