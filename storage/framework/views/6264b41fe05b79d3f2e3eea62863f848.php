@@ -74,7 +74,7 @@ unset($__errorArgs, $__bag); ?>
                     </div>
                 </div>
                 <div class="mt-auto flex justify-between">
-                    <a href="<?php echo e(route('booking.create.step-two')); ?>" class="bg-white/20 text-white font-bold py-3 px-8 rounded-full shadow-md hover:bg-white/30 transition-all transform hover:scale-105">&larr; Back</a>
+                    <a href="<?php echo e(route('booking.create.step-two')); ?>" class="bg-white border-2 border-emerald-400 text-emerald-600 font-bold py-3 px-8 rounded-full shadow-lg hover:bg-emerald-50 hover:text-emerald-700 transition-all transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-emerald-300">&larr; Back</a>
                     <button type="submit" :disabled="!selectedTime" class="bg-white text-teal-600 font-bold py-3 px-8 rounded-full shadow-md hover:bg-cyan-100 transition-all transform hover:scale-105 disabled:bg-gray-400 disabled:cursor-not-allowed disabled:transform-none">Next Step &rarr;</button>
                 </div>
             </form>

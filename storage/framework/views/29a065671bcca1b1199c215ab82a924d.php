@@ -77,7 +77,7 @@
                 </div>
 
                     <div class="mt-10 flex justify-between">
-                    <a href="<?php echo e(route('booking.create.step-three')); ?>" class="bg-white/20 text-white font-bold py-3 px-10 rounded-full shadow-md hover:bg-white/30 transition-all transform hover:scale-105">
+                    <a href="<?php echo e(route('booking.create.step-three')); ?>" class="bg-white border-2 border-emerald-400 text-emerald-600 font-bold py-3 px-10 rounded-full shadow-lg hover:bg-emerald-50 hover:text-emerald-700 transition-all transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-emerald-300">
                         &larr; Back
                     </a>
                     <!-- Open privacy modal before submitting -->
