@@ -276,7 +276,7 @@
     <!-- Page 4: Testimonials & Footer Section -->
     <section id="testimonials" class="scroll-section">
         <div class="container mx-auto h-full flex flex-col justify-center">
-            <div class="absolute inset-0 bg-black/35"></div>
+            <!-- overlay removed to keep testimonials background clean -->
             <div class="relative z-10 flex flex-col">
              @if($feedbacks->isNotEmpty())
                 <div class="text-center mb-4 sm:mb-8">
