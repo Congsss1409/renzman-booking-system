@@ -47,11 +47,33 @@
                 </ul>
                 <form action="{{ route('admin.payrolls.items.add', $payroll->id) }}" method="POST" class="mt-4 space-y-2">
                     @csrf
-                    <input type="text" name="description" placeholder="Description" class="w-full rounded border-gray-200 p-2" required>
-                    <input type="number" step="0.01" name="amount" placeholder="Amount" class="w-full rounded border-gray-200 p-2" required>
+                    <select name="service_id" id="service_id" class="w-full rounded border-gray-200 p-2" required>
+                        <option value="" disabled selected>Select service</option>
+                        @foreach($services as $service)
+                            <option value="{{ $service->id }}" data-price="{{ $service->price }}">{{ $service->name }}</option>
+                        @endforeach
+                    </select>
+                    <input type="number" step="0.01" name="amount" id="service_amount" placeholder="Amount" class="w-full rounded border-gray-200 p-2" required>
                     <div class="mt-2">
                         <button class="bg-teal-600 text-white py-1 px-3 rounded">Add Item</button>
                     </div>
+                    <script>
+                        document.addEventListener('DOMContentLoaded', function () {
+                            const serviceSelect = document.getElementById('service_id');
+                            const amountInput = document.getElementById('service_amount');
+                            if (serviceSelect && amountInput) {
+                                serviceSelect.addEventListener('change', function () {
+                                    const selected = serviceSelect.options[serviceSelect.selectedIndex];
+                                    const price = selected.getAttribute('data-price');
+                                    if (price) {
+                                        amountInput.value = price;
+                                    } else {
+                                        amountInput.value = '';
+                                    }
+                                });
+                            }
+                        });
+                    </script>
                 </form>
             </div>
             <div class="bg-gray-50 p-4 rounded">

@@ -7,6 +7,7 @@ use App\Models\Therapist;
 use App\Models\PayrollItem;
 use App\Models\PayrollPayment;
 use App\Models\Booking;
+use App\Models\Service;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Response;
@@ -74,18 +75,24 @@ class PayrollController extends Controller
 
     public function show(Payroll $payroll)
     {
-        $payroll->load('therapist', 'items', 'payments');
-        return view('payrolls.show', compact('payroll'));
+    $payroll->load('therapist', 'items', 'payments');
+    $services = Service::orderBy('name')->get();
+    return view('payrolls.show', compact('payroll', 'services'));
     }
 
     public function addItem(Request $request, Payroll $payroll)
     {
+
         $data = $request->validate([
-            'description' => 'required|string',
+            'service_id' => 'required|exists:services,id',
             'amount' => 'required|numeric',
         ]);
 
-        $item = $payroll->items()->create($data);
+        $service = Service::find($data['service_id']);
+        $item = $payroll->items()->create([
+            'description' => $service->name,
+            'amount' => $data['amount'],
+        ]);
 
         // recalc totals
     $payroll->gross = $payroll->items()->sum('amount');
