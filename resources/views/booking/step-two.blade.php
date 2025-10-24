@@ -4,7 +4,7 @@
 
 @section('content')
 <div x-data="{ showModal: false, selectedTherapist: '' }" class="glass-panel rounded-3xl max-w-6xl mx-auto overflow-hidden shadow-2xl">
-    <div class="grid md:grid-cols-2">
+    <div class="flex flex-col md:grid md:grid-cols-2">
         
         <!-- Left Column: Image & Branding -->
         <div class="hidden md:block relative">
@@ -22,7 +22,7 @@
         </div>
 
         <!-- Right Column: Form -->
-        <div class="p-8 md:p-12">
+    <div class="p-4 sm:p-6 md:p-12 w-full">
             <!-- Progress Bar -->
             <div class="mb-8">
                 <div class="flex justify-between items-center text-sm font-semibold text-black mb-2">
@@ -54,34 +54,34 @@
             <form x-ref="stepTwoForm" action="{{ route('booking.store.step-two') }}" method="POST">
                 @csrf
                 <input type="hidden" name="extended_session" x-ref="extendedSessionInput" value="0">
-                <div class="space-y-4 max-h-[40vh] overflow-y-auto pr-4 text-black">
+                <div class="space-y-4 max-h-[40vh] overflow-y-auto pr-0 md:pr-4 text-black">
                     @php
                         // These variables are passed from the controller
                         // $isOpen, $openHour, $closeHour
                     @endphp
                     @forelse($therapists as $therapist)
-                        <label class="block text-black">
+                        <label class="block text-black w-full">
                             <input type="radio" name="therapist_id" value="{{ $therapist->id }}" @change="selectedTherapist = $event.target.value" class="hidden peer" required>
-                            <div class="p-4 rounded-lg border border-white/30 cursor-pointer peer-checked:bg-white peer-checked:text-teal-600 peer-checked:ring-2 peer-checked:ring-white hover:bg-white/20 transition-all text-black">
+                            <div class="p-4 rounded-lg border border-white/30 cursor-pointer peer-checked:bg-white peer-checked:text-teal-600 peer-checked:ring-2 peer-checked:ring-white hover:bg-white/20 transition-all text-black flex flex-col sm:flex-row sm:items-center sm:justify-between">
                                 <div class="flex items-center justify-between">
-                                    <div class="flex items-center gap-4">
+                                    <div class="flex items-center gap-4 mb-2 sm:mb-0">
                                         <img src="{{ $therapist->image_url ?? 'https://ui-avatars.com/api/?name=' . urlencode($therapist->name) . '&color=FFFFFF&background=059669&size=128' }}" alt="{{ $therapist->name }}" class="w-12 h-12 rounded-full object-cover">
                                         <div>
                                             <p class="font-bold text-lg text-black">{{ $therapist->name }}</p>
                                         </div>
                                     </div>
                                     @if($therapist->current_status == 'In Session')
-                                        <div class="text-right">
-                                            <span class="px-3 py-1 text-xs font-semibold text-yellow-800 bg-yellow-200 rounded-full">Currently Busy</span>
+                                        <div class="text-left sm:text-right">
+                                            <span class="px-3 py-1 text-xs font-semibold text-yellow-800 bg-yellow-200 rounded-full block">Currently Busy</span>
                                             <p class="text-xs opacity-80 mt-1 text-black">Available after {{ $therapist->available_at }}</p>
                                         </div>
                                     @elseif($therapist->current_status == 'Available' && $isOpen)
-                                        <div class="text-right">
-                                            <span class="px-3 py-1 text-xs font-semibold text-green-800 bg-green-200 rounded-full">Available Now</span>
+                                        <div class="text-left sm:text-right">
+                                            <span class="px-3 py-1 text-xs font-semibold text-green-800 bg-green-200 rounded-full block">Available Now</span>
                                         </div>
                                     @elseif($therapist->current_status == 'Available' && !$isOpen)
-                                        <div class="text-right">
-                                            <span class="px-3 py-1 text-xs font-semibold text-blue-800 bg-blue-100 rounded-full">Book for tomorrow or later</span>
+                                        <div class="text-left sm:text-right">
+                                            <span class="px-3 py-1 text-xs font-semibold text-blue-800 bg-blue-100 rounded-full block">Book for tomorrow or later</span>
                                             <p class="text-xs opacity-80 mt-1 text-black">Appointments: 8:00 AM - 9:00 PM</p>
                                         </div>
                                     @endif
