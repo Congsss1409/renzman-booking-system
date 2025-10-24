@@ -180,13 +180,40 @@
     section.scroll-section { padding:4rem 1rem; position:relative; }
     /* Glassy cards with subtle blur for better contrast while preserving background */
     .glass-panel {
+        position: relative;
+        overflow: hidden;
         background: rgba(255,255,255,0.78);
         -webkit-backdrop-filter: blur(6px);
         backdrop-filter: blur(6px);
         border-radius: 1rem;
         padding: 1rem;
-        border: 1px solid rgba(255,255,255,0.35);
-        box-shadow: 0 8px 30px rgba(2,6,23,0.06);
+        /* subtle gradient rim */
+        border: 1px solid transparent;
+        border-image: linear-gradient(90deg, rgba(162,89,230,0.36), rgba(16,185,129,0.22)) 1;
+        box-shadow: 0 8px 30px rgba(2,6,23,0.06), 0 0 28px rgba(162,89,230,0.02);
+    }
+    /* glossy sheen to suggest glass */
+    .glass-panel::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        background: linear-gradient(180deg, rgba(255,255,255,0.20) 0%, rgba(255,255,255,0.03) 36%, rgba(255,255,255,0) 100%);
+        mix-blend-mode: overlay;
+        opacity: 1;
+    }
+    /* soft top-left highlight */
+    .glass-panel::after {
+        content: "";
+        position: absolute;
+        top: -40%;
+        left: -40%;
+        width: 80%;
+        height: 80%;
+        background: radial-gradient(circle at 28% 28%, rgba(255,255,255,0.22), rgba(255,255,255,0) 55%);
+        transform: rotate(-12deg);
+        pointer-events: none;
+        opacity: 0.95;
     }
     .section-inner { max-width:1200px; margin:0 auto; }
     h2.section-title { font-size:2rem; color:#062425; margin-bottom:0.5rem; }
