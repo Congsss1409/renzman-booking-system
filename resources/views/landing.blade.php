@@ -69,6 +69,34 @@
     .main-navbar .social a { color:#fff; display:inline-flex; width:36px; height:36px; align-items:center; justify-content:center; border-radius:8px; transition:background .12s, color .12s; }
     .main-navbar .social a:hover { background: rgba(255,255,255,0.06); }
     .hero-content { display:flex; gap:2.5rem; align-items:center; justify-content:space-between; flex:1 1 0%; padding:7.5rem 1rem 6rem; max-width:1300px; margin:0 auto; width:100%; }
+
+    /* Subtle page animations */
+    @keyframes floatY { 0%{ transform: translateY(0);} 50%{ transform: translateY(-6px);} 100%{ transform: translateY(0);} }
+    @keyframes pulseLift { 0%,100%{ transform: translateY(0) scale(1);} 50%{ transform: translateY(-4px) scale(1.02);} }
+    @keyframes navIn { 0%{ transform: translateY(-12px); opacity:0;} 100%{ transform: translateY(0); opacity:1;} }
+
+    .hero-img.animate-float { animation: floatY 6s ease-in-out infinite; }
+    .hero-btn.animate-pulse { animation: pulseLift 3.2s ease-in-out infinite; }
+
+    header { animation: navIn 700ms cubic-bezier(.2,.9,.2,1) 120ms both; }
+
+    /* fade-up reveal used across sections */
+    .fade-up { opacity: 0; transform: translateY(14px); transition: opacity .6s ease, transform .6s ease; }
+    .fade-up.in-view { opacity: 1; transform: translateY(0); }
+
+    /* staggered children reveal */
+    .staggered > * { opacity: 0; transform: translateY(8px); transition: transform .5s ease, opacity .5s ease; }
+    .staggered.in-view > * { opacity: 1; transform: translateY(0); }
+    .staggered.in-view > *:nth-child(1){ transition-delay: .06s; }
+    .staggered.in-view > *:nth-child(2){ transition-delay: .12s; }
+    .staggered.in-view > *:nth-child(3){ transition-delay: .18s; }
+    .staggered.in-view > *:nth-child(4){ transition-delay: .24s; }
+    .staggered.in-view > *:nth-child(5){ transition-delay: .30s; }
+    .staggered.in-view > *:nth-child(6){ transition-delay: .36s; }
+
+    /* small hover lift for social icons */
+    .nav-right .social a { transition: transform .18s ease, box-shadow .18s ease; }
+    .nav-right .social a:hover { transform: translateY(-3px); }
     .hero-left { flex:1 1 0%; padding:2rem; display:flex; flex-direction:column; align-items:flex-start; justify-content:center; }
     .hero-title { font-size:5.25rem; font-weight:900; line-height:0.98; margin-bottom:0.6rem; color:#fff; text-shadow: 0 10px 36px rgba(0,0,0,0.26); }
     .hero-desc { font-size:1.05rem; margin-bottom:1.6rem; color: #000 !important; max-width:520px; }
@@ -153,7 +181,7 @@
 
 <div class="hero-bg">
     @include('partials.header')
-    <div class="hero-content">
+    <div class="hero-content fade-up">
         <div class="hero-left">
             <div class="hero-title">IT'S TIME<br>FOR THAT <span style="color:#fff; background:#a259e6; border-radius:0.5rem; padding:0 0.5rem;">RENZMAN</span> MASSAGE!</div>
             <div class="hero-desc">Escape the everyday and discover a new level of peace and rejuvenation. Experience the art of healing touch at Renzman.</div>
@@ -175,7 +203,7 @@
                 <p class="mt-2 text-cyan-100 px-4">Tailored treatments designed for your ultimate comfort.</p>
             </div>
             <div class="flex-1 overflow-y-auto py-4">
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 staggered">
                      @forelse($services->take(3) as $service)
                         <div class="glass-panel rounded-2xl p-4 sm:p-6 text-center shadow-lg flex flex-col transform hover:-translate-y-2 transition-transform duration-300">
                             <img src="{{ $service->image_url ?? 'https://placehold.co/400x500/FFFFFF/333333?text=' . urlencode($service->name) }}" alt="{{ $service->name }}" class="w-full h-40 sm:h-48 object-cover rounded-lg mb-4">
@@ -215,7 +243,7 @@
                 <p class="mt-2 text-cyan-100 px-4">Find a sanctuary near you.</p>
             </div>
             <div class="flex-1 overflow-y-auto py-4">
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 staggered">
                     @forelse($branches as $branch)
                         <a href="https://www.google.com/maps/search/?api=1&query={{ urlencode($branch->name . ', ' . $branch->address) }}" target="_blank" rel="noopener noreferrer" class="block">
                             <div class="relative rounded overflow-hidden shadow-lg">
@@ -245,7 +273,7 @@
                     <h2 class="text-3xl sm:text-4xl font-bold">What Our Clients Say</h2>
                 </div>
                 <div class="flex-1 overflow-y-auto py-4">
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 staggered">
                         @foreach($feedbacks as $feedback)
                             <div class="glass-panel rounded-2xl p-6 sm:p-8 shadow-lg">
                                 <div class="flex text-xl sm:text-2xl text-amber-300 mb-4">@for ($i = 0; $i < 5; $i++)<span>{{ $i < $feedback->rating ? '★' : '☆' }}</span>@endfor</div>
@@ -262,7 +290,7 @@
 
             <!-- Footer -->
             <footer class="w-full mt-auto pt-8 sm:pt-12">
-                <div class="glass-panel rounded-2xl p-6 sm:p-8">
+                <div class="glass-panel rounded-2xl p-6 sm:p-8 fade-up">
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center md:text-left">
                         <div>
                             <h3 class="font-bold text-base sm:text-lg">About Renzman</h3>
@@ -359,6 +387,29 @@
         const expanded = this.getAttribute('aria-expanded') === 'true';
         this.setAttribute('aria-expanded', String(!expanded));
         document.querySelector('.main-navbar').classList.toggle('open');
+    });
+})();
+ 
+// Simple reveal and subtle motion for liveliness
+(function(){
+    // Fade-up / staggered reveal using IntersectionObserver
+    const io = new IntersectionObserver((entries, obs) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('in-view');
+                obs.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.12 });
+
+    document.querySelectorAll('.fade-up, .staggered').forEach(el => io.observe(el));
+
+    // Add small floating/pulse animations to hero elements after load
+    window.addEventListener('load', () => {
+        const img = document.querySelector('.hero-img');
+        const btn = document.querySelector('.hero-btn');
+        if (img) img.classList.add('animate-float');
+        if (btn) btn.classList.add('animate-pulse');
     });
 })();
 </script>
