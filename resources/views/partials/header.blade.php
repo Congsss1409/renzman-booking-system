@@ -1,6 +1,6 @@
-<header x-data="{ open: false }" class="fixed top-0 left-0 right-0 z-50 p-2 sm:p-4">
-    <div class="container mx-auto flex justify-between items-center header-glass rounded-2xl p-2 px-4 sm:px-6 shadow-lg">
-        <a href="{{ route('landing') }}"><img src="{{ asset('images/logo_white.png') }}" alt="Renzman Logo" class="h-10 sm:h-12"></a>
+<header x-data="{ open: false }" class="sticky top-0 z-50 p-4">
+    <div class="container mx-auto flex justify-between items-center header-glass rounded-full p-2 px-6 shadow-lg">
+        <a href="{{ route('landing') }}"><img src="{{ asset('images/logo_white.png') }}" alt="Renzman Logo" class="h-16"></a>
         <nav class="hidden md:flex items-center space-x-8">
             <a href="{{ route('landing') }}" class="transition-colors px-1 py-1 text-sm {{ request()->routeIs('landing') ? 'font-bold text-white' : 'text-gray-200 hover:text-white' }}" {{ request()->routeIs('landing') ? 'aria-current="page"' : '' }}>Home</a>
             <a href="{{ route('services') }}" class="transition-colors px-1 py-1 text-sm {{ request()->routeIs('services') ? 'font-bold text-white' : 'text-gray-200 hover:text-white' }}" {{ request()->routeIs('services') ? 'aria-current="page"' : '' }}>Services</a>
@@ -8,7 +8,7 @@
         </nav>
 
         <div class="nav-right flex items-center gap-3">
-            <a href="{{ route('booking.create.step-one') }}" class="hidden sm:inline-block bg-white text-teal-600 font-bold py-2 px-6 text-sm sm:py-3 sm:px-8 sm:text-base rounded-full shadow-md hover:bg-cyan-100 transition-all transform hover:scale-105">
+            <a href="{{ route('booking.create.step-one') }}" class="bg-white text-teal-600 font-bold py-3 px-8 rounded-full shadow-md hover:bg-cyan-100 transition-all transform hover:scale-105">
                 Book Now
             </a>
 
