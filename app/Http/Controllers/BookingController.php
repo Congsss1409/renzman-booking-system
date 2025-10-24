@@ -45,6 +45,9 @@ class BookingController extends Controller
         }
         $therapists = Therapist::where('branch_id', $bookingData->branch_id)->get();
         $now = Carbon::now('Asia/Manila');
+    $openHour = 8; // 8:00 AM
+    $closeHour = 21; // 9:00 PM
+    $isOpen = $now->hour >= $openHour && $now->hour < $closeHour;
         foreach ($therapists as $therapist) {
             $currentBooking = Booking::where('therapist_id', $therapist->id)
                 ->whereIn('status', ['Confirmed', 'In Progress'])
@@ -57,7 +60,7 @@ class BookingController extends Controller
                 $therapist->available_at = null;
             }
         }
-        return view('booking.step-two', compact('therapists', 'bookingData'));
+        return view('booking.step-two', compact('therapists', 'bookingData', 'isOpen', 'openHour', 'closeHour'));
     }
     
     public function storeStepTwo(Request $request)
@@ -314,31 +317,29 @@ class BookingController extends Controller
         // --- START: MODIFIED LOGIC ---
         
         // Define default working hours
-        $dayStart = $selectedDate->copy()->hour(10); // Default open time: 10 AM
-        $dayEnd = $selectedDate->copy()->hour(21);   // Shop closes at 9 PM
-    
+        $dayStart = $selectedDate->copy()->hour(8)->minute(0)->second(0); // 8:00 AM
+        $dayEnd = $selectedDate->copy()->hour(21)->minute(0)->second(0);   // 9:00 PM
+
         $now = Carbon::now('Asia/Manila');
-    
-        // Apply special logic if the selected date is today
-        if ($selectedDate->isToday()) {
-            // Define the special 4:00 PM start time for today
-            $specialStartTime = $selectedDate->copy()->setTime(16, 0); // 4:00 PM
-    
-            // The earliest booking can start is the later of the current time or 4:00 PM.
-            $effectiveStartTime = $now->gt($specialStartTime) ? $now : $specialStartTime;
-    
-            // If this effective start time is later than the normal opening time, use it.
-            if ($effectiveStartTime->gt($dayStart)) {
-                $dayStart = $effectiveStartTime;
-            }
-    
-            // Round up the start time to the next full hour to maintain clean 1-hour intervals.
-            if ($dayStart->minute > 0 || $dayStart->second > 0) {
-                $dayStart->addHour()->startOfHour();
-            }
-        } else if ($selectedDate->isPast()) {
+
+        if ($selectedDate->isPast()) {
             // If a past date is somehow selected, return no slots.
             return response()->json([]);
+        }
+
+        if ($selectedDate->isToday()) {
+            // For today, only allow slots after the current time
+            if ($now->gt($dayEnd)) {
+                // If it's already past closing, no slots
+                return response()->json([]);
+            }
+            if ($now->gt($dayStart)) {
+                $dayStart = $now->copy();
+                // Round up to next full hour
+                if ($dayStart->minute > 0 || $dayStart->second > 0) {
+                    $dayStart->addHour()->startOfHour();
+                }
+            }
         }
     
         // --- END: MODIFIED LOGIC ---
