@@ -1,10 +1,10 @@
 <header x-data="{ open: false }" class="fixed top-0 left-0 right-0 z-50 p-2 sm:p-4">
-    <div class="container mx-auto flex justify-between items-center header-glass rounded-full p-2 px-4 sm:px-6 shadow-lg">
+    <div class="container mx-auto flex justify-between items-center header-glass rounded-2xl p-2 px-4 sm:px-6 shadow-lg">
         <a href="{{ route('landing') }}"><img src="{{ asset('images/logo_white.png') }}" alt="Renzman Logo" class="h-10 sm:h-12"></a>
-        <nav class="hidden md:flex items-center space-x-8 text-gray-200">
-            <a href="{{ route('landing') }}" class="hover:text-white transition-colors">Home</a>
-            <a href="{{ route('services') }}" class="hover:text-white transition-colors">Services</a>
-            <a href="{{ route('about') }}" class="font-bold text-white">About Us</a>
+        <nav class="hidden md:flex items-center space-x-8">
+            <a href="{{ route('landing') }}" class="transition-colors px-1 py-1 text-sm {{ request()->routeIs('landing') ? 'font-bold text-white' : 'text-gray-200 hover:text-white' }}" {{ request()->routeIs('landing') ? 'aria-current="page"' : '' }}>Home</a>
+            <a href="{{ route('services') }}" class="transition-colors px-1 py-1 text-sm {{ request()->routeIs('services') ? 'font-bold text-white' : 'text-gray-200 hover:text-white' }}" {{ request()->routeIs('services') ? 'aria-current="page"' : '' }}>Services</a>
+            <a href="{{ route('about') }}" class="transition-colors px-1 py-1 text-sm {{ request()->routeIs('about') ? 'font-bold text-white' : 'text-gray-200 hover:text-white' }}" {{ request()->routeIs('about') ? 'aria-current="page"' : '' }}>About Us</a>
         </nav>
 
         <div class="nav-right flex items-center gap-3">
@@ -33,9 +33,9 @@
 
     <!-- Mobile Menu -->
     <div x-show="open" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 -translate-y-2" x-transition:enter-end="opacity-100 translate-y-0" x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100 translate-y-0" x-transition:leave-end="opacity-0 -translate-y-2" @click.away="open = false" class="md:hidden mt-3 mobile-nav rounded-2xl shadow-lg">
-        <a href="{{ route('landing') }}" @click="open = false" class="block text-center py-3 px-4 text-white hover:bg-white/10 rounded-t-2xl">Home</a>
-        <a href="{{ route('services') }}" @click="open = false" class="block text-center py-3 px-4 text-white hover:bg-white/10">Services</a>
-        <a href="{{ route('about') }}" @click="open = false" class="block text-center py-3 px-4 text-white bg-white/10 font-bold">About Us</a>
+        <a href="{{ route('landing') }}" @click="open = false" class="block text-center py-3 px-4 {{ request()->routeIs('landing') ? 'text-white bg-white/10 font-bold rounded-t-2xl' : 'text-white hover:bg-white/10 rounded-t-2xl' }}" {{ request()->routeIs('landing') ? 'aria-current="page"' : '' }}>Home</a>
+        <a href="{{ route('services') }}" @click="open = false" class="block text-center py-3 px-4 {{ request()->routeIs('services') ? 'text-white bg-white/10 font-bold' : 'text-white hover:bg-white/10' }}" {{ request()->routeIs('services') ? 'aria-current="page"' : '' }}>Services</a>
+        <a href="{{ route('about') }}" @click="open = false" class="block text-center py-3 px-4 {{ request()->routeIs('about') ? 'text-white bg-white/10 font-bold' : 'text-white hover:bg-white/10' }}">About Us</a>
         <!-- Make Facebook a full-width mobile menu item with label so it lines up with the other options -->
         <a href="https://www.facebook.com/RenzmanBlindMASSAGE" @click="open = false" class="block text-center py-3 px-4 text-white hover:bg-white/10" target="_blank" rel="noopener noreferrer" aria-label="Facebook">
             <span class="inline-flex items-center justify-center gap-2">
