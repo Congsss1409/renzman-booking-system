@@ -106,5 +106,6 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
     Route::post('payrolls/items/{item}/remove', [\App\Http\Controllers\PayrollController::class, 'removeItem'])->name('payrolls.items.remove');
     Route::post('payrolls/{payroll}/payments', [\App\Http\Controllers\PayrollController::class, 'addPayment'])->name('payrolls.payments.add');
     Route::post('payrolls/generate-from-bookings', [\App\Http\Controllers\PayrollController::class, 'generateFromBookings'])->name('payrolls.generate_from_bookings');
+    Route::delete('payrolls/{payroll}', [\App\Http\Controllers\PayrollController::class, 'destroy'])->name('payrolls.destroy');
 });
 

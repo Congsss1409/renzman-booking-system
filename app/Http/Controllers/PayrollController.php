@@ -259,4 +259,13 @@ class PayrollController extends Controller
         // If no PDF library, return the HTML view so it can be printed in browser
         return view('payrolls.pdf', compact('payroll', 'company_name', 'company_logo_url', 'employee_name'));
     }
+
+    /**
+     * Remove the specified payroll from storage.
+     */
+    public function destroy(Payroll $payroll)
+    {
+        $payroll->delete();
+        return redirect()->route('admin.payrolls.index')->with('success', 'Payroll deleted successfully.');
+    }
 }

@@ -60,6 +60,11 @@
                 <div class="mt-4 flex flex-col gap-2 w-full">
                     <a href="{{ route('admin.payrolls.show', $p->id) }}" class="font-semibold bg-gray-200 text-gray-700 py-2 rounded-full shadow-md transition-transform hover:scale-105 w-full">View</a>
                     <a href="{{ route('admin.payrolls.export_pdf', $p->id) }}" class="font-semibold bg-cyan-400 text-white py-2 rounded-full shadow-md transition-transform hover:scale-105 w-full">Export PDF</a>
+                    <form action="{{ route('admin.payrolls.destroy', $p->id) }}" method="POST" class="w-full" onsubmit="return confirm('Are you sure you want to delete this payroll? This action cannot be undone.');">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="font-semibold bg-red-500 text-white py-2 rounded-full shadow-md transition-transform hover:scale-105 w-full mt-1">Delete</button>
+                    </form>
                 </div>
             </div>
         @empty

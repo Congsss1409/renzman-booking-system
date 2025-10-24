@@ -6,176 +6,188 @@
     <style>
         @page {
             size: A4;
-            margin: 0; /* Remove margin for full page control */
+            margin: 0;
         }
         body {
-            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-            background-color: #f4f7f6;
+            font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+            background: #f4f7f6;
             margin: 0;
-            padding: 10mm; /* Add padding to body to center content */
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-            box-sizing: border-box;
+            padding: 0;
         }
         .payslip-container {
-            width: 100%; /* Use full width of padded body */
-            max-width: 190mm; /* A4 width minus padding */
-            min-height: 277mm; /* A4 height minus padding */
-            margin: 0 auto;
+            max-width: 800px;
+            margin: 8px auto;
             background: #fff;
-            padding: 10mm;
-            box-sizing: border-box;
-            box-shadow: 0 0 15px rgba(0,0,0,0.05);
-            border-radius: 8px;
+            border-radius: 12px;
+            box-shadow: 0 4px 32px rgba(44,62,80,0.08);
+            padding: 12px 16px 12px 16px;
         }
         .header {
-            text-align: center;
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid #6c5ce7;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 2px solid #e0e7ef;
+            padding-bottom: 8px;
+            margin-bottom: 14px;
         }
         .logo {
-            max-width: 100px;
-            margin-bottom: 10px;
+            max-width: 80px;
+        }
+        .company-info {
+            text-align: right;
         }
         .company-name {
-            font-size: 24px;
-            font-weight: bold;
-            color: #333;
+            font-size: 28px;
+            font-weight: 700;
+            color: #2d3748;
             margin: 0;
         }
         .payslip-title {
             font-size: 18px;
-            color: #555;
-            margin-top: 5px;
-            text-transform: uppercase;
+            color: #6c5ce7;
+            font-weight: 600;
+            margin: 0;
             letter-spacing: 2px;
         }
-        .details-section {
-            margin-bottom: 20px;
-            padding: 15px;
-            background-color: #f8f9fa;
-            border-radius: 5px;
+        .summary-panel {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            background: #fff;
+            border-radius: 8px;
+            padding: 8px 10px;
+            margin-bottom: 14px;
             font-size: 14px;
-            line-height: 1.6;
         }
-        .details-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
+        .summary-panel .summary-item {
+            flex: 1 1 180px;
+            min-width: 160px;
+            margin-bottom: 8px;
         }
-        .details-grid strong {
-            display: inline-block;
-            width: 120px;
-            color: #333;
+        .summary-label {
+            color: #444;
+            font-weight: 500;
+        }
+        .summary-value {
+            color: #222;
+            font-weight: 600;
+            font-size: 16px;
         }
         .section {
-            margin-bottom: 25px;
+            margin-bottom: 14px;
         }
         .section-title {
             font-size: 16px;
-            font-weight: bold;
-            color: #6c5ce7;
-            margin-bottom: 10px;
-            padding-bottom: 5px;
-            border-bottom: 1px solid #eee;
+            font-weight: 600;
+            color: #222;
+            margin-bottom: 6px;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 2px;
         }
         table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 14px;
+            font-size: 15px;
+            margin-bottom: 0;
         }
         th, td {
-            padding: 12px 15px;
+            padding: 6px 7px;
             text-align: left;
-            border-bottom: 1px solid #f0f0f0;
         }
         th {
-            background-color: #f8f9fa;
+            background: #fff;
+            color: #222;
             font-weight: 600;
-            color: #555;
+            border-bottom: 2px solid #ccc;
+        }
+        tr:not(:last-child) td {
+            border-bottom: 1px solid #ccc;
         }
         .total-row td {
-            font-weight: bold;
-            background-color: #f8f9fa;
-            border-top: 2px solid #ddd;
+            font-weight: 700;
+            background: #fff;
+            border-top: 2px solid #ccc;
         }
         .amount-column {
             text-align: right;
         }
         .net-pay-section {
-            margin-top: 20px;
-            padding: 20px;
-            background-color: #6c5ce7;
-            color: #fff;
-            text-align: center;
-            border-radius: 5px;
+            margin-top: 10px;
+            padding: 10px 0 6px 0;
+                background: #fff;
+                color: #222;
+                text-align: center;
+            border-radius: 8px;
         }
         .net-pay-label {
-            font-size: 18px;
-            font-weight: bold;
+            font-size: 20px;
+            font-weight: 700;
             margin: 0;
-            text-transform: uppercase;
-            letter-spacing: 1px;
+              text-transform: none;
+              letter-spacing: 0;
         }
         .net-pay-amount {
             font-size: 36px;
-            font-weight: bold;
-            margin: 5px 0;
+            font-weight: 700;
+            margin: 8px 0 0 0;
+              color: #222;
         }
         .net-pay-note {
-            font-size: 12px;
+            font-size: 13px;
+              color: #444;
         }
         .footer {
-            margin-top: 30px;
+            margin-top: 40px;
             text-align: center;
-            font-size: 12px;
-            color: #888;
+            font-size: 13px;
+            color: #222;
+        }
+        .signature-section {
+            margin-top: 48px;
+            display: flex;
+            justify-content: flex-end;
+        }
+        .signature-line {
+            border-top: 1.5px solid #bfc9d8;
+            width: 220px;
+            margin-top: 32px;
+            text-align: center;
+            color: #222;
+            font-size: 14px;
+            padding-top: 6px;
         }
     </style>
 </head>
 <body>
     <div class="payslip-container">
         <div class="header">
-            <img src="{{ $company_logo_url }}" alt="Company Logo" class="logo">
-            <h1 class="company-name">{{ $company_name }}</h1>
-            <p class="payslip-title">Payslip</p>
+            <div class="company-info" style="width:100%;text-align:center;">
+                <div class="payslip-title" style="font-size:22px; color:#222;">Payroll Statement</div>
+            </div>
         </div>
-        <div class="details-section">
-            <div class="details-grid">
-                <div><strong>Employee:</strong> {{ $employee_name }}</div>
-                <div><strong>Pay Date:</strong> {{ $payroll->period_end->addDays(7)->format('M d, Y') }}</div>
-                <div><strong>Payroll Start:</strong> {{ $payroll->period_start->format('M d, Y') }}</div>
-                <div><strong>Status:</strong> {{ ucfirst($payroll->status ?? 'pending') }}</div>
-                <div><strong>Payroll End:</strong> {{ $payroll->period_end->format('M d, Y') }}</div>
+        <div class="summary-panel">
+            <div class="summary-item">
+                <div class="summary-label">Employee</div>
+                <div class="summary-value">{{ $employee_name }}</div>
+            </div>
+            <div class="summary-item">
+                <div class="summary-label">Pay Date</div>
+                <div class="summary-value">{{ $payroll->period_end->addDays(7)->format('M d, Y') }}</div>
+            </div>
+            <div class="summary-item">
+                <div class="summary-label">Payroll Period</div>
+                <div class="summary-value">{{ $payroll->period_start->format('M d, Y') }} - {{ $payroll->period_end->format('M d, Y') }}</div>
+            </div>
+            <div class="summary-item">
+                <div class="summary-label">Status</div>
+                <div class="summary-value">{{ ucfirst($payroll->status ?? 'pending') }}</div>
             </div>
         </div>
         <div class="section">
             <div class="section-title">Earnings</div>
             <table>
                 <thead>
-                    <tr>
-                        <th>Description</th>
-                        <th class="amount-column">Amount (PHP)</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>Gross Revenue</td>
-                        <td class="amount-column">{{ number_format($payroll->gross, 2) }}</td>
-                    </tr>
-                    <tr>
-                        <td>Therapist Share (60%)</td>
-                        <td class="amount-column">{{ number_format($payroll->therapist_share ?? 0, 2) }}</td>
-                    </tr>
-                    @if($payroll->items->count())
-                        @foreach($payroll->items as $item)
-                        <tr>
-                            <td>{{ $item->description }}</td>
-                            <td class="amount-column">{{ number_format($item->amount, 2) }}</td>
-                        </tr>
-                        @endforeach
-                    @endif
+                    
                     <tr class="total-row">
                         <td><strong>Total Earnings</strong></td>
                         <td class="amount-column"><strong>{{ number_format(($payroll->therapist_share ?? 0) + $payroll->items->sum('amount'), 2) }}</strong></td>
@@ -237,12 +249,8 @@
                 </tbody>
             </table>
         </div>
-        @endif
-        <div class="footer">
-            <p>Confidential: Keep secure.</p>
-            <p>Contact HR: hr@renzman.com | Phone: (555) 123-4567</p>
-            <p>Electronically generated document - no signature required.</p>
-        </div>
+    @endif
+    <!-- Signature and footer removed for single-page, clean payslip. -->
     </div>
 </body>
 </html>
