@@ -2,9 +2,9 @@
     <div class="container mx-auto flex justify-between items-center header-glass rounded-full p-2 px-6 shadow-lg">
         <a href="{{ route('landing') }}"><img src="{{ asset('images/logo_white.png') }}" alt="Renzman Logo" class="h-16"></a>
         <nav class="hidden md:flex items-center space-x-6">
-            <a href="{{ route('landing') }}" class="transition-colors text-sm {{ request()->routeIs('landing') ? 'text-white rounded-full px-3 py-1 shadow-sm' : 'text-gray-200 hover:text-white' }}" {{ request()->routeIs('landing') ? 'aria-current="page" style="background: rgba(255,255,255,0.18);"' : '' }}>Home</a>
-            <a href="{{ route('services') }}" class="transition-colors text-sm {{ request()->routeIs('services') ? 'text-white rounded-full px-3 py-1 shadow-sm' : 'text-gray-200 hover:text-white' }}" {{ request()->routeIs('services') ? 'aria-current="page" style="background: rgba(255,255,255,0.18);"' : '' }}>Services</a>
-            <a href="{{ route('about') }}" class="transition-colors text-sm {{ request()->routeIs('about') ? 'text-white rounded-full px-3 py-1 shadow-sm' : 'text-gray-200 hover:text-white' }}" {{ request()->routeIs('about') ? 'aria-current="page" style="background: rgba(255,255,255,0.18);"' : '' }}>About Us</a>
+            <a href="{{ route('landing') }}" class="transition-colors text-sm {{ request()->routeIs('landing') ? 'text-white rounded-full px-3 py-1 shadow-sm' : 'text-gray-200 hover:text-white' }}" {{ request()->routeIs('landing') ? 'aria-current="page" style="background: rgba(255,255,255,0.10);"' : '' }}>Home</a>
+            <a href="{{ route('services') }}" class="transition-colors text-sm {{ request()->routeIs('services') ? 'text-white rounded-full px-3 py-1 shadow-sm' : 'text-gray-200 hover:text-white' }}" {{ request()->routeIs('services') ? 'aria-current="page" style="background: rgba(255,255,255,0.10);"' : '' }}>Services</a>
+            <a href="{{ route('about') }}" class="transition-colors text-sm {{ request()->routeIs('about') ? 'text-white rounded-full px-3 py-1 shadow-sm' : 'text-gray-200 hover:text-white' }}" {{ request()->routeIs('about') ? 'aria-current="page" style="background: rgba(255,255,255,0.10);"' : '' }}>About Us</a>
         </nav>
 
         <div class="nav-right flex items-center gap-3">
@@ -33,9 +33,9 @@
 
     <!-- Mobile Menu -->
     <div x-show="open" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 -translate-y-2" x-transition:enter-end="opacity-100 translate-y-0" x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100 translate-y-0" x-transition:leave-end="opacity-0 -translate-y-2" @click.away="open = false" class="md:hidden mt-3 mobile-nav rounded-2xl shadow-lg">
-    <a href="{{ route('landing') }}" @click="open = false" class="block text-center py-3 px-4 {{ request()->routeIs('landing') ? 'text-white font-medium rounded-t-2xl' : 'text-white hover:bg-white/10 rounded-t-2xl' }}" {{ request()->routeIs('landing') ? 'aria-current="page" style="background: rgba(255,255,255,0.18);"' : '' }}>Home</a>
-    <a href="{{ route('services') }}" @click="open = false" class="block text-center py-3 px-4 {{ request()->routeIs('services') ? 'text-white font-medium' : 'text-white hover:bg-white/10' }}" {{ request()->routeIs('services') ? 'aria-current="page" style="background: rgba(255,255,255,0.18);"' : '' }}>Services</a>
-    <a href="{{ route('about') }}" @click="open = false" class="block text-center py-3 px-4 {{ request()->routeIs('about') ? 'text-white font-medium' : 'text-white hover:bg-white/10' }}" {{ request()->routeIs('about') ? 'style="background: rgba(255,255,255,0.18);"' : '' }}>About Us</a>
+    <a href="{{ route('landing') }}" @click="open = false" class="block text-center py-3 px-4 {{ request()->routeIs('landing') ? 'text-white font-medium rounded-t-2xl' : 'text-white hover:bg-white/10 rounded-t-2xl' }}" {{ request()->routeIs('landing') ? 'aria-current="page" style="background: rgba(255,255,255,0.10);"' : '' }}>Home</a>
+    <a href="{{ route('services') }}" @click="open = false" class="block text-center py-3 px-4 {{ request()->routeIs('services') ? 'text-white font-medium' : 'text-white hover:bg-white/10' }}" {{ request()->routeIs('services') ? 'aria-current="page" style="background: rgba(255,255,255,0.10);"' : '' }}>Services</a>
+    <a href="{{ route('about') }}" @click="open = false" class="block text-center py-3 px-4 {{ request()->routeIs('about') ? 'text-white font-medium' : 'text-white hover:bg-white/10' }}" {{ request()->routeIs('about') ? 'style="background: rgba(255,255,255,0.10);"' : '' }}>About Us</a>
         <!-- Make Facebook a full-width mobile menu item with label so it lines up with the other options -->
         <a href="https://www.facebook.com/RenzmanBlindMASSAGE" @click="open = false" class="block text-center py-3 px-4 text-white hover:bg-white/10" target="_blank" rel="noopener noreferrer" aria-label="Facebook">
             <span class="inline-flex items-center justify-center gap-2">
