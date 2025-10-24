@@ -206,7 +206,7 @@
     <!-- Page 2: Services Section -->
     <section id="services" class="scroll-section">
         <div class="container mx-auto h-full flex flex-col justify-center">
-            <div class="absolute inset-0 bg-black/40"></div>
+            <!-- overlay removed to keep section background clean -->
             <div class="relative z-10 flex flex-col">
             <div class="text-center mb-4 sm:mb-8">
                 <h2 class="text-3xl sm:text-4xl font-bold">Our Signature Services</h2>
@@ -246,7 +246,7 @@
     <!-- Page 3: Our Branches Section -->
     <section id="branches" class="scroll-section">
         <div class="container mx-auto h-full flex flex-col justify-center">
-            <div class="absolute inset-0 bg-black/30"></div>
+            <!-- overlay removed to keep section background clean -->
             <div class="relative z-10 flex flex-col">
             <div class="text-center mb-4 sm:mb-8">
                 <h2 class="text-3xl sm:text-4xl font-bold">Visit Our Branches</h2>
