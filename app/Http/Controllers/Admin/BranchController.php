@@ -9,6 +9,18 @@ use Illuminate\Support\Facades\Storage;
 
 class BranchController extends Controller
 {
+    public function destroy(Branch $branch)
+    {
+        // Delete branch image if exists
+        if ($branch->image_url) {
+            if (strpos($branch->image_url, '/storage/') === 0) {
+                $path = substr($branch->image_url, 9); // remove '/storage/'
+                \Storage::disk('public')->delete($path);
+            }
+        }
+        $branch->delete();
+        return redirect()->route('admin.branches.index')->with('success', 'Branch deleted successfully.');
+    }
     // List branches in admin
     public function index()
     {
@@ -81,4 +93,5 @@ class BranchController extends Controller
 
         return redirect()->back()->with('success', 'Branch image removed successfully.');
     }
-}
+
+    }
