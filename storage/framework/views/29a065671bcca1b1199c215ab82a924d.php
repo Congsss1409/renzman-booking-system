@@ -1,8 +1,6 @@
-@extends('layouts.Booking')
+<?php $__env->startSection('title', 'Step 4: Your Details'); ?>
 
-@section('title', 'Step 4: Your Details')
-
-@section('content')
+<?php $__env->startSection('content'); ?>
 <div class="glass-panel rounded-3xl max-w-6xl mx-auto overflow-hidden shadow-2xl">
     <div class="grid md:grid-cols-2">
         
@@ -36,15 +34,15 @@
                 <p class="mt-2 text-lg text-black">This information will be used to confirm your booking.</p>
             </div>
 
-            @if ($errors->any())
+            <?php if($errors->any()): ?>
                 <div class="mb-4 bg-red-500/30 border border-red-400 text-black px-4 py-3 rounded-lg relative" role="alert">
                     <ul>
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
+                        <?php $__currentLoopData = $errors->all(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $error): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                            <li><?php echo e($error); ?></li>
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                     </ul>
                 </div>
-            @endif
+            <?php endif; ?>
 
             <form x-data="{
                 showPrivacyModal: false,
@@ -56,30 +54,30 @@
                         this.scrolledToBottom = true;
                     }
                 }
-            }" x-ref="bookingForm" action="{{ route('booking.store.step-four') }}" method="POST">
-                @csrf
+            }" x-ref="bookingForm" action="<?php echo e(route('booking.store.step-four')); ?>" method="POST">
+                <?php echo csrf_field(); ?>
                 <div class="space-y-6 text-black">
                     <div>
                         <label for="client_name" class="block text-lg font-semibold mb-2 text-black">Full Name</label>
-               <input type="text" name="client_name" id="client_name" required
-                   class="w-full p-4 bg-white/10 rounded-lg border border-white/30 focus:outline-none focus:ring-2 focus:ring-white text-black" placeholder="e.g., Jane Doe">
+                        <input type="text" name="client_name" id="client_name" value="<?php echo e(old('client_name', $booking->client_name ?? '')); ?>" required
+                               class="w-full p-4 bg-white/10 rounded-lg border border-white/30 focus:outline-none focus:ring-2 focus:ring-white text-black" placeholder="e.g., Jane Doe">
                     </div>
                     <div>
                         <label for="client_email" class="block text-lg font-semibold mb-2 text-black">Email Address</label>
-               <input type="email" name="client_email" id="client_email" required
-                   class="w-full p-4 bg-white/10 rounded-lg border border-white/30 focus:outline-none focus:ring-2 focus:ring-white text-black" placeholder="you@example.com">
+                        <input type="email" name="client_email" id="client_email" value="<?php echo e(old('client_email', $booking->client_email ?? '')); ?>" required
+                               class="w-full p-4 bg-white/10 rounded-lg border border-white/30 focus:outline-none focus:ring-2 focus:ring-white text-black" placeholder="you@example.com">
                     </div>
                      <div>
                         <label for="client_phone" class="block text-lg font-semibold mb-2 text-black">Phone Number</label>
-               <input type="tel" name="client_phone" id="client_phone" required
-                   pattern="^[0-9]{11}$" maxlength="11" minlength="11" inputmode="numeric" oninput="this.value=this.value.replace(/[^0-9]/g,'')"
-             class="w-full p-4 bg-white/10 rounded-lg border border-white/30 focus:outline-none focus:ring-2 focus:ring-white text-black" placeholder="e.g., 09171234567">
+                        <input type="tel" name="client_phone" id="client_phone" value="<?php echo e(old('client_phone', $booking->client_phone ?? '')); ?>" required
+                               pattern="^[0-9]{11}$" maxlength="11" minlength="11" inputmode="numeric" oninput="this.value=this.value.replace(/[^0-9]/g,'')"
+                   class="w-full p-4 bg-white/10 rounded-lg border border-white/30 focus:outline-none focus:ring-2 focus:ring-white text-black" placeholder="e.g., 09171234567">
                <small class="text-black/70 text-sm">Please enter exactly 11 numbers (digits only)</small>
                     </div>
                 </div>
 
                     <div class="mt-10 flex justify-between">
-                    <a href="{{ route('booking.create.step-three') }}" class="bg-white/20 text-white font-bold py-3 px-10 rounded-full shadow-md hover:bg-white/30 transition-all transform hover:scale-105">
+                    <a href="<?php echo e(route('booking.create.step-three')); ?>" class="bg-white/20 text-white font-bold py-3 px-10 rounded-full shadow-md hover:bg-white/30 transition-all transform hover:scale-105">
                         &larr; Back
                     </a>
                     <!-- Open privacy modal before submitting -->
@@ -127,4 +125,5 @@
         </div>
     </div>
 </div>
-@endsection
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('layouts.Booking', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\xampp\htdocs\renzman-booking-system\resources\views/booking/step-four.blade.php ENDPATH**/ ?>

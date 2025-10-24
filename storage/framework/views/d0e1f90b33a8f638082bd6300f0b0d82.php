@@ -1,8 +1,8 @@
-@extends('layouts.app')
 
-@section('title', 'About Us')
 
-@section('content')
+<?php $__env->startSection('title', 'About Us'); ?>
+
+<?php $__env->startSection('content'); ?>
 <style>
     /* Custom styles for the Liquid Glass effect */
     .glass-panel {
@@ -33,9 +33,9 @@
     }
 </style>
 
-<div class="relative min-h-screen w-full text-black overflow-x-hidden bg-cover bg-center bg-no-repeat" style="background-image: url('{{ asset('images/store4.jpg') }}');">
+<div class="relative min-h-screen w-full text-black overflow-x-hidden bg-cover bg-center bg-no-repeat" style="background-image: url('<?php echo e(asset('images/store4.jpg')); ?>');">
     
-    @include('partials.header')
+    <?php echo $__env->make('partials.header', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 
     <!-- Floating decorative blobs -->
     <div class="absolute top-0 -left-20 w-72 h-72 bg-teal-400 rounded-full mix-blend-soft-light filter blur-xl opacity-70 animate-blob"></div>
@@ -53,7 +53,7 @@
 
                 <div class="mt-12 sm:mt-16 grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center">
                     <div>
-                        <img src="{{ asset('images/store.jpg') }}" alt="A relaxing spa environment" class="rounded-2xl shadow-xl">
+                        <img src="<?php echo e(asset('images/store.jpg')); ?>" alt="A relaxing spa environment" class="rounded-2xl shadow-xl">
                     </div>
                     <div class="glass-panel rounded-2xl p-6 sm:p-8">
                         <h2 class="text-2xl sm:text-3xl font-bold">Our Mission</h2>
@@ -80,9 +80,9 @@
                     <div>
                                 <h3 class="font-bold text-lg">Quick Links</h3>
                                 <ul class="mt-2 space-y-1 text-sm text-black">
-                                    <li><a href="{{ route('landing') }}#services" class="hover:text-black">Services</a></li>
-                                    <li><a href="{{ route('landing') }}#branches" class="hover:text-black">Branches</a></li>
-                                    <li><a href="{{ route('about') }}" class="hover:text-black">About Us</a></li>
+                                    <li><a href="<?php echo e(route('landing')); ?>#services" class="hover:text-black">Services</a></li>
+                                    <li><a href="<?php echo e(route('landing')); ?>#branches" class="hover:text-black">Branches</a></li>
+                                    <li><a href="<?php echo e(route('about')); ?>" class="hover:text-black">About Us</a></li>
                         </ul>
                     </div>
                     <div>
@@ -94,11 +94,13 @@
                     </div>
                 </div>
                 <div class="border-t border-white/20 mt-8 pt-6 text-center text-sm text-black">
-                    <p>&copy; {{ date('Y') }} Renzman. All rights reserved. <span class="mx-2">|</span> <a href="{{ url('/login') }}" class="hover:text-white underline">Admin Login</a></p>
+                    <p>&copy; <?php echo e(date('Y')); ?> Renzman. All rights reserved. <span class="mx-2">|</span> <a href="<?php echo e(url('/login')); ?>" class="hover:text-white underline">Admin Login</a></p>
                 </div>
             </div>
         </footer>
     </div>
 </div>
-@endsection
+<?php $__env->stopSection(); ?>
 
+
+<?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\xampp\htdocs\renzman-booking-system\resources\views/about.blade.php ENDPATH**/ ?>

@@ -1,8 +1,6 @@
-@extends('layouts.app')
+<?php $__env->startSection('title', 'Our Services'); ?>
 
-@section('title', 'Our Services')
-
-@section('content')
+<?php $__env->startSection('content'); ?>
 <style>
     /* Custom styles for the Liquid Glass effect */
     .glass-panel {
@@ -33,7 +31,7 @@
     }
 </style>
 
-<div class="relative min-h-screen w-full text-black overflow-x-hidden bg-cover bg-center bg-no-repeat" style="background-image: url('{{ asset('images/store4.jpg') }}');">
+<div class="relative min-h-screen w-full text-black overflow-x-hidden bg-cover bg-center bg-no-repeat" style="background-image: url('<?php echo e(asset('images/store4.jpg')); ?>');">
     
     <!-- Floating decorative blobs -->
     <div class="absolute top-0 -left-20 w-72 h-72 bg-teal-400 rounded-full mix-blend-soft-light filter blur-xl opacity-70 animate-blob"></div>
@@ -41,7 +39,7 @@
     <div class="absolute -bottom-8 left-20 w-72 h-72 bg-emerald-400 rounded-full mix-blend-soft-light filter blur-xl opacity-70 animate-blob animation-delay-4000"></div>
 
     <div class="relative z-10">
-        @include('partials.header')
+        <?php echo $__env->make('partials.header', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 
         <!-- Main Content -->
                     <main class="container mx-auto px-3 sm:px-6 pt-24 pb-16">
@@ -52,13 +50,13 @@
                 </div>
 
                 <div class="mt-12 sm:mt-16 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-                    @forelse($services as $service)
+                    <?php $__empty_1 = true; $__currentLoopData = $services; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $service): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                         <div class="glass-panel rounded-2xl p-6 sm:p-8 text-center shadow-lg transform hover:-translate-y-2 transition-transform duration-300">
-                            <img src="{{ $service->image_url ?? 'https://placehold.co/400x250/FFFFFF/333333?text=' . urlencode($service->name) }}" alt="{{ $service->name }}" class="w-full h-40 sm:h-48 object-cover rounded-lg mb-4">
-                            <h3 class="text-xl sm:text-2xl font-bold">{{ $service->name }}</h3>
-                            <p class="text-black mt-2 text-sm h-16">{{ $service->description }}</p>
-                            <div class="my-4 sm:my-6"><span class="text-3xl sm:text-4xl font-bold">₱{{ number_format($service->price, 2) }}</span><span class="text-black">/ {{ $service->duration }} mins</span></div>
-                            <a href="{{ route('booking.create.step-one') }}" class="mt-4 inline-block glass-btn font-semibold py-3 px-6 sm:px-8 rounded-full transition focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:ring-offset-2">
+                            <img src="<?php echo e($service->image_url ?? 'https://placehold.co/400x250/FFFFFF/333333?text=' . urlencode($service->name)); ?>" alt="<?php echo e($service->name); ?>" class="w-full h-40 sm:h-48 object-cover rounded-lg mb-4">
+                            <h3 class="text-xl sm:text-2xl font-bold"><?php echo e($service->name); ?></h3>
+                            <p class="text-black mt-2 text-sm h-16"><?php echo e($service->description); ?></p>
+                            <div class="my-4 sm:my-6"><span class="text-3xl sm:text-4xl font-bold">₱<?php echo e(number_format($service->price, 2)); ?></span><span class="text-black">/ <?php echo e($service->duration); ?> mins</span></div>
+                            <a href="<?php echo e(route('booking.create.step-one')); ?>" class="mt-4 inline-block glass-btn font-semibold py-3 px-6 sm:px-8 rounded-full transition focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:ring-offset-2">
                                 Book This Service
                             </a>
 </style>
@@ -80,9 +78,9 @@
     }
 </style>
                         </div>
-                    @empty
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                         <p class="col-span-full text-center">Services will be listed here soon.</p>
-                    @endforelse
+                    <?php endif; ?>
                 </div>
             </div>
         </main>
@@ -98,9 +96,9 @@
                     <div>
                         <h3 class="font-bold text-lg">Quick Links</h3>
                         <ul class="mt-2 space-y-1 text-sm text-black">
-                            <li><a href="{{ route('landing') }}#services" class="hover:text-black">Services</a></li>
-                            <li><a href="{{ route('landing') }}#branches" class="hover:text-black">Branches</a></li>
-                            <li><a href="{{ route('about') }}" class="hover:text-black">About Us</a></li>
+                            <li><a href="<?php echo e(route('landing')); ?>#services" class="hover:text-black">Services</a></li>
+                            <li><a href="<?php echo e(route('landing')); ?>#branches" class="hover:text-black">Branches</a></li>
+                            <li><a href="<?php echo e(route('about')); ?>" class="hover:text-black">About Us</a></li>
                         </ul>
                     </div>
                     <div>
@@ -112,11 +110,13 @@
                     </div>
                 </div>
                 <div class="border-t border-white/20 mt-8 pt-6 text-center text-sm text-black">
-                   <p>&copy; {{ date('Y') }} Renzman. All rights reserved. <span class="mx-2">|</span> <a href="{{ url('/login') }}" class="hover:text-white underline">Admin Login</a></p>
+                   <p>&copy; <?php echo e(date('Y')); ?> Renzman. All rights reserved. <span class="mx-2">|</span> <a href="<?php echo e(url('/login')); ?>" class="hover:text-white underline">Admin Login</a></p>
                 </div>
             </div>
             </footer>
     </div>
 </div>
-@endsection
+<?php $__env->stopSection(); ?>
 
+
+<?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\xampp\htdocs\renzman-booking-system\resources\views/services.blade.php ENDPATH**/ ?>

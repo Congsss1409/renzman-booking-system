@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="app.diagrams.net">
+  <diagram name="Client Flow" id="client-flow-1">
+    <mxGraphModel dx="1000" dy="1000" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <!-- Start -->
+        <mxCell id="2" value="Start" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;" vertex="1" parent="1">
+          <mxGeometry x="60" y="60" width="100" height="40" as="geometry" />
+        </mxCell>
+        <!-- Landing Page -->
+        <mxCell id="3" value="Landing Page" style="rhombus;whiteSpace=wrap;html=1;shape=parallelogram;" vertex="1" parent="1">
+          <mxGeometry x="220" y="60" width="140" height="50" as="geometry" />
+        </mxCell>
+        <!-- View Services -->
+        <mxCell id="4" value="View Services" style="rhombus;whiteSpace=wrap;html=1;shape=parallelogram;" vertex="1" parent="1">
+          <mxGeometry x="400" y="20" width="140" height="50" as="geometry" />
+        </mxCell>
+        <!-- View About -->
+        <mxCell id="5" value="View About" style="rhombus;whiteSpace=wrap;html=1;shape=parallelogram;" vertex="1" parent="1">
+          <mxGeometry x="400" y="100" width="140" height="50" as="geometry" />
+        </mxCell>
+        <!-- Booking Step 1 -->
+        <mxCell id="6" value="Booking Step 1: Enter Details" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="220" y="160" width="180" height="50" as="geometry" />
+        </mxCell>
+        <!-- Booking Step 2 -->
+        <mxCell id="7" value="Booking Step 2: Select Service/Therapist" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="220" y="230" width="220" height="50" as="geometry" />
+        </mxCell>
+        <!-- Booking Step 3 -->
+        <mxCell id="8" value="Booking Step 3: Pick Date/Time" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="220" y="300" width="200" height="50" as="geometry" />
+        </mxCell>
+        <!-- Booking Step 4 -->
+        <mxCell id="9" value="Booking Step 4: Confirm Details" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="220" y="370" width="200" height="50" as="geometry" />
+        </mxCell>
+        <!-- Booking Step 5 -->
+        <mxCell id="10" value="Booking Step 5: Verification Code" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="220" y="440" width="200" height="50" as="geometry" />
+        </mxCell>
+        <!-- Resend Code -->
+        <mxCell id="11" value="Resend Code" style="rhombus;whiteSpace=wrap;html=1;shape=parallelogram;" vertex="1" parent="1">
+          <mxGeometry x="440" y="440" width="140" height="50" as="geometry" />
+        </mxCell>
+        <!-- Booking Success -->
+        <mxCell id="12" value="Booking Success" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;" vertex="1" parent="1">
+          <mxGeometry x="220" y="520" width="140" height="50" as="geometry" />
+        </mxCell>
+        <!-- Submit Feedback -->
+        <mxCell id="13" value="Submit Feedback" style="rhombus;whiteSpace=wrap;html=1;shape=parallelogram;" vertex="1" parent="1">
+          <mxGeometry x="400" y="520" width="140" height="50" as="geometry" />
+        </mxCell>
+        <!-- View Therapist Availability -->
+        <mxCell id="14" value="View Therapist Availability" style="rhombus;whiteSpace=wrap;html=1;shape=parallelogram;" vertex="1" parent="1">
+          <mxGeometry x="440" y="160" width="180" height="50" as="geometry" />
+        </mxCell>
+        <!-- Edges -->
+        <mxCell id="15" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;" edge="1" parent="1" source="2" target="3" />
+        <mxCell id="16" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;" edge="1" parent="1" source="3" target="4" />
+        <mxCell id="17" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;" edge="1" parent="1" source="3" target="5" />
+        <mxCell id="18" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;" edge="1" parent="1" source="3" target="6" />
+        <mxCell id="19" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;" edge="1" parent="1" source="6" target="7" />
+        <mxCell id="20" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;" edge="1" parent="1" source="7" target="8" />
+        <mxCell id="21" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;" edge="1" parent="1" source="8" target="9" />
+        <mxCell id="22" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;" edge="1" parent="1" source="9" target="10" />
+        <mxCell id="23" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;" edge="1" parent="1" source="10" target="12" />
+        <mxCell id="24" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;" edge="1" parent="1" source="10" target="11" />
+        <mxCell id="25" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;" edge="1" parent="1" source="12" target="13" />
+        <mxCell id="26" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;" edge="1" parent="1" source="6" target="14" />
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

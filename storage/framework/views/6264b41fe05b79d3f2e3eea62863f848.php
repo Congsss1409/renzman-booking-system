@@ -1,12 +1,10 @@
-@extends('layouts.Booking')
+<?php $__env->startSection('title', 'Step 3: Select Date & Time'); ?>
 
-@section('title', 'Step 3: Select Date & Time')
-
-@section('content')
+<?php $__env->startSection('content'); ?>
 <div class="glass-panel rounded-3xl max-w-6xl mx-auto overflow-hidden shadow-2xl">
     <div class="grid grid-cols-1 items-stretch min-h-[560px]">
 
-    <div class="p-8 md:p-12 flex flex-col h-full" x-data="dateTimePicker('{{ $now }}', {{ json_encode($todayForJs) }}, {{ $extendedSession ? 'true' : 'false' }})">
+    <div class="p-8 md:p-12 flex flex-col h-full" x-data="dateTimePicker('<?php echo e($now); ?>', <?php echo e(json_encode($todayForJs)); ?>, <?php echo e($extendedSession ? 'true' : 'false'); ?>)">
             <div class="mb-8">
                 <div class="flex justify-between items-center text-sm font-semibold text-black mb-2"><span class="text-black">Step 3/5: Date & Time</span><span class="text-black">60%</span></div>
                 <div class="w-full bg-emerald-200/60 rounded-full h-2.5"><div class="bg-emerald-500 h-2.5 rounded-full transition-all duration-300" style="width: 60%"></div></div>
@@ -14,14 +12,21 @@
 
             <div class="text-left mb-8">
                 <h1 class="text-3xl md:text-4xl font-bold text-black">Select Date & Time</h1>
-                <p class="mt-2 text-lg text-black">Choose an available time slot with {{ $therapist->name }}.</p>
+                <p class="mt-2 text-lg text-black">Choose an available time slot with <?php echo e($therapist->name); ?>.</p>
             </div>
 
-            @if (session('error'))<div class="mb-4 p-4 text-sm text-black bg-red-500/30 rounded-lg" role="alert">{{ session('error') }}</div>@endif
-            @error('booking_time')<div class="mb-4 p-4 text-sm text-black bg-red-500/30 rounded-lg" role="alert">{{ $message }}</div>@enderror
+            <?php if(session('error')): ?><div class="mb-4 p-4 text-sm text-black bg-red-500/30 rounded-lg" role="alert"><?php echo e(session('error')); ?></div><?php endif; ?>
+            <?php $__errorArgs = ['booking_time'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?><div class="mb-4 p-4 text-sm text-black bg-red-500/30 rounded-lg" role="alert"><?php echo e($message); ?></div><?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
 
-            <form action="{{ route('booking.store.step-three') }}" method="POST" class="flex flex-col flex-1 text-black">
-                @csrf
+            <form action="<?php echo e(route('booking.store.step-three')); ?>" method="POST" class="flex flex-col flex-1 text-black">
+                <?php echo csrf_field(); ?>
                 <input type="hidden" name="booking_date">
                 <input type="hidden" name="booking_time">
                 
@@ -69,16 +74,16 @@
                     </div>
                 </div>
                 <div class="mt-auto flex justify-between">
-                    <a href="{{ route('booking.create.step-two') }}" class="bg-white/20 text-white font-bold py-3 px-8 rounded-full shadow-md hover:bg-white/30 transition-all transform hover:scale-105">&larr; Back</a>
+                    <a href="<?php echo e(route('booking.create.step-two')); ?>" class="bg-white/20 text-white font-bold py-3 px-8 rounded-full shadow-md hover:bg-white/30 transition-all transform hover:scale-105">&larr; Back</a>
                     <button type="submit" :disabled="!selectedTime" class="bg-white text-teal-600 font-bold py-3 px-8 rounded-full shadow-md hover:bg-cyan-100 transition-all transform hover:scale-105 disabled:bg-gray-400 disabled:cursor-not-allowed disabled:transform-none">Next Step &rarr;</button>
                 </div>
             </form>
         </div>
     </div>
 </div>
-@endsection
+<?php $__env->stopSection(); ?>
 
-@push('scripts')
+<?php $__env->startPush('scripts'); ?>
 <script>
 function dateTimePicker(serverTime, todayForJs, isExtended) { // Accept the new isExtended parameter
     return {
@@ -131,7 +136,7 @@ function dateTimePicker(serverTime, todayForJs, isExtended) { // Accept the new 
             
             // Use the isExtended state variable to build the correct API URL
             const extendedParam = this.isExtended ? '1' : '0';
-            const apiUrl = `/api/therapists/{{ $therapist->id }}/availability/${this.selectedDate}/{{ $service->id }}?extended=${extendedParam}`;
+            const apiUrl = `/api/therapists/<?php echo e($therapist->id); ?>/availability/${this.selectedDate}/<?php echo e($service->id); ?>?extended=${extendedParam}`;
 
             fetch(apiUrl)
                 .then(response => response.json())
@@ -152,4 +157,6 @@ function dateTimePicker(serverTime, todayForJs, isExtended) { // Accept the new 
     }
 }
 </script>
-@endpush
+<?php $__env->stopPush(); ?>
+
+<?php echo $__env->make('layouts.Booking', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\xampp\htdocs\renzman-booking-system\resources\views/booking/step-three.blade.php ENDPATH**/ ?>
