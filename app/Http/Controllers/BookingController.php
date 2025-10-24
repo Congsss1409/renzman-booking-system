@@ -310,73 +310,107 @@ class BookingController extends Controller
     public function getAvailability(Request $request, Therapist $therapist, $date, Service $service)
     {
         $isExtended = $request->query('extended') === '1';
-        $durationInMinutes = $service->duration + ($isExtended ? 60 : 0);
-    
         $selectedDate = Carbon::parse($date, 'Asia/Manila')->startOfDay();
-        
-        // --- START: MODIFIED LOGIC ---
-        
+        // Use client_now if provided, otherwise use server time
+        $clientNow = $request->query('client_now');
+        if ($clientNow) {
+            $now = Carbon::parse($clientNow, 'Asia/Manila');
+        } else {
+            $now = Carbon::now('Asia/Manila');
+        }
         // Define default working hours
         $dayStart = $selectedDate->copy()->hour(8)->minute(0)->second(0); // 8:00 AM
         $dayEnd = $selectedDate->copy()->hour(21)->minute(0)->second(0);   // 9:00 PM
+        $durationInMinutes = $service->duration + ($isExtended ? 60 : 0);
 
-        $now = Carbon::now('Asia/Manila');
+        // Intelligent slot logic
+        if ($selectedDate->isToday()) {
+            if ($now->gt($dayEnd)) {
+                // If it's already past closing, no slots
+                Log::info('No slots: now is after closing', ['now' => $now->toDateTimeString(), 'dayEnd' => $dayEnd->toDateTimeString()]);
+                return response()->json([]);
+            }
+            if ($now->gte($dayStart)) {
+                // If after 8:00 AM, set to next full hour after now
+                $dayStart = $now->copy();
+                if ($dayStart->minute > 0 || $dayStart->second > 0) {
+                    $dayStart->addHour()->startOfHour();
+                }
+                Log::info('Adjusted dayStart for today (intelligent)', ['dayStart' => $dayStart->toDateTimeString()]);
+            } else {
+                // If before 8:00 AM, show all slots from 8:00 AM
+                Log::info('Before opening, show all slots from 8:00 AM', ['dayStart' => $dayStart->toDateTimeString()]);
+            }
+        }
+
+        Log::info('Checking availability', [
+            'therapist_id' => $therapist->id,
+            'date' => $date,
+            'service_id' => $service->id,
+            'isExtended' => $isExtended,
+            'selectedDate' => $selectedDate->toDateTimeString(),
+            'dayStart' => $dayStart->toDateTimeString(),
+            'dayEnd' => $dayEnd->toDateTimeString(),
+            'now' => $now->toDateTimeString(),
+        ]);
 
         if ($selectedDate->isPast()) {
             // If a past date is somehow selected, return no slots.
             return response()->json([]);
         }
 
-        if ($selectedDate->isToday()) {
-            // For today, only allow slots after the current time
-            if ($now->gt($dayEnd)) {
-                // If it's already past closing, no slots
-                return response()->json([]);
-            }
-            if ($now->gt($dayStart)) {
-                $dayStart = $now->copy();
-                // Round up to next full hour
-                if ($dayStart->minute > 0 || $dayStart->second > 0) {
-                    $dayStart->addHour()->startOfHour();
-                }
-            }
-        }
-    
-        // --- END: MODIFIED LOGIC ---
-    
         $existingBookings = Booking::where('therapist_id', $therapist->id)
             ->whereDate('start_time', $selectedDate->toDateString())
             ->whereIn('status', ['Confirmed', 'In Progress', 'Pending Verification'])
             ->orderBy('start_time')
             ->get(['start_time', 'end_time']);
-    
+
+        Log::info('Existing bookings', [
+            'bookings' => $existingBookings->toArray()
+        ]);
+
         $availableSlots = [];
         $potentialSlotStart = $dayStart->copy();
-    
+        $debugSlots = [];
+
+        Log::info('Slot loop start', [
+            'potentialSlotStart' => $potentialSlotStart->toDateTimeString(),
+            'dayEnd' => $dayEnd->toDateTimeString(),
+            'durationInMinutes' => $durationInMinutes
+        ]);
+
         // Loop through potential slots until the end of the working day
         while ($potentialSlotStart->copy()->addMinutes($durationInMinutes) <= $dayEnd) {
             $potentialSlotEnd = $potentialSlotStart->copy()->addMinutes($durationInMinutes);
-    
+
             $isConflict = false;
             foreach ($existingBookings as $booking) {
                 $bookingStart = Carbon::parse($booking->start_time);
                 $bookingEnd = Carbon::parse($booking->end_time);
-    
+
                 if ($potentialSlotStart < $bookingEnd && $potentialSlotEnd > $bookingStart) {
                     $isConflict = true;
                     break;
                 }
             }
-    
+
+            $debugSlots[] = [
+                'start' => $potentialSlotStart->format('Y-m-d H:i'),
+                'end' => $potentialSlotEnd->format('Y-m-d H:i'),
+                'isConflict' => $isConflict
+            ];
+
             if (!$isConflict) {
                 $availableSlots[] = $potentialSlotStart->format('H:i');
             }
-            
-            // --- INTERVAL CHANGE ---
             // Move to the next potential slot, 1 hour later
             $potentialSlotStart->addHour();
         }
-    
+        Log::info('Slot loop end', [
+            'slots' => $debugSlots,
+            'availableSlots' => $availableSlots
+        ]);
+
         return response()->json($availableSlots);
     }
 }
