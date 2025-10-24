@@ -178,7 +178,8 @@
 
     /* Sections styling to match the hero look */
     section.scroll-section { padding:4rem 1rem; position:relative; }
-    .glass-panel { background: rgba(255,255,255,0.06); border-radius:1rem; padding:1rem; border:1px solid rgba(255,255,255,0.08); }
+    /* Make cards more opaque for readability */
+    .glass-panel { background: rgba(255,255,255,0.9); border-radius:1rem; padding:1rem; border:1px solid rgba(0,0,0,0.06); }
     .section-inner { max-width:1200px; margin:0 auto; }
     h2.section-title { font-size:2rem; color:#062425; margin-bottom:0.5rem; }
     p.section-sub { color: rgba(3,15,15,0.7); margin-bottom:1.25rem; }
@@ -186,6 +187,11 @@
     .branch-card { border-radius:0.75rem; overflow:hidden; box-shadow:0 8px 30px rgba(2,6,23,0.06); }
     .testimonial-card { background: rgba(255,255,255,0.95); padding:1rem; border-radius:1rem; box-shadow:0 6px 24px rgba(2,6,23,0.06); }
     footer .glass-panel { background: rgba(255,255,255,0.04); }
+
+    /* Force black headings for key sections so they read clearly over the background */
+    section#services h2,
+    section#branches h2,
+    section#testimonials h2 { color: #062425 !important; }
 </style>
 
 
