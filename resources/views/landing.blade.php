@@ -117,34 +117,34 @@
         .hero-left .hero-title { color: #fff !important; }
         .hero-left .hero-desc { color: #000 !important; }
     .hero-right { flex:1 1 0%; display:flex; align-items:center; justify-content:center; padding:2rem; }
-    /* Center and style hero image to look professional */
+    /* Center and style hero image as wide glass card (80-90% width) with smaller border */
     .hero-img {
         display:block;
-        margin:0 auto;
-        width:320px;
-        height:320px;
-        max-width:80%;
+        margin:0 auto 1.4rem;
+        width:90%;          /* occupy 80-90% of the hero column */
+        max-width:760px;    /* don't get too wide on very large screens */
+        height:auto;        /* keep aspect ratio */
         border-radius:1rem;
         object-fit:cover;
         background:#fff;
-        border:8px solid rgba(255,255,255,0.95);
-        box-shadow:0 22px 60px rgba(2,6,23,0.18), 0 6px 18px rgba(2,6,23,0.08);
+        border:6px solid rgba(255,255,255,0.98); /* reduced border */
+        box-shadow:0 28px 70px rgba(2,6,23,0.18), 0 8px 22px rgba(2,6,23,0.08);
     }
     @media (max-width: 1200px) {
         .hero-content { padding:6rem 1rem 4.5rem; }
         .hero-title { font-size:4rem; }
-        .hero-img { width:260px; height:260px; }
+        .hero-img { width:88%; max-width:640px; height:auto; }
     }
     @media (max-width: 960px) {
         .hero-content { flex-direction:column-reverse; gap:1.5rem; padding:2.5rem 1rem; }
         .hero-left, .hero-right { padding:1rem; text-align:center; align-items:center; }
         .hero-title { font-size:2.25rem; }
-        .hero-img { width:220px; height:220px; }
+        .hero-img { width:86%; max-width:520px; height:auto; }
     }
     @media (max-width: 520px) {
         .main-navbar { width: calc(100% - 20px); margin: 0.6rem auto; }
         .hero-title { font-size:1.5rem; }
-    .hero-img { width:180px; height:180px; }
+    .hero-img { width:80%; max-width:360px; height:auto; }
         .main-navbar { padding:0.6rem; }
         .main-navbar nav { display:none; }
         .main-navbar .mobile-toggle { display:block; }
