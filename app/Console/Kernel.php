@@ -24,10 +24,14 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule): void
     {
-        $schedule
-            ->command('bookings:update-status')
-            ->everyFiveMinutes()
-            ->withoutOverlapping();
+        // $schedule->command('inspire')->hourly();
+
+        // --- ADD THIS LINE ---
+        $schedule->command('bookings:update-status')->everyMinute();
+
+        // You can add your other commands here too
+         $schedule->command('app:auto-complete-bookings')->everyMinute();
+         $schedule->command('app:update-therapist-live-status')->everyMinute();
     }
 
     /**
