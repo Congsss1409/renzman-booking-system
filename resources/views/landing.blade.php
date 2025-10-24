@@ -77,6 +77,27 @@
 
     .hero-img.animate-float { animation: floatY 5.5s ease-in-out infinite; }
     .hero-btn.animate-pulse { animation: pulseLift 2.8s ease-in-out infinite; }
+    /* Late caption for therapist (subtle, delayed reveal) */
+    .therapist-caption {
+        margin-top: 0.6rem;
+        display: inline-block;
+        background: rgba(255,255,255,0.9);
+        color: #062425;
+        padding: 0.45rem 0.9rem;
+        border-radius: 9999px;
+        font-weight:600;
+        font-size:0.9rem;
+        box-shadow: 0 8px 22px rgba(2,6,23,0.08);
+        transform: translateY(8px);
+        opacity: 0;
+        transition: opacity .6s cubic-bezier(.2,.9,.2,1) .12s, transform .6s cubic-bezier(.2,.9,.2,1) .12s;
+        border: 1px solid rgba(0,0,0,0.04);
+        backdrop-filter: blur(4px);
+    }
+    .therapist-caption.in-view {
+        opacity: 1;
+        transform: translateY(0);
+    }
 
     header { animation: navIn 520ms cubic-bezier(.2,.9,.2,1) 120ms both; }
 
@@ -251,6 +272,8 @@
         </div>
         <div class="hero-right">
             <img src="{{ asset('images/thera.png') }}" alt="Our therapists at Renzman" class="hero-img" />
+            <!-- Late animated caption representing our visually-impaired therapist (accessible, non-intrusive) -->
+            <div class="therapist-caption" role="note" aria-label="Our therapists are visually impaired and trained">👩‍🦯 Our therapists are visually impaired — highly trained & compassionate</div>
         </div>
     </div>
 </div>
@@ -472,6 +495,12 @@
         const btn = document.querySelector('.hero-btn');
         if (img) img.classList.add('animate-float');
         if (btn) btn.classList.add('animate-pulse');
+        // Late reveal for therapist caption to give a subtle, delayed appearance
+        const caption = document.querySelector('.therapist-caption');
+        if (caption) {
+            // Delay slightly longer than other hero animations for a 'late' effect
+            setTimeout(() => caption.classList.add('in-view'), 950);
+        }
     });
 })();
 </script>
