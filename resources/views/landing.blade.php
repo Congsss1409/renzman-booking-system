@@ -104,29 +104,9 @@
     /* image wrapper: center contents so caption sits under the image */
     .hero-img-wrap { position: relative; display: block; text-align: center; }
 
-    /* cloud bump decorations for the caption */
-    .therapist-caption::before,
-    .therapist-caption::after {
-        content: '';
-        position: absolute;
-        top: -18px;
-        width: 44px;
-        height: 44px;
-        background: rgba(255,255,255,0.98);
-        border-radius: 50%;
-        box-shadow: 0 18px 40px rgba(2,6,23,0.08);
-        border: 1px solid rgba(0,0,0,0.04);
-    }
-    .therapist-caption::before { left: 8px; }
-    .therapist-caption::after { right: 8px; }
-
-    /* responsive: slightly smaller bumps and spacing on small screens */
+    /* responsive: spacing for small screens */
     @media (max-width: 960px) {
         .therapist-caption { display: inline-block; margin: 0.8rem auto 0; transform: translateY(12px); }
-        .therapist-caption::before,
-        .therapist-caption::after { width: 32px; height: 32px; top: -12px; }
-        .therapist-caption::before { left: 6px; }
-        .therapist-caption::after { right: 6px; }
     }
 
     header { animation: navIn 520ms cubic-bezier(.2,.9,.2,1) 120ms both; }
