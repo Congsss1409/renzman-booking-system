@@ -70,33 +70,43 @@
     .main-navbar .social a:hover { background: rgba(255,255,255,0.06); }
     .hero-content { display:flex; gap:2.5rem; align-items:center; justify-content:space-between; flex:1 1 0%; padding:7.5rem 1rem 6rem; max-width:1300px; margin:0 auto; width:100%; }
 
-    /* Subtle page animations */
-    @keyframes floatY { 0%{ transform: translateY(0);} 50%{ transform: translateY(-6px);} 100%{ transform: translateY(0);} }
-    @keyframes pulseLift { 0%,100%{ transform: translateY(0) scale(1);} 50%{ transform: translateY(-4px) scale(1.02);} }
-    @keyframes navIn { 0%{ transform: translateY(-12px); opacity:0;} 100%{ transform: translateY(0); opacity:1;} }
+    /* Subtle page animations (reduced intensity + prefers-reduced-motion support) */
+    @keyframes floatY { 0%{ transform: translateY(0);} 50%{ transform: translateY(-4px);} 100%{ transform: translateY(0);} }
+    @keyframes pulseLift { 0%,100%{ transform: translateY(0) scale(1);} 50%{ transform: translateY(-2px) scale(1.01);} }
+    @keyframes navIn { 0%{ transform: translateY(-10px); opacity:0;} 100%{ transform: translateY(0); opacity:1;} }
 
-    .hero-img.animate-float { animation: floatY 6s ease-in-out infinite; }
-    .hero-btn.animate-pulse { animation: pulseLift 3.2s ease-in-out infinite; }
+    .hero-img.animate-float { animation: floatY 5.5s ease-in-out infinite; }
+    .hero-btn.animate-pulse { animation: pulseLift 2.8s ease-in-out infinite; }
 
-    header { animation: navIn 700ms cubic-bezier(.2,.9,.2,1) 120ms both; }
+    header { animation: navIn 520ms cubic-bezier(.2,.9,.2,1) 120ms both; }
 
     /* fade-up reveal used across sections */
-    .fade-up { opacity: 0; transform: translateY(14px); transition: opacity .6s ease, transform .6s ease; }
+    .fade-up { opacity: 0; transform: translateY(12px); transition: opacity .6s ease, transform .6s ease; }
     .fade-up.in-view { opacity: 1; transform: translateY(0); }
 
     /* staggered children reveal */
-    .staggered > * { opacity: 0; transform: translateY(8px); transition: transform .5s ease, opacity .5s ease; }
+    .staggered > * { opacity: 0; transform: translateY(6px); transition: transform .5s ease, opacity .5s ease; }
     .staggered.in-view > * { opacity: 1; transform: translateY(0); }
-    .staggered.in-view > *:nth-child(1){ transition-delay: .06s; }
-    .staggered.in-view > *:nth-child(2){ transition-delay: .12s; }
-    .staggered.in-view > *:nth-child(3){ transition-delay: .18s; }
-    .staggered.in-view > *:nth-child(4){ transition-delay: .24s; }
-    .staggered.in-view > *:nth-child(5){ transition-delay: .30s; }
-    .staggered.in-view > *:nth-child(6){ transition-delay: .36s; }
+    .staggered.in-view > *:nth-child(1){ transition-delay: .05s; }
+    .staggered.in-view > *:nth-child(2){ transition-delay: .10s; }
+    .staggered.in-view > *:nth-child(3){ transition-delay: .15s; }
+    .staggered.in-view > *:nth-child(4){ transition-delay: .20s; }
+    .staggered.in-view > *:nth-child(5){ transition-delay: .25s; }
+    .staggered.in-view > *:nth-child(6){ transition-delay: .30s; }
 
     /* small hover lift for social icons */
     .nav-right .social a { transition: transform .18s ease, box-shadow .18s ease; }
-    .nav-right .social a:hover { transform: translateY(-3px); }
+    .nav-right .social a:hover { transform: translateY(-2px); }
+
+    /* Respect user preference to reduce motion */
+    @media (prefers-reduced-motion: reduce) {
+        .hero-img.animate-float,
+        .hero-btn.animate-pulse,
+        header,
+        .fade-up,
+        .staggered,
+        .nav-right .social a { animation: none !important; transition: none !important; transform: none !important; }
+    }
     .hero-left { flex:1 1 0%; padding:2rem; display:flex; flex-direction:column; align-items:flex-start; justify-content:center; }
     .hero-title { font-size:5.25rem; font-weight:900; line-height:0.98; margin-bottom:0.6rem; color:#fff; text-shadow: 0 10px 36px rgba(0,0,0,0.26); }
     .hero-desc { font-size:1.05rem; margin-bottom:1.6rem; color: #000 !important; max-width:520px; }
