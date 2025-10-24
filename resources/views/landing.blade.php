@@ -44,12 +44,13 @@
     }
     /* header glass style used on About page navbar */
     .header-glass {
-        background: rgba(0, 0, 0, 0.25);
+        /* make header fully pill-shaped and tint to match landing palette */
+        background: rgba(12, 92, 66, 0.12); /* subtle teal tint */
         backdrop-filter: blur(12px);
         -webkit-backdrop-filter: blur(12px);
-        border: 1px solid rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.08);
         padding: 0.4rem 0.75rem;
-        border-radius: 12px;
+        border-radius: 9999px !important; /* force pill shape on landing */
     }
     .mobile-nav {
         background: rgba(0, 0, 0, 0.4);
