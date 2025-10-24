@@ -79,24 +79,48 @@
     .hero-btn.animate-pulse { animation: pulseLift 2.8s ease-in-out infinite; }
     /* Late caption for therapist (subtle, delayed reveal) */
     .therapist-caption {
-        margin-top: 0.6rem;
-        display: inline-block;
-        background: rgba(255,255,255,0.9);
+        /* default hidden badge styles (desktop) */
+        position: absolute;
+        right: -34px;
+        top: 22%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        width: 180px;
+        min-height: 64px;
+        background: rgba(255,255,255,0.95);
         color: #062425;
-        padding: 0.45rem 0.9rem;
+        padding: 0.6rem 0.9rem;
         border-radius: 9999px;
         font-weight:600;
         font-size:0.9rem;
-        box-shadow: 0 8px 22px rgba(2,6,23,0.08);
+        box-shadow: 0 12px 30px rgba(2,6,23,0.09);
         transform: translateY(8px);
         opacity: 0;
         transition: opacity .6s cubic-bezier(.2,.9,.2,1) .12s, transform .6s cubic-bezier(.2,.9,.2,1) .12s;
-        border: 1px solid rgba(0,0,0,0.04);
+        border: 1px solid rgba(0,0,0,0.06);
         backdrop-filter: blur(4px);
     }
     .therapist-caption.in-view {
         opacity: 1;
         transform: translateY(0);
+    }
+
+    /* image wrapper to anchor the caption badge */
+    .hero-img-wrap { position: relative; display: inline-block; }
+
+    /* responsive: stack caption under image on smaller screens */
+    @media (max-width: 960px) {
+        .therapist-caption {
+            position: static;
+            width: auto;
+            min-height: 0;
+            margin: 0.8rem auto 0;
+            display: inline-block;
+            transform: translateY(8px);
+        }
+        .hero-img-wrap { display:block; }
     }
 
     header { animation: navIn 520ms cubic-bezier(.2,.9,.2,1) 120ms both; }
@@ -271,9 +295,11 @@
             <a href="{{ route('booking.create.step-one') }}" class="hero-btn">Book an Appointment</a>
         </div>
         <div class="hero-right">
-            <img src="{{ asset('images/thera.png') }}" alt="Our therapists at Renzman" class="hero-img" />
-            <!-- Late animated caption representing our visually-impaired therapist (accessible, non-intrusive) -->
-            <div class="therapist-caption" role="note" aria-label="Our therapists are visually impaired and trained">👩‍🦯 Our therapists are visually impaired — highly trained & compassionate</div>
+            <div class="hero-img-wrap">
+                <img src="{{ asset('images/thera.png') }}" alt="Our therapists at Renzman" class="hero-img" />
+                <!-- Late animated caption representing our visually-impaired therapist (accessible, non-intrusive) -->
+                <div class="therapist-caption" role="note" aria-label="Our therapists are visually impaired and trained">👩‍🦯 Our therapists are visually impaired — highly trained &amp; compassionate</div>
+            </div>
         </div>
     </div>
 </div>
