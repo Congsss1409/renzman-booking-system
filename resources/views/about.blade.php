@@ -94,7 +94,7 @@
                         </div>
                 </div>
                 <div class="border-t border-white/20 mt-8 pt-6 text-center text-sm text-black">
-                    <p>&copy; {{ date('Y') }} Renzman. All rights reserved.</p>
+                    <p>&copy; {{ date('Y') }} Renzman. All rights reserved. <span class="mx-2">|</span> <a href="{{ url('/admin/login') }}" class="hover:text-white underline">Admin Login</a></p>
                 </div>
             </div>
         </footer>
