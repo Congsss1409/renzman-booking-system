@@ -117,22 +117,34 @@
         .hero-left .hero-title { color: #fff !important; }
         .hero-left .hero-desc { color: #000 !important; }
     .hero-right { flex:1 1 0%; display:flex; align-items:center; justify-content:center; padding:2rem; }
-    .hero-img { max-width:900px; width:100%; border-radius:1.5rem; box-shadow:0 40px 110px rgba(2,6,23,0.16); background:#fff; object-fit:cover; border:10px solid rgba(255,255,255,0.22); }
+    /* Center and style hero image to look professional */
+    .hero-img {
+        display:block;
+        margin:0 auto;
+        width:320px;
+        height:320px;
+        max-width:80%;
+        border-radius:1rem;
+        object-fit:cover;
+        background:#fff;
+        border:8px solid rgba(255,255,255,0.95);
+        box-shadow:0 22px 60px rgba(2,6,23,0.18), 0 6px 18px rgba(2,6,23,0.08);
+    }
     @media (max-width: 1200px) {
         .hero-content { padding:6rem 1rem 4.5rem; }
         .hero-title { font-size:4rem; }
-        .hero-img { max-width:720px; }
+        .hero-img { width:260px; height:260px; }
     }
     @media (max-width: 960px) {
         .hero-content { flex-direction:column-reverse; gap:1.5rem; padding:2.5rem 1rem; }
         .hero-left, .hero-right { padding:1rem; text-align:center; align-items:center; }
         .hero-title { font-size:2.25rem; }
-        .hero-img { max-width:420px; }
+        .hero-img { width:220px; height:220px; }
     }
     @media (max-width: 520px) {
         .main-navbar { width: calc(100% - 20px); margin: 0.6rem auto; }
         .hero-title { font-size:1.5rem; }
-        .hero-img { max-width:220px; }
+    .hero-img { width:180px; height:180px; }
         .main-navbar { padding:0.6rem; }
         .main-navbar nav { display:none; }
         .main-navbar .mobile-toggle { display:block; }
@@ -238,7 +250,7 @@
             <a href="{{ route('booking.create.step-one') }}" class="hero-btn">Book an Appointment</a>
         </div>
         <div class="hero-right">
-            <img src="{{ asset('images/thera.png') }}" alt="Our therapists at Renzman" class="hero-img" />
+            <img src="{{ asset('images/massage-hands.jpg') }}" alt="Our therapists at Renzman" class="hero-img" />
         </div>
     </div>
 </div>
