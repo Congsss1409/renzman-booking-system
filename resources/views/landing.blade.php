@@ -250,7 +250,7 @@
             <a href="{{ route('booking.create.step-one') }}" class="hero-btn">Book an Appointment</a>
         </div>
         <div class="hero-right">
-            <img src="{{ asset('images/massage-hands.jpg') }}" alt="Our therapists at Renzman" class="hero-img" />
+            <img src="{{ asset('images/thera.png') }}" alt="Our therapists at Renzman" class="hero-img" />
         </div>
     </div>
 </div>
