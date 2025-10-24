@@ -22,18 +22,22 @@ class UserController extends Controller
 
     public function store(Request $request)
     {
+
         $data = $request->validate([
-            'name' => 'required|string|max:255',
+            'first_name' => 'required|string|max:100',
+            'middle_name' => 'nullable|string|max:100',
+            'last_name' => 'required|string|max:100',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|string|min:6|confirmed',
-            'role' => 'nullable|string|in:admin,therapist',
         ]);
 
+        $fullName = trim($data['first_name'] . ' ' . ($data['middle_name'] ? $data['middle_name'] . ' ' : '') . $data['last_name']);
+
         $user = User::create([
-            'name' => $data['name'],
+            'name' => $fullName,
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
-            'role' => $data['role'] ?? 'admin',
+            'role' => 'admin',
         ]);
 
         return redirect()->route('admin.users.index')->with('success', 'User created successfully.');
@@ -46,21 +50,23 @@ class UserController extends Controller
 
     public function update(Request $request, User $user)
     {
+
         $data = $request->validate([
-            'name' => 'required|string|max:255',
+            'first_name' => 'required|string|max:100',
+            'middle_name' => 'nullable|string|max:100',
+            'last_name' => 'required|string|max:100',
             'email' => 'required|email|unique:users,email,' . $user->id,
             'password' => 'nullable|string|min:6|confirmed',
-            'role' => 'nullable|string|in:admin,therapist',
         ]);
 
-        $user->name = $data['name'];
+        $fullName = trim($data['first_name'] . ' ' . ($data['middle_name'] ? $data['middle_name'] . ' ' : '') . $data['last_name']);
+
+        $user->name = $fullName;
         $user->email = $data['email'];
         if (!empty($data['password'])) {
             $user->password = Hash::make($data['password']);
         }
-        if (isset($data['role'])) {
-            $user->role = $data['role'];
-        }
+        $user->role = 'admin';
         $user->save();
 
         return redirect()->route('admin.users.index')->with('success', 'User updated successfully.');
