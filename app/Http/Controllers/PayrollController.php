@@ -147,53 +147,48 @@ class PayrollController extends Controller
             'period_end' => 'required|date|after_or_equal:period_start',
         ]);
         $start = \Carbon\Carbon::parse($data['period_start'])->startOfDay();
-        $end = \Carbon\Carbon::parse($data['period_end'])->startOfDay();
+        $end = \Carbon\Carbon::parse($data['period_end'])->endOfDay();
 
         $created = 0;
 
-        // iterate each day in the range and create payrolls per therapist per day
-        for ($date = $start->copy(); $date->lte($end); $date->addDay()) {
-            $dayStart = $date->copy()->startOfDay();
-            $dayEnd = $date->copy()->endOfDay();
+        // Generate one payroll per therapist for the entire requested period
+        $therapistIds = Booking::whereBetween('start_time', [$start, $end])
+            ->whereRaw('LOWER(status) = ?', ['completed'])
+            ->groupBy('therapist_id')
+            ->pluck('therapist_id');
 
-            $therapistIds = Booking::whereBetween('start_time', [$dayStart, $dayEnd])
+        foreach ($therapistIds as $tid) {
+            $gross = Booking::where('therapist_id', $tid)
+                ->whereBetween('start_time', [$start, $end])
                 ->whereRaw('LOWER(status) = ?', ['completed'])
-                ->groupBy('therapist_id')
-                ->pluck('therapist_id');
+                ->sum('price');
 
-            foreach ($therapistIds as $tid) {
-                $gross = Booking::where('therapist_id', $tid)
-                    ->whereBetween('start_time', [$dayStart, $dayEnd])
-                    ->whereRaw('LOWER(status) = ?', ['completed'])
-                    ->sum('price');
+            if ($gross <= 0) continue;
 
-                if ($gross <= 0) continue;
+            // skip if payroll already exists for this therapist and the exact same period
+            $exists = Payroll::where('therapist_id', $tid)
+                ->whereDate('period_start', $start->toDateString())
+                ->whereDate('period_end', $end->toDateString())
+                ->exists();
 
-                // skip if payroll already exists for this therapist and day
-                $exists = Payroll::where('therapist_id', $tid)
-                    ->whereDate('period_start', $dayStart->toDateString())
-                    ->whereDate('period_end', $dayStart->toDateString())
-                    ->exists();
+            if ($exists) continue;
 
-                if ($exists) continue;
+            $therapistShare = round($gross * 0.6, 2);
+            $ownerShare = round($gross * 0.4, 2);
 
-                $therapistShare = round($gross * 0.6, 2);
-                $ownerShare = round($gross * 0.4, 2);
+            Payroll::create([
+                'therapist_id' => $tid,
+                'period_start' => $start->toDateString(),
+                'period_end' => $end->toDateString(),
+                'gross' => $gross,
+                'therapist_share' => $therapistShare,
+                'owner_share' => $ownerShare,
+                'deductions' => 0,
+                'net' => $therapistShare,
+                'status' => 'draft',
+            ]);
 
-                Payroll::create([
-                    'therapist_id' => $tid,
-                    'period_start' => $dayStart->toDateString(),
-                    'period_end' => $dayStart->toDateString(),
-                    'gross' => $gross,
-                    'therapist_share' => $therapistShare,
-                    'owner_share' => $ownerShare,
-                    'deductions' => 0,
-                    'net' => $therapistShare,
-                    'status' => 'draft',
-                ]);
-
-                $created++;
-            }
+            $created++;
         }
 
         return redirect()->route('admin.payrolls.index')->with('success', "Generated {$created} payroll(s) from bookings");
