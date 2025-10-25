@@ -324,7 +324,9 @@ class BookingController extends Controller
         $durationInMinutes = $service->duration + ($isExtended ? 60 : 0);
 
         // Intelligent slot logic
-        if ($selectedDate->isToday()) {
+        // Use the computed $now (which may come from client_now) when deciding "today"
+        // so that client timezone and provided now are respected.
+        if ($selectedDate->isSameDay($now)) {
             if ($now->gt($dayEnd)) {
                 // If it's already past closing, no slots
                 Log::info('No slots: now is after closing', ['now' => $now->toDateTimeString(), 'dayEnd' => $dayEnd->toDateTimeString()]);
@@ -354,8 +356,8 @@ class BookingController extends Controller
             'now' => $now->toDateTimeString(),
         ]);
 
-        if ($selectedDate->isPast()) {
-            // If a past date is somehow selected, return no slots.
+        // If the selected date is before the current day (in $now timezone), return no slots.
+        if ($selectedDate->lt($now->copy()->startOfDay())) {
             return response()->json([]);
         }
 
