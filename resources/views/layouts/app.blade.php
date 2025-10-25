@@ -31,6 +31,7 @@
         body { font-family: 'Poppins', sans-serif; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
         [x-cloak] { display: none !important; }
     </style>
+    @stack('styles')
 </head>
 <body class="bg-gray-50">
 
@@ -38,6 +39,7 @@
 
     {{-- The new booking modal will likely be part of a page's content,
          so it will be included via the @yield directive above. --}}
-
+</body>
+    @stack('scripts')
 </body>
 </html>

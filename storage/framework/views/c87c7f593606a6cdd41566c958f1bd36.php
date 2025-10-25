@@ -70,4 +70,4 @@
         <a href="<?php echo e(route('booking.create.step-one')); ?>" class="block text-center bg-white/20 hover:bg-white/30 text-white font-bold py-4 px-4 rounded-b-2xl">Book Now</a>
     </div>
 </header>
-<?php /**PATH C:\xampp\htdocs\renzman-booking-system\resources\views/partials/header.blade.php ENDPATH**/ ?>
+<?php /**PATH C:\Desktop\renzman-booking-system\resources\views/partials/header.blade.php ENDPATH**/ ?>

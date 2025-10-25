@@ -31,13 +31,15 @@
         body { font-family: 'Poppins', sans-serif; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
         [x-cloak] { display: none !important; }
     </style>
+    <?php echo $__env->yieldPushContent('styles'); ?>
 </head>
 <body class="bg-gray-50">
 
     <?php echo $__env->yieldContent('content'); ?>
 
     
-
+</body>
+    <?php echo $__env->yieldPushContent('scripts'); ?>
 </body>
 </html>
-<?php /**PATH C:\xampp\htdocs\renzman-booking-system\resources\views/layouts/app.blade.php ENDPATH**/ ?>
+<?php /**PATH C:\Desktop\renzman-booking-system\resources\views/layouts/app.blade.php ENDPATH**/ ?>
