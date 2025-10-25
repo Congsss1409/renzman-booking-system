@@ -187,10 +187,29 @@
             <div class="section-title">Earnings</div>
             <table>
                 <thead>
-                    
+                    <tr>
+                        <th>Description</th>
+                        <th class="amount-column">Amount (PHP)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($payroll->items as $item)
+                    <tr>
+                        <td style="vertical-align:top">{{ $item->description }}</td>
+                        <td class="amount-column">{{ number_format($item->amount, 2) }}</td>
+                    </tr>
+                    @endforeach
                     <tr class="total-row">
-                        <td><strong>Total Earnings</strong></td>
-                        <td class="amount-column"><strong>{{ number_format(($payroll->therapist_share ?? 0) + $payroll->items->sum('amount'), 2) }}</strong></td>
+                        <td><strong>Gross Total</strong></td>
+                        <td class="amount-column"><strong>{{ number_format($payroll->gross, 2) }}</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Therapist (60%)</td>
+                        <td class="amount-column">{{ number_format($payroll->therapist_share ?? 0, 2) }}</td>
+                    </tr>
+                    <tr>
+                        <td>Owner (40%)</td>
+                        <td class="amount-column">{{ number_format($payroll->owner_share ?? 0, 2) }}</td>
                     </tr>
                 </tbody>
             </table>

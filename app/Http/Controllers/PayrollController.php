@@ -188,6 +188,47 @@ class PayrollController extends Controller
                 'status' => 'draft',
             ]);
 
+            // Retrieve the created payroll so we can attach items (one per completed booking)
+            $payroll = Payroll::where('therapist_id', $tid)
+                ->whereDate('period_start', $start->toDateString())
+                ->whereDate('period_end', $end->toDateString())
+                ->orderBy('id', 'desc')
+                ->first();
+
+            if ($payroll) {
+                $bookings = Booking::with('service')
+                    ->where('therapist_id', $tid)
+                    ->whereBetween('start_time', [$start, $end])
+                    ->whereRaw('LOWER(status) = ?', ['completed'])
+                    ->orderBy('start_time')
+                    ->get();
+
+                foreach ($bookings as $b) {
+                    $serviceName = $b->service->name ?? 'Service';
+                    $when = Carbon::parse($b->start_time)->format('M d, Y H:i');
+                    $client = $b->client_name ?? null;
+                    $descriptionParts = [$serviceName, $when];
+                    if ($b->id) {
+                        $descriptionParts[] = "Booking #{$b->id}";
+                    }
+                    if ($client) {
+                        $descriptionParts[] = $client;
+                    }
+                    $description = implode(' — ', $descriptionParts);
+                    $payroll->items()->create([
+                        'description' => $description,
+                        'amount' => $b->price,
+                    ]);
+                }
+
+                // Recalculate payroll totals from items to ensure accuracy
+                $payroll->gross = $payroll->items()->sum('amount');
+                $payroll->therapist_share = round($payroll->gross * 0.6, 2);
+                $payroll->owner_share = round($payroll->gross * 0.4, 2);
+                $payroll->net = round($payroll->therapist_share - $payroll->deductions, 2);
+                $payroll->save();
+            }
+
             $created++;
         }
 
